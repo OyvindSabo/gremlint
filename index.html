@@ -28,6 +28,10 @@
   const format = (query) => {
     // Remove all whitespaes
     query = query.replace(/\s/g, '');
+    // Split on punctuation
+    query = query.split('.').map(operator => operator + '.');
+
+    query = query.join('');
     return '<code>' + query + '</code>';
   }
 </script>

@@ -25,13 +25,39 @@
 </style>
 
 <script>
+  // Function to flatten an array
+  const flatten = array => {
+    flatArray = [];
+    for (let element of array) {
+      if (Array.isArray(element)) {
+        flatArray.push(flatten(element));
+      } else {
+        flatArray.push(element);
+      }
+    }
+    return flatArray;
+  }
+
   const format = (query) => {
     // Remove all whitespaes
     query = query.replace(/\s/g, '');
     // Split on punctuation
-    query = query.split('.').map(operator => operator + '.');
+    query = query.split('.');
+    // If there are multiple open parentheses, then newline and indent all of the following lines
+    for (let lineIndex of Object.keys(query)) {
+      if (query[lineIndex].split('(').length > 2) {
+        query[lineIndex] = query[lineIndex].split('(').join('(<br>');
+      }
+    }
 
-    query = query.join('');
+
+
+    // Add space before all elements which are not one of the first three
+    query = query.map((element, index) => element = index < 3 ? element : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + element);
+    // Add newline before all elements which are not one of the first three
+    query = query.map((element, index) => element = index < 3 ? element : '<br>' + element);
+
+    query = query.join('.');
     return '<code>' + query + '</code>';
   }
 </script>

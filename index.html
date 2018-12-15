@@ -52,6 +52,7 @@
     let unclosedParenthesisCount = 0;
     let indentCount = 6;
     let unclosedString = false;
+    let unclosedValue = false;
     // Swap all double quotes for single quotes
     query = query.replace(/"/g, "'");
     queryArray = query.split('');
@@ -84,10 +85,17 @@
           // If another open parenthesis is found before the closing parenthesis, add newline
           if (query.substr(i+1).indexOf('(') < query.substr(i+1).indexOf(')') && query.substr(i+1).indexOf('(') !== -1) {
             queryArray[i] = queryArray[i] + '<br>' + spaces(indentCount);
+          } else if (![')', "'"].includes(queryArray[i+1])) {
+            queryArray[i] = queryArray[i] + "<span style='color:Orange;'>"
+            unclosedValue = true;
           }
         } else if (queryArray[i] === ')') {
           unclosedParenthesisCount--;
           indentCount -= 2;
+          if (unclosedValue) {
+            queryArray[i] = '</span>' + queryArray[i];
+            unclosedValue = false;
+          }
         }
       }
     }

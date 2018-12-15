@@ -42,7 +42,18 @@
     // Swap all double quotes for single quotes
     query = query.replace(/"/g, "'");
     queryArray = query.split('');
-    for (let i = 0; i < queryArray.length; i++) {
+
+
+    for (let i = 0; i < query.indexOf('g.V()'); i++) {
+      if (!unclosedString & /\n/.test(queryArray[i])) {
+        queryArray[i] = '<br>';
+      }
+      if (queryArray[i] === ' ') {
+        queryArray[i] = '&nbsp;';
+      }
+    }
+    // Format Gremlin
+    for (let i = query.indexOf('g.V()'); i < queryArray.length; i++) {
       if (queryArray[i] === "'") {
         unclosedString = !unclosedString;
         if (unclosedString) {

@@ -25,20 +25,6 @@
 </style>
 
 <script>
-  // Function to flatten an array
-  const recursiveFlatten = array => {
-    flatArray = [];
-    for (let element of array) {
-      if (Array.isArray(element)) {
-        flatArray.push(...recursiveFlatten(element));
-      } else {
-        flatArray.push(element);
-      }
-    }
-    console.log('flatArray: ', flatArray);
-    return flatArray;
-  }
-  
   const spaces = (numberOfSpaces) => {
     spaceArray = [];
     for (let i = 0; i < numberOfSpaces; i++) {

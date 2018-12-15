@@ -58,6 +58,11 @@
     for (let i = 0; i < queryArray.length; i++) {
       if (queryArray[i] === "'") {
         unclosedString = !unclosedString;
+        if (unclosedString) {
+          queryArray[i] = "<span style='color:Green;'>" + queryArray[i];
+        } else {
+          queryArray[i] = queryArray[i] + '</span>';
+        }
       }
       if (!unclosedString & /\s/.test(queryArray[i])) {
         queryArray[i] = '';

@@ -35,17 +35,20 @@
   }
 
   const format = (query) => {
+    
+    // Adjust input window height
     document.getElementById('inputQuery').rows = Math.max(query.split('\n').length, 10);
     let dotCount = 0;
     let unclosedParenthesisCount = 0;
     let indentCount = 6;
     let unclosedString = false;
     let unclosedValue = false;
+
     // Swap all double quotes for single quotes
     query = query.replace(/"/g, "'");
     queryArray = query.split('');
 
-
+    // Basic formatting for whatever comes before Gremlin
     for (let i = 0; i < query.indexOf('g.V()'); i++) {
       if (!unclosedString & /\n/.test(queryArray[i])) {
         queryArray[i] = '<br>';
@@ -54,29 +57,28 @@
         queryArray[i] = '&nbsp;';
       }
     }
+
     // Format Gremlin
     for (let i = query.indexOf('g.V()'); i < queryArray.length; i++) {
       if (queryArray[i] === "'") {
         unclosedString = !unclosedString;
-        if (unclosedString) {
-          queryArray[i] = "<span style='color:Green;'>" + queryArray[i];
-        } else {
-          queryArray[i] = queryArray[i] + '</span>';
-        }
+        queryArray[i] = unclosedString
+          ? "<span style='color:Green;'>" + queryArray[i]
+          : queryArray[i] + '</span>';
       }
-      if (!unclosedString & /\s/.test(queryArray[i])) {
-        queryArray[i] = '';
-      }
-      if (queryArray[i] === ',') {
-        queryArray[i] = ', ';
-      }
+
+      // Remove any spacey characters
+      !unclosedString && /\s/.test(queryArray[i]) && (queryArray[i] = '');
+
+      // Add space after commas
+      queryArray[i] === ',' && (queryArray[i] = ', ');
+
       if (queryArray[i] === '.') {
         dotCount++;
         if (dotCount > 2) {
+          
           // Check if punctuation newline is required
-          if (queryArray[i] === '.') {
-            queryArray[i] = queryArray[i] + '<br>' + spaces(indentCount);
-          }
+          queryArray[i] === '.' && (queryArray[i] += '<br>' + spaces(indentCount));
         }
       }
       if (dotCount > 1) {
@@ -87,6 +89,8 @@
           // If another open parenthesis is found before the closing parenthesis, add newline
           if (query.substr(i+1).indexOf('(') < query.substr(i+1).indexOf(')') && query.substr(i+1).indexOf('(') !== -1) {
             queryArray[i] = queryArray[i] + '<br>' + spaces(indentCount);
+          
+          // Highlight parenthesis content orange if the next character is not the close parenthesis or the start of a string
           } else if (![')', "'"].includes(queryArray[i+1])) {
             queryArray[i] = queryArray[i] + "<span style='color:Orange;'>"
             unclosedValue = true;
@@ -94,6 +98,8 @@
         } else if (queryArray[i] === ')') {
           unclosedParenthesisCount--;
           indentCount -= 2;
+          
+          // Close highlighting of parenthesis content
           if (unclosedValue) {
             queryArray[i] = '</span>' + queryArray[i];
             unclosedValue = false;

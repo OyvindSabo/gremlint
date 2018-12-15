@@ -34,6 +34,7 @@
   }
 
   const format = (query) => {
+    document.getElementById('inputQuery').rows = Math.max(query.split('\n').length, 10);
     let dotCount = 0;
     let unclosedParenthesisCount = 0;
     let indentCount = 6;
@@ -64,6 +65,9 @@
       }
       if (!unclosedString & /\s/.test(queryArray[i])) {
         queryArray[i] = '';
+      }
+      if (queryArray[i] === ',') {
+        queryArray[i] = ', ';
       }
       if (queryArray[i] === '.') {
         dotCount++;

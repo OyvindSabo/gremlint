@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<style>
+  #formatter {
+    font-family: Arial;
+    color: #2F3D45;
+    width: 1200px;
+  }
+  #inputQuery {
+    background-color: #f5f5f5;
+    border-radius: 0.5vw;
+    border-style:solid;
+    font-size: 14px;
+    color: #2F3D45;
+    outline: none;
+    padding: 14px;
+    border:none;
+    width: 100%;
+  }
+  #outputQuery {
+    word-break: break-all;
+    text-align: left;
+    padding: 14px;
+  }
+</style>
+
+<script>
+  const format = (query) => {
+    // Remove all whitespaes
+    query = query.replace(/\s/g, '');
+    return '<code>' + query + '</code>';
+  }
+</script>
+
+<body>
+  <center>
+    <div id='formatter' >
+      <form>
+        <textarea id='inputQuery'
+                  name='input'
+                  cols=100
+                  rows=10
+                  oninput="document.getElementById('outputQuery').innerHTML=format(value);"></textarea>
+      </form>
+      <div id='outputQuery'></div>
+    </div>
+  </center>
+</body>

@@ -75,19 +75,21 @@
 
       if (queryArray[i] === '.') {
         dotCount++;
-        if (dotCount > 2) {
-          
-          // Check if punctuation newline is required
-          queryArray[i] === '.' && (queryArray[i] += '<br>' + spaces(indentCount));
-        }
+        
+        // Add punctuation newline for each dot after g.V().
+        dotCount > 2 && queryArray[i] === '.' && (queryArray[i] += '<br>' + spaces(indentCount));
       }
-      if (dotCount > 1) {
+
+      // Only consider parenthesis newlines after g.V().
+      if (dotCount >= 2) {
+        
         // Check if open parenthesis newline is required
         if (queryArray[i] === '(') {
           unclosedParenthesisCount++;
           indentCount += 2;
+          
           // If another open parenthesis is found before the closing parenthesis, add newline
-          if (query.substr(i+1).indexOf('(') < query.substr(i+1).indexOf(')') && query.substr(i+1).indexOf('(') !== -1) {
+          if (query.substring(i+1).indexOf('(') < query.substring(i+1).indexOf(')') && query.substring(i+1).indexOf('(') !== -1) {
             queryArray[i] = queryArray[i] + '<br>' + spaces(indentCount);
           
           // Highlight parenthesis content orange if the next character is not the close parenthesis or the start of a string

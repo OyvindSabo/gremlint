@@ -26,13 +26,9 @@
 </style>
 
 <script>
-  const spaces = (numberOfSpaces) => {
-    spaceArray = [];
-    for (let i = 0; i < numberOfSpaces; i++) {
-      spaceArray.push('&nbsp;');
-    }
-    return spaceArray.join('');
-  }
+  
+  // Returns a given number of consecutive non-breaking spaces
+  const spaces = (numberOfSpaces) => Array(numberOfSpaces+1).join('&nbsp');
 
   const format = (query) => {
     

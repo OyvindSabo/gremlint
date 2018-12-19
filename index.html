@@ -72,8 +72,10 @@
       if (queryArray[i] === '.') {
         dotCount++;
         
-        // Add punctuation newline for each dot after g.V().
-        dotCount > 2 && queryArray[i] === '.' && (queryArray[i] += '<br>' + spaces(indentCount));
+        // Add punctuation newline for each dot after g.V()
+        queryArray[i-1] !== 'g' && queryArray[i+1] + queryArray[i+2] + queryArray[i+3] !== 'V()' &&
+        queryArray[i-5] + queryArray[i-4] + queryArray[i-3] + queryArray[i-2] + queryArray[i-1] !== 'g.V()' &&
+        (queryArray[i] += '<br>' + spaces(indentCount));
       }
 
       // Only consider parenthesis newlines after g.V().

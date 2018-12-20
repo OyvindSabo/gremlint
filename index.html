@@ -26,6 +26,9 @@
 </style>
 
 <script>
+  const rainbowColors = ['f00', 'f80', '880', '8f0', '0f0', '0f8', '088', '08f', '00f', '80f'];
+
+  const superWord = 'oyvindsort';
   
   // Returns a given number of consecutive non-breaking spaces
   const spaces = (numberOfSpaces) => Array(numberOfSpaces+1).join('&nbsp');
@@ -61,6 +64,14 @@
         queryArray[i] = unclosedString
           ? "<span style='color:Green;'>" + queryArray[i]
           : queryArray[i] + '</span>';
+      }
+
+      if (queryArray.slice(i, i + superWord.length).join('') === superWord) {
+	    for(let j = 0; j < superWord.length; j++) {
+ 	        queryArray[i + j] = "<span style='color:#" + rainbowColors[j] + ";'>" + queryArray[i + j] + "</span>";
+	    }
+        i += superWord.length;
+	    continue;
       }
 
       // Remove any spacey characters

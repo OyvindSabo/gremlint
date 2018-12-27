@@ -69,6 +69,10 @@
       // Add space after commas
       queryArray[i] === ',' && (queryArray[i] = ', ');
 
+      // Escape HTML characters
+      queryArray[i] === '<' && (queryArray[i] = '&lt;');
+      queryArray[i] === '>' && (queryArray[i] = '&gt;');
+
       if (queryArray[i] === '.') {
         dotCount++;
         

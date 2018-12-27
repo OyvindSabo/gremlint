@@ -102,7 +102,7 @@
           }
         } else if (queryArray[i] === ')') {
           unclosedParenthesisCount--;
-          unclosedParenthesisCount < gDotV[gDotV.length-1] && (gDotV.length = gDotV.length-1);
+          unclosedParenthesisCount < gDotV[gDotV.length-1] && gDotV.length > 1 && (gDotV.length = gDotV.length-1);
           
           // Close highlighting of parenthesis content
           if (unclosedValue) {

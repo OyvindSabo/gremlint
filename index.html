@@ -40,9 +40,12 @@
     let unclosedParenthesisCount = 0;
     let unclosedString = false;
     let unclosedValue = false;
+    
+    // Boolean value to check if the character currently parsed belongs to a Gremlin section
+    let isGremlin = query.charAt(0) === 'g';
 
-    // Swap all double quotes for single quotes
-    query = query.replace(/"/g, "'");
+    // Set all quotes to single quotes
+    query = query.replace(/"|“|”|‘|’/g, "'");
     queryArray = query.split('');
 
     let vIndex = query.indexOf('g.V()') > 0 ? query.indexOf('g.V()') : 10000;

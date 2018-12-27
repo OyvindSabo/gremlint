@@ -34,9 +34,10 @@
     
     // Adjust input window height
     document.getElementById('inputQuery').rows = Math.max(query.split('\n').length, 10);
-    let dotCount = 0;
+
+    // Store the number of open parenthesis at the time of g.V()
+    let gDotV = [];
     let unclosedParenthesisCount = 0;
-    let indentCount = 6;
     let unclosedString = false;
     let unclosedValue = false;
 
@@ -74,25 +75,25 @@
       queryArray[i] === '>' && (queryArray[i] = '&gt;');
 
       if (queryArray[i] === '.') {
-        dotCount++;
+        queryArray[i-5] + queryArray[i-4] + queryArray[i-3] + queryArray[i-2] + queryArray[i-1] === 'g.V()' &&
+        (gDotV.push(unclosedParenthesisCount));
         
         // Add punctuation newline for each dot after g.V()
         queryArray[i-1] !== 'g' && queryArray[i+1] + queryArray[i+2] + queryArray[i+3] !== 'V()' &&
         queryArray[i-5] + queryArray[i-4] + queryArray[i-3] + queryArray[i-2] + queryArray[i-1] !== 'g.V()' &&
-        (queryArray[i] += '<br>' + spaces(indentCount));
+        (queryArray[i] += '<br>' + spaces(2*unclosedParenthesisCount+6*gDotV.length));
       }
 
       // Only consider parenthesis newlines after g.V().
-      if (dotCount >= 2) {
+      if (gDotV.length) {
         
         // Check if open parenthesis newline is required
         if (queryArray[i] === '(') {
           unclosedParenthesisCount++;
-          indentCount += 2;
           
           // If another open parenthesis is found before the closing parenthesis, add newline
           if (query.substring(i+1).indexOf('(') < query.substring(i+1).indexOf(')') && query.substring(i+1).indexOf('(') !== -1) {
-            queryArray[i] = queryArray[i] + '<br>' + spaces(indentCount);
+            queryArray[i] = queryArray[i] + '<br>' + spaces(2*unclosedParenthesisCount + 6*gDotV.length);
           
           // Highlight parenthesis content orange if the next character is not the close parenthesis or the start of a string
           } else if (![')', "'"].includes(queryArray[i+1])) {
@@ -101,7 +102,7 @@
           }
         } else if (queryArray[i] === ')') {
           unclosedParenthesisCount--;
-          indentCount -= 2;
+          unclosedParenthesisCount < gDotV[gDotV.length-1] && (gDotV.length = gDotV.length-1);
           
           // Close highlighting of parenthesis content
           if (unclosedValue) {

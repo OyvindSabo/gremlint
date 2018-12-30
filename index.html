@@ -34,9 +34,6 @@
   const isAlphabetical = character => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(character);
 
   const format = query => {
-    
-    // Adjust input window height
-    document.getElementById('inputQuery').rows = Math.max(query.split('\n').length, 10);
 
     // Store the number of open parenthesis at the time of g.V()
     let gDotV = [];
@@ -305,7 +302,8 @@
                   name='input'
                   cols=80
                   rows=10
-                  oninput="document.getElementById('outputQuery').innerHTML=format(value);"></textarea>
+                  oninput="document.getElementById('inputQuery').rows = Math.max(value.split('\n').length, 10);
+                           document.getElementById('outputQuery').innerHTML=format(value);"></textarea>
       </form>
       <div id='outputQuery'></div>
     </div>

@@ -28,7 +28,7 @@
 <script>
   
   // Returns a given number of consecutive non-breaking spaces
-  const spaces = numberOfSpaces => Array(numberOfSpaces+1).join('&nbsp');
+  const spaces = numberOfSpaces => Array(numberOfSpaces+1).join('&nbsp;');
 
   const isAlphabetical = character => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(character);
 
@@ -43,6 +43,7 @@
     let unclosedCurlyBracketCount = 0;
     let unclosedString = false;
     let unclosedValue = false;
+    let unclosedComment = false;
     
     // Boolean value to check if the character currently parsed belongs to a Gremlin section
     let isGremlin = query.charAt(0) === 'g';
@@ -58,7 +59,7 @@
       ------------------------------------------------------------------------*/
       
       // Color string content
-      if (queryArray[i] === "'") {
+      if (!unclosedComment && queryArray[i] === "'") {
         unclosedString = !unclosedString;
         queryArray[i] = unclosedString
           ? "<span style='color:Green;'>" + queryArray[i]
@@ -86,19 +87,70 @@
       // The code should be considered Gremlin if all curly brackets are closed only if there is an unfinished g.V() or g.E()
       (queryArray.slice(i, i+4).join('') === 'g.V(' || queryArray.slice(i, i+4).join('') === 'g.E(') && (isGremlin = true);
 
+      // Handle start of comment
+      if (!unclosedComment && queryArray.slice(i, i+2).join('') === '//') {
+        unclosedComment = '//';
+        
+        // Add grey color
+        queryArray[i] = "<span style='color:LightGray;'>" + queryArray[i];
+        
+        // Add space before double slash comment start if there aren't any
+        if (i !== 0 && queryArray[i-1] !== '' && queryArray[i-1].substring(queryArray[i-1].length-4) !== '<br>' && queryArray[i-1].substring(queryArray[i-1].length-6) !== '&nbsp;') {
+          queryArray[i-1] += '&nbsp;';
+        }
+
+        // Add space after double slash comment start if there aren't any
+        if (queryArray[i+2] !== ' ' && queryArray[i+2] !== '&nbsp;') {
+          queryArray[i+1] += '&nbsp;';
+        }
+
+      } else if (!unclosedComment && queryArray.slice(i, i+2).join('') === '/*') {
+        unclosedComment = '/*'
+        
+        // Add grey color
+        queryArray[i] = "<span style='color:LightGray;'>" + queryArray[i];
+
+        // Add space before start of multi-line comment if there aren't any
+        if (i !== 0 && queryArray[i-1] !== '' && queryArray[i-1].substring(queryArray[i-1].length-4) !== '<br>' && queryArray[i-1].substring(queryArray[i-1].length-6) !== '&nbsp;') {
+          queryArray[i-1] += '&nbsp;';
+        }
+
+        // Add space after start of multi-line comment if there aren't any
+        if (queryArray[i+2] !== ' ' && queryArray[i+2] !== '&nbsp;') {
+          queryArray[i+1] += '&nbsp;';
+        }
+      }
+
+      // Handle end of comment
+      if (unclosedComment === '//' && queryArray[i] == '\n') {
+          unclosedComment = false;
+          queryArray[i] += '</span><br>' + spaces(2*unclosedParenthesisCount+6*gDotV.length);
+      } else if (unclosedComment === '/*') {
+        if (queryArray[i] === '\n') {
+          queryArray[i] += '<br>' + spaces(2*unclosedParenthesisCount+6*gDotV.length);
+        } else if (queryArray.slice(i-1, i+1).join('') === '*/') {
+          unclosedComment = false;
+          queryArray[i] += '</span>';
+          if (queryArray[i-2].substring(queryArray[i-2].length-6) !== '&nbsp;' && queryArray[i-2].substring(queryArray[i-2].length-1) !== ' ' && queryArray[i-2].substring(queryArray[i-2].length-4) !== '<br>' && queryArray[i-2] !== '') {
+            queryArray[i-2] += '&nbsp;';
+          }
+        }
+      }
+
       /*------------------------------------------------------------------------
       Groovy-specific formatting
       ------------------------------------------------------------------------*/
 
-      if (!isGremlin) {
+      if (!isGremlin && !unclosedComment) {
+
         // Preserve linebreaks
         !unclosedString && /\n/.test(queryArray[i]) && (queryArray[i] = '<br>');
         
         // Preserve spaces
         queryArray[i] === ' ' && (queryArray[i] = '&nbsp;');
         
-        // Color Groovy reserved keywords
-        if (!isAlphabetical(queryArray[i-1])) {
+        // Color Groovy reserved keywords which are not part of a comment
+        if (!unclosedComment && !isAlphabetical(queryArray[i-1])) {
           queryArray.slice(i, i+8).join('') === 'abstract' && !isAlphabetical(queryArray[i+8]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+7] += '</span>');
           queryArray.slice(i, i+2).join('') === 'as' && !isAlphabetical(queryArray[i+2]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+1] += '</span>');
           queryArray.slice(i, i+6).join('') === 'assert' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
@@ -193,10 +245,10 @@
       Gremlin-specific formatting
       ------------------------------------------------------------------------*/
 
-      if (isGremlin) {
+      if (isGremlin && unclosedComment !== '//') {
 
         // Remove any spaces and newlines
-        !unclosedString && (queryArray[i] === ' ' || queryArray[i] === '\n') && (queryArray[i] = '');
+        !unclosedComment && !unclosedString && (queryArray[i] === ' ' || queryArray[i] === '\n' || queryArray[i] === '&nbsp;') && (queryArray[i] = '');
 
         if (queryArray[i] === '.') {
           (queryArray[i-5] + queryArray[i-4] + queryArray[i-3] + queryArray[i-2] + queryArray[i-1] === 'g.V()' ||
@@ -222,7 +274,7 @@
               queryArray[i] = queryArray[i] + '<br>' + spaces(2*unclosedParenthesisCount + 6*gDotV.length);
           
             // Highlight parenthesis content orange if the next character is not the close parenthesis or the start of a string
-            } else if (![')', "'", '{', '}'].includes(queryArray[i+1])) {
+            } else if (!unclosedComment && ![')', "'", '{', '}'].includes(queryArray[i+1])) {
               queryArray[i] = queryArray[i] + "<span style='color:Orange;'>"
               unclosedValue = true;
             }
@@ -231,7 +283,7 @@
             unclosedParenthesisCount < gDotV[gDotV.length-1] && gDotV.length > 1 && (gDotV.length = gDotV.length-1);
           
             // Close highlighting of parenthesis content
-            if (unclosedValue) {
+            if (!unclosedComment && unclosedValue) {
               queryArray[i] = '</span>' + queryArray[i];
               unclosedValue = false;
             }

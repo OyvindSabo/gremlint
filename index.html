@@ -123,7 +123,7 @@
       }
 
       // Handle end of comment
-      if (unclosedComment === '//' && queryArray[i] == '\n') {
+      if (unclosedComment === '//' && queryArray[i] === '\n') {
           unclosedComment = false;
           queryArray[i] += '</span><br>' + spaces(2*unclosedParenthesisCount+6*gDotV.length);
       } else if (unclosedComment === '/*') {
@@ -145,7 +145,7 @@
       if (!isGremlin && !unclosedComment) {
 
         // Preserve linebreaks
-        !unclosedString && /\n/.test(queryArray[i]) && (queryArray[i] = '<br>');
+        !unclosedString && queryArray[i] === '\n' && (queryArray[i] = '<br>');
         
         // Preserve spaces
         queryArray[i] === ' ' && (queryArray[i] = '&nbsp;');

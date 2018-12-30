@@ -9,6 +9,7 @@
   #inputQuery {
     background-color: #f5f5f5;
     border-radius: 10px;
+    line-height: normal;
     border-style:solid;
     font-size: 18px;
     color: #2F3D45;
@@ -21,6 +22,7 @@
   #outputQuery {
     word-break: break-all;
     border-radius: 10px;
+    line-height: normal;
     text-align: left;
     min-height: 10em;
     font-size: 18px;
@@ -308,7 +310,6 @@
                   oninput="document.getElementById('inputQuery').rows = Math.max(value.split('\n').length, 10);
                            document.getElementById('outputQuery').innerHTML=format(value);"></textarea>
       </form>
-      <br>
       <div id='outputQuery'></div>
     </div>
   </center>

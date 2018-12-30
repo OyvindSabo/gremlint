@@ -1,4 +1,4 @@
-# Gremlint
+![Gremlint logo 1920x360.png](https://cdn.steemitimages.com/DQmVTNMgZkxa2wxJVVLr4yihneNkB9amcYyoH4fVdXdZ3vm/Gremlint%20logo%201920x360.png)
 
 ### What is Gremlint?
 Gremlint is a code formatter which parses Gremlin queries and rewrites them to adhere to certain styling rules.

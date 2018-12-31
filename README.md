@@ -9,5 +9,5 @@ Gremlint is a code formatter which parses Gremlin queries and rewrites them to a
 - Because I have never found a good Gremlin style guide
 
 ### How do I use it?
-Gremlint is simply an HTML document. You can download it and open it in a browser, or simply paste all the code into a JavaScript compatible HTML editor.
+The easiest way to use Gremlint is via the official website (https://gremlint.com). Since Gremlint is just a standalone HTML document, you can easily download it and run it locally if you wish.
 ![Gremlint.png](https://cdn.steemitimages.com/DQmWnS7cztfduGmCWWMyjfGmMzmdAtmR2w3rmBggfdVAenE/Gremlint.png)

@@ -24,7 +24,7 @@
     word-break: break-all;
     border-radius: 10px;
     line-height: normal;
-    min-height: 180px;
+    min-height: 360px;
     text-align: left;
     font-size: 18px;
     padding: 14px;
@@ -307,8 +307,8 @@
         <textarea id='inputQuery'
                   name='input'
                   cols=80
-                  rows=10
-                  oninput="document.getElementById('inputQuery').rows = Math.max(value.split('\n').length, 10);
+                  rows=12
+                  oninput="document.getElementById('inputQuery').rows = Math.max(value.split('\n').length, 12);
                            document.getElementById('outputQuery').innerHTML=format(value);"></textarea>
       </form>
       <div id='outputQuery'></div>

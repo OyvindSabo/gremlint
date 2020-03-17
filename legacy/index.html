@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<style>
+  #formatter {
+    font-family: Arial;
+    max-width: 1200px;
+    color: #2F3D45;
+    width: 100%;
+  }
+  #inputQuery {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    line-height: normal;
+    border-style:solid;
+    font-size: 18px;
+    color: #2F3D45;
+    outline: none;
+    padding: 18px;
+    resize: none;
+    border:none;
+    width: 100%;
+  }
+  #outputQuery {
+    word-break: break-all;
+    border-radius: 10px;
+    line-height: normal;
+    min-height: 360px;
+    text-align: left;
+    font-size: 18px;
+    padding: 18px;
+    width: 100%;
+  }
+</style>
+
+<script>
+  
+  // Returns a given number of consecutive non-breaking spaces
+  const spaces = numberOfSpaces => Array(numberOfSpaces+1).join('&nbsp;');
+
+  const isAlphabetical = character => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(character);
+
+  const format = query => {
+
+    // Store the number of open parenthesis at the time of g.V()
+    let gDotV = [];
+    let unclosedParenthesisCount = 0;
+    let unclosedCurlyBracketCount = 0;
+    let unclosedString = false;
+    let unclosedValue = false;
+    let unclosedComment = false;
+    
+    // Boolean value to check if the character currently parsed belongs to a Gremlin section
+    let isGremlin = query.charAt(0) === 'g';
+
+    // Set all quotes to single quotes
+    query = query.replace(/"|“|”|‘|’/g, "'");
+    queryArray = query.split('');
+
+    for (let i = 0; i < queryArray.length; i++) {
+      
+      /*------------------------------------------------------------------------
+      General formatting
+      ------------------------------------------------------------------------*/
+      
+      // Color string content
+      if (!unclosedComment && queryArray[i] === "'") {
+        unclosedString = !unclosedString;
+        queryArray[i] = unclosedString
+          ? "<span style='color:Green;'>" + queryArray[i]
+          : queryArray[i] + '</span>';
+      }
+
+      // Escape HTML characters
+      queryArray[i] === '<' && (queryArray[i] = '&lt;');
+      queryArray[i] === '>' && (queryArray[i] = '&gt;');
+
+      // Add space after commas if the comma is not within a string
+      queryArray[i] === ',' && !unclosedString && (queryArray[i] = ', ');
+      
+      // Consider code inside curly brackets as Groovy
+      if (queryArray[i] === '{') {
+        unclosedCurlyBracketCount++;
+        isGremlin = false;
+      } else if (query[i] === '}') {
+        unclosedCurlyBracketCount--;
+        if (unclosedCurlyBracketCount === 0) {
+          gDotV.length && (isGremlin = true);
+        }
+      }
+
+      // The code should be considered Gremlin if all curly brackets are closed only if there is an unfinished g.V() or g.E()
+      (queryArray.slice(i, i+4).join('') === 'g.V(' || queryArray.slice(i, i+4).join('') === 'g.E(') && (isGremlin = true);
+
+      // Handle start of comment
+      if (!unclosedComment && queryArray.slice(i, i+2).join('') === '//') {
+        unclosedComment = '//';
+        
+        // Add grey color
+        queryArray[i] = "<span style='color:LightGray;'>" + queryArray[i];
+        
+        // Add space before double slash comment start if there aren't any
+        if (i !== 0 && queryArray[i-1] !== '' && queryArray[i-1].substring(queryArray[i-1].length-4) !== '<br>' && queryArray[i-1].substring(queryArray[i-1].length-6) !== '&nbsp;') {
+          queryArray[i-1] += '&nbsp;';
+        }
+
+        // Add space after double slash comment start if there aren't any
+        if (queryArray[i+2] !== ' ' && queryArray[i+2] !== '&nbsp;') {
+          queryArray[i+1] += '&nbsp;';
+        }
+
+      } else if (!unclosedComment && queryArray.slice(i, i+2).join('') === '/*') {
+        unclosedComment = '/*'
+        
+        // Add grey color
+        queryArray[i] = "<span style='color:LightGray;'>" + queryArray[i];
+
+        // Add space before start of multi-line comment if there aren't any
+        if (i !== 0 && queryArray[i-1] !== '' && queryArray[i-1].substring(queryArray[i-1].length-4) !== '<br>' && queryArray[i-1].substring(queryArray[i-1].length-6) !== '&nbsp;') {
+          queryArray[i-1] += '&nbsp;';
+        }
+
+        // Add space after start of multi-line comment if there aren't any
+        if (queryArray[i+2] !== ' ' && queryArray[i+2] !== '&nbsp;') {
+          queryArray[i+1] += '&nbsp;';
+        }
+      }
+
+      // Handle end of comment
+      if (unclosedComment === '//' && queryArray[i] === '\n') {
+          unclosedComment = false;
+          queryArray[i] += '</span><br>' + spaces(2*unclosedParenthesisCount+6*gDotV.length);
+      } else if (unclosedComment === '/*') {
+        if (queryArray[i] === '\n') {
+          queryArray[i] += '<br>' + spaces(2*unclosedParenthesisCount+6*gDotV.length);
+        } else if (queryArray.slice(i-1, i+1).join('') === '*/') {
+          unclosedComment = false;
+          queryArray[i] += '</span>';
+          if (queryArray[i-2].substring(queryArray[i-2].length-6) !== '&nbsp;' && queryArray[i-2].substring(queryArray[i-2].length-1) !== ' ' && queryArray[i-2].substring(queryArray[i-2].length-4) !== '<br>' && queryArray[i-2] !== '') {
+            queryArray[i-2] += '&nbsp;';
+          }
+        }
+      }
+
+      /*------------------------------------------------------------------------
+      Groovy-specific formatting
+      ------------------------------------------------------------------------*/
+
+      if (!isGremlin && !unclosedComment) {
+
+        // Preserve linebreaks
+        !unclosedString && queryArray[i] === '\n' && (queryArray[i] = '<br>');
+        
+        // Preserve spaces
+        queryArray[i] === ' ' && (queryArray[i] = '&nbsp;');
+        
+        // Color Groovy reserved keywords which are not part of a comment
+        if (!unclosedComment && !isAlphabetical(queryArray[i-1])) {
+          queryArray.slice(i, i+8).join('') === 'abstract' && !isAlphabetical(queryArray[i+8]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+7] += '</span>');
+          queryArray.slice(i, i+2).join('') === 'as' && !isAlphabetical(queryArray[i+2]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+1] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'assert' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'boolean' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'break' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'byte' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'case' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'catch' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'char' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'class' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'const' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+8).join('') === 'continue' && !isAlphabetical(queryArray[i+8]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+7] += '</span>');
+          queryArray.slice(i, i+3).join('') === 'def' && !isAlphabetical(queryArray[i+3]) && (queryArray[i] = "<span style='color:DeepPink;'>" + queryArray[i]) && (queryArray[i+2] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'default' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+2).join('') === 'do' && !isAlphabetical(queryArray[i+2]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+1] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'double' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:DeepPink;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'else' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'enum' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'extends' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'false' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'final' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'finally' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'float' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+3).join('') === 'for' && !isAlphabetical(queryArray[i+3]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+2] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'goto' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+2).join('') === 'if' && !isAlphabetical(queryArray[i+2]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+1] += '</span>');
+          queryArray.slice(i, i+10).join('') === 'implements' && !isAlphabetical(queryArray[i+10]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+9] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'import' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+2).join('') === 'in' && !isAlphabetical(queryArray[i+2]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+1] += '</span>');
+          queryArray.slice(i, i+10).join('') === 'instanceof' && !isAlphabetical(queryArray[i+10]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+9] += '</span>');
+          queryArray.slice(i, i+3).join('') === 'int' && !isAlphabetical(queryArray[i+3]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+2] += '</span>');
+          queryArray.slice(i, i+9).join('') === 'interface' && !isAlphabetical(queryArray[i+9]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+8] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'long' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'native' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+3).join('') === 'new' && !isAlphabetical(queryArray[i+3]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+2] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'null' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'package' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'private' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+9).join('') === 'protected' && !isAlphabetical(queryArray[i+9]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+8] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'public' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'return' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'short' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'static' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+8).join('') === 'strictfp' && !isAlphabetical(queryArray[i+8]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+7] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'super' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'switch' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+12).join('') === 'synchronized' && !isAlphabetical(queryArray[i+12]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+11] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'this' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+10).join('') === 'threadsafe' && !isAlphabetical(queryArray[i+10]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+9] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'throw' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'throws' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+9).join('') === 'transient' && !isAlphabetical(queryArray[i+9]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+8] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'true' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+3).join('') === 'try' && !isAlphabetical(queryArray[i+3]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+2] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'void' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+8).join('') === 'volatile' && !isAlphabetical(queryArray[i+8]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+7] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'while' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:Purple;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+
+          // Dark violet
+          queryArray.slice(i, i+11).join('') === 'DEFAULTLANG' && !isAlphabetical(queryArray[i+11]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+10] += '</span>');
+          queryArray.slice(i, i+12).join('') === 'MILLISECONDS' && !isAlphabetical(queryArray[i+12]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+11] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'SECONDS' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'MINUTES' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'HOURS' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'DAYS' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'WEEKS' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'MONTHS' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'YEARS' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+18).join('') === 'DATEFORMAT_DEFAULT' && !isAlphabetical(queryArray[i+18]) && (queryArray[i] = "<span style='color:DarkViolet;'>" + queryArray[i]) && (queryArray[i+17] += '</span>');
+
+          // Color Groovy classes
+          queryArray.slice(i, i+4).join('') === 'Math' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'Integer' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'Float' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'Double' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'Long' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+10).join('') === 'BigDecimal' && !isAlphabetical(queryArray[i+10]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+9] += '</span>');
+          queryArray.slice(i, i+4).join('') === 'Date' && !isAlphabetical(queryArray[i+4]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+3] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'Geocode' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'Object' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+7).join('') === 'Closure' && !isAlphabetical(queryArray[i+7]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+6] += '</span>');
+          queryArray.slice(i, i+6).join('') === 'String' && !isAlphabetical(queryArray[i+6]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+5] += '</span>');
+          queryArray.slice(i, i+3).join('') === 'Set' && !isAlphabetical(queryArray[i+3]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+2] += '</span>');
+          queryArray.slice(i, i+5).join('') === 'Array' && !isAlphabetical(queryArray[i+5]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+4] += '</span>');
+          queryArray.slice(i, i+13).join('') === 'InvokerHelper' && !isAlphabetical(queryArray[i+13]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+12] += '</span>');
+          queryArray.slice(i, i+9).join('') === 'Exception' && !isAlphabetical(queryArray[i+9]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+8] += '</span>');
+          queryArray.slice(i, i+10).join('') === 'Rowbinding' && !isAlphabetical(queryArray[i+10]) && (queryArray[i] = "<span style='color:DeepSkyBlue;'>" + queryArray[i]) && (queryArray[i+9] += '</span>');
+        }
+      }
+
+      /*------------------------------------------------------------------------
+      Gremlin-specific formatting
+      ------------------------------------------------------------------------*/
+
+      if (isGremlin && unclosedComment !== '//') {
+
+        // Remove any spaces and newlines
+        !unclosedComment && !unclosedString && (queryArray[i] === ' ' || queryArray[i] === '\n' || queryArray[i] === '&nbsp;') && (queryArray[i] = '');
+
+        if (queryArray[i] === '.') {
+          (queryArray[i-5] + queryArray[i-4] + queryArray[i-3] + queryArray[i-2] + queryArray[i-1] === 'g.V()' ||
+          queryArray[i-5] + queryArray[i-4] + queryArray[i-3] + queryArray[i-2] + queryArray[i-1] === 'g.E()') &&
+          (gDotV.push(unclosedParenthesisCount));
+        
+          // Add punctuation newline for each dot after g.V() or g.E()
+          (queryArray[i-1] !== 'g' || queryArray[i+1] + queryArray[i+2] + queryArray[i+3] !== 'V()') &&
+          (queryArray[i-1] !== 'g' || queryArray[i+1] + queryArray[i+2] + queryArray[i+3] !== 'E()') &&
+          queryArray[i-5] + queryArray[i-4] + queryArray[i-3] + queryArray[i-2] + queryArray[i-1] !== 'g.V()' &&
+          queryArray[i-5] + queryArray[i-4] + queryArray[i-3] + queryArray[i-2] + queryArray[i-1] !== 'g.E()' &&
+          (queryArray[i] += '<br>' + spaces(2*unclosedParenthesisCount+6*gDotV.length));
+        }
+        // Only consider parenthesis newlines after g.V() or g.E().
+        if (gDotV.length) {
+        
+          // Check if open parenthesis newline is required
+          if (queryArray[i] === '(') {
+            unclosedParenthesisCount++;
+
+            // If another open parenthesis is found before the closing parenthesis, add newline
+            if (query.substring(i+1).indexOf('(') < query.substring(i+1).indexOf(')') && query.substring(i+1).indexOf('(') !== -1) {
+              queryArray[i] = queryArray[i] + '<br>' + spaces(2*unclosedParenthesisCount + 6*gDotV.length);
+          
+            // Highlight parenthesis content orange if the next character is not the close parenthesis or the start of a string
+            } else if (!unclosedComment && ![')', "'", '{', '}'].includes(queryArray[i+1])) {
+              queryArray[i] = queryArray[i] + "<span style='color:Orange;'>"
+              unclosedValue = true;
+            }
+          } else if (queryArray[i] === ')') {
+            unclosedParenthesisCount--;
+            unclosedParenthesisCount < gDotV[gDotV.length-1] && gDotV.length > 1 && (gDotV.length = gDotV.length-1);
+          
+            // Close highlighting of parenthesis content
+            if (!unclosedComment && unclosedValue) {
+              queryArray[i] = '</span>' + queryArray[i];
+              unclosedValue = false;
+            }
+          }
+        }
+      }
+    }
+    let formattedQuery = queryArray.join('');
+    return '<code>' + formattedQuery + '</code>';
+  }
+</script>
+
+<body>
+  <center>
+    <div id='formatter' >
+      <form>
+        <textarea id='inputQuery'
+                  name='input'
+                  cols=80
+                  rows=12
+                  oninput="document.getElementById('inputQuery').rows = Math.max(value.split('\n').length, 12);
+                           document.getElementById('outputQuery').innerHTML=format(value);"></textarea>
+      </form>
+      <div id='outputQuery'></div>
+    </div>
+  </center>
+</body>

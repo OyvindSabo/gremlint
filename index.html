@@ -770,6 +770,14 @@
       padding: '10px',
     });
 
+  const Navigator = (...children) =>
+    div$(...children).setStyle({ padding: '10px 0', marginBottom: '20px' });
+
+  const NavigatorLink = ({ title, to }) =>
+    a$(title)
+      .setProps({ href: `#!${to}` })
+      .setStyle({ marginRight: '20px' });
+
   const CodeFormatter = ({ state }) =>
     div$(
       QueryInput(state.queryInput$).onInput(({ value }) => {
@@ -797,6 +805,10 @@
 
   const App = ({ state, currentRoute$ }) =>
     CenteredContainer(
+      Navigator(
+        NavigatorLink({ title: 'Query formatter', to: '/' }),
+        NavigatorLink({ title: 'Test cases', to: '/test-cases' })
+      ),
       Switch$(currentRoute$)(
         '/',
         CodeFormatter({ state }),
@@ -809,7 +821,7 @@
 <script>
   window.onload = () => {
     const router = new Router({
-      '/': 'Gremlint - Gremlin code formatter',
+      '/': 'Gremlint - Gremlin query formatter',
       '/test-cases': 'Gremlint - Test cases',
     });
 

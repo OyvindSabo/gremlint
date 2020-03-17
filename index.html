@@ -779,7 +779,21 @@
       QueryOutput(state.queryOutput$)
     );
 
-  const TestCases = ({ state }) => div$('Test cases');
+  const testCases = [`g.V().hasLabel('application')`, `g.V().limit(10)`];
+  const TestCases = ({ state }) =>
+    div$(
+      ...testCases.map(query => {
+        const formattedQuery = formatQuery(query);
+        return div$(
+          QueryOutput(query).setStyle({
+            background: formattedQuery === query ? 'lightgreen' : 'lightpink',
+          }),
+          QueryOutput(formattedQuery)
+        ).setStyle({
+          marginBottom: '20px',
+        });
+      })
+    );
 
   const App = ({ state, currentRoute$ }) =>
     CenteredContainer(

@@ -643,7 +643,7 @@
       return element;
     };
     element.onInput = inputCallback => {
-      element.oninput = () => inputCallback(element);
+      element.addEventListener('input', () => inputCallback(element));
       return element;
     };
     return element;

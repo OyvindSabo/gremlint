@@ -1,0 +1,31 @@
+
+<script>
+const dependencyHell = {}
+const createDependencyHell = path => dependencyHell[path];
+
+dependencyHell['src/utils2.js'] = (() => {
+return {
+  printHelloWorld: () => 'Hello, world!',
+};
+
+})();
+
+dependencyHell['src/utils.js'] = (() => {
+const { printHelloWorld } = createDependencyHell('src/utils2.js');
+return {
+  printHelloWorld,
+};
+
+})();
+
+dependencyHell['src/index.js'] = (() => {
+const { printHelloWorld } = createDependencyHell('src/utils.js');
+
+window.onload = () => {
+  const div = document.createElement('div');
+  div.innerText = printHelloWorld();
+  document.body.appendChild(div);
+};
+
+})();
+</script>

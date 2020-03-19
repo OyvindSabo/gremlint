@@ -1,0 +1,3 @@
+return {
+  printHelloWorld: () => 'Hello, world!',
+};

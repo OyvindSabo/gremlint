@@ -28,7 +28,14 @@ while (importQueue.length) {
 }
 const topologicallyOrderedFiles = getOrderedListOfFiles(importedFilePaths);
 topologicallyOrderedFiles.forEach(({ path, content }) => {
-  output += `
+  output +=
+    path === 'src/index.js'
+      ? `
+window.addEventListener('load', () => {
+${content}  
+})
+`
+      : `
 dependencyHell['${path}'] = (() => {
 ${content}
 })();

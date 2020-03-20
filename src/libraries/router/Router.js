@@ -1,4 +1,4 @@
-const { Observable } = include('src/libraries/observable/Observable.js');
+const Observable = include('src/libraries/observable/Observable.js');
 
 function Router(routes) {
   /**
@@ -211,6 +211,4 @@ function Router(routes) {
   };
 }
 
-module.exports = {
-  Router,
-};
+module.exports = Router;

@@ -1,6 +1,6 @@
-const { Router } = include('src/libraries/router/Router.js');
-const { Observable } = include('src/libraries/observable/Observable.js');
-const { App } = include('src/app/App.js');
+const Router = include('src/libraries/router/Router.js');
+const Observable = include('src/libraries/observable/Observable.js');
+const App = include('src/app/App.js');
 
 const router = new Router({
   '/': 'Gremlint - Gremlin query formatter',

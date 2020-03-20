@@ -25,6 +25,4 @@ class Observable {
   }
 }
 
-module.exports = {
-  Observable,
-};
+module.exports = Observable;

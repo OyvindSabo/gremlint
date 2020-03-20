@@ -1,5 +1,4 @@
-//const { CenteredContainer } = include('src/components/centeredContainer/CenteredContainer.js');
-const { Observable } = include('src/libraries/observable/Observable.js');
+const Observable = include('src/libraries/observable/Observable.js');
 
 // Currently needs at least two arguments
 const add$ = (...observables) => {
@@ -318,109 +317,6 @@ const toArray$ = (...observables) => {
   return array$;
 };
 
-const createElement$ = (elementType, ...observables) => {
-  const element = document.createElement(elementType);
-  observables.flat().forEach(observable => {
-    if (
-      // If it is observable value
-      observable instanceof Observable &&
-      ['string', 'number'].includes(typeof observable.value)
-    ) {
-      const textNode = document.createTextNode(observable.value);
-      element.appendChild(textNode);
-      window.addEventListener(observable.id, ({ detail }) => {
-        textNode.nodeValue = detail;
-      });
-      return;
-    }
-    if (
-      // If it is non-observable value
-      ['string', 'number'].includes(typeof observable)
-    ) {
-      const textNode = document.createTextNode(observable);
-      element.appendChild(textNode);
-      return;
-    }
-    // If it is a dom node
-    element.appendChild(observable);
-  });
-  // Note that styleObject$ is an object with observable values, not an observable object
-  // TODO: It should also be possible to set the style as a non-observable object
-  element.setStyle = styleObject$ => {
-    Object.entries(styleObject$).forEach(([styleProperty, styleValue$]) => {
-      if (styleValue$ instanceof Observable) {
-        element.style[styleProperty] = styleValue$.value;
-        window.addEventListener(styleValue$.id, ({ detail }) => {
-          element.style[styleProperty] = detail;
-        });
-        return;
-      }
-      element.style[styleProperty] = styleValue$;
-    });
-    return element;
-  };
-  element.setProps = propsObject => {
-    Object.entries(propsObject).forEach(([propKey, propValue$]) => {
-      if (propValue$ instanceof Observable) {
-        element[propKey] = propValue$.value;
-        window.addEventListener(propValue$.id, ({ detail }) => {
-          element[propKey] = detail;
-        });
-        return;
-      }
-      element[propKey] = propValue$;
-    });
-    return element;
-  };
-  element.onClick = clickCallback => {
-    element.style.cursor = 'pointer';
-    element.onclick = () => clickCallback(element);
-    return element;
-  };
-  element.onMouseEnter = mouseEnterCallback => {
-    element.onmouseenter = () => mouseEnterCallback(element);
-    return element;
-  };
-  element.onMouseLeave = mouseLeaveCallback => {
-    element.onmouseleave = () => mouseLeaveCallback(element);
-    return element;
-  };
-  element.onInput = inputCallback => {
-    element.addEventListener('input', () => inputCallback(element));
-    return element;
-  };
-  return element;
-};
-const a$ = (...children) => createElement$('a', ...children);
-const p$ = (...children) => createElement$('p', ...children);
-const button$ = (...children) => createElement$('button', ...children);
-const div$ = (...children) => createElement$('div', ...children);
-const h1$ = (...children) =>
-  createElement$('h1', ...children).setStyle({
-    margin: '0',
-    fontWeight: 'normal',
-  });
-const h2$ = (...children) =>
-  createElement$('h2', ...children).setStyle({
-    margin: '0',
-    fontWeight: 'normal',
-  });
-const h3$ = (...children) =>
-  createElement$('h3', ...children).setStyle({
-    margin: '0',
-    fontWeight: 'normal',
-  });
-const input$ = (value = '') => createElement$('input').setProps({ value });
-const textArea$ = (value = '') =>
-  createElement$('textarea').setProps({ value });
-const br$ = () => createElement$('br');
-const canvas$ = ({ width, height }) => {
-  const element = createElement('canvas');
-  element.width = width;
-  element.height = height;
-  return element;
-};
-
 const Choose$ = (observable, element1, element2) => {
   let element = (observable instanceof Observable
   ? observable.value
@@ -461,82 +357,19 @@ const Nothing$ = () => div$().setStyle({ display: 'none' });
 
 const If$ = (observable, element) => Choose$(observable, element, Nothing$());
 
-const pipe = value => (...fns) => fns.reduce((value, fn) => fn(value), value);
-
-const formatQuery = (query, config = { maxLineLength: 80 }) => pipe(query)();
-
-const CenteredContainer = (...chilren) =>
-  div$(...chilren).setStyle({ margin: 'auto', width: '720px' });
-
-const ExpandableTextArea = value =>
-  textArea$(value).onInput(textArea => {
-    const previousClientHeight = textArea.clientHeight;
-    const { scrollX, scrollY } = window;
-    textArea.setStyle({ height: 'auto' });
-    textArea.setStyle({ height: `${textArea.scrollHeight}px` });
-    const newClientHeight = textArea.clientHeight;
-    const scrollChange = newClientHeight - previousClientHeight;
-    window.scrollTo(scrollX, scrollY + scrollChange);
-  });
-
-const QueryInput = value =>
-  ExpandableTextArea(value).setStyle({
-    borderRadius: '5px',
-    fontFamily: '"Courier New", Courier, monospace',
-    background: 'whiteSmoke',
-    minHeight: '10em',
-    overflow: 'hidden',
-    outline: 'none',
-    padding: '10px',
-    border: 'none',
-    resize: 'none',
-    width: '100%',
-  });
-
-const QueryOutput = (...children) =>
-  div$(...children).setStyle({
-    fontFamily: '"Courier New", Courier, monospace',
-    whiteSpace: 'pre-wrap',
-    borderRadius: '5px',
-    padding: '10px',
-  });
-
-const Navigator = (...children) =>
-  div$(...children).setStyle({ padding: '10px 0', marginBottom: '20px' });
+const { a$, div$ } = include('src/libraries/fakeReact/FakeReact.js');
 
 const NavigatorLink = ({ title, to }) =>
   a$(title)
     .setProps({ href: `#!${to}` })
     .setStyle({ marginRight: '20px' });
 
-const CodeFormatter = ({ state }) =>
-  div$(
-    QueryInput(state.queryInput$).onInput(({ value }) => {
-      state.queryInput$.value = value;
-      state.queryOutput$.value = formatQuery(value);
-    }),
-    QueryOutput(state.queryOutput$)
-  );
-
-const testCases = [`g.V().hasLabel('application')`, `g.V().limit(10)`];
-const TestCases = ({ state }) =>
-  div$(
-    ...testCases.map(query => {
-      const formattedQuery = formatQuery(query);
-      return div$(
-        QueryOutput(query).setStyle({
-          background: formattedQuery === query ? 'lightgreen' : 'lightpink',
-        }),
-        QueryOutput(formattedQuery)
-      ).setStyle({
-        marginBottom: '20px',
-      });
-    })
-  );
-
-const { QueryFormatter } = include(
-  'src/views/queryFormatter/QueryFormatter.js'
+const CenteredContainer = include(
+  'src/components/centeredContainer/CenteredContainer.js'
 );
+const Navigator = include('src/components/navigator/Navigator.js');
+const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
+const TestCases = include('src/views/testCases/TestCases.js');
 
 const App = ({ state, currentRoute$ }) =>
   CenteredContainer(
@@ -552,6 +385,4 @@ const App = ({ state, currentRoute$ }) =>
     )
   );
 
-module.exports = {
-  App,
-};
+module.exports = App;

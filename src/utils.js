@@ -1,4 +1,4 @@
-const { printHelloWorld } = createDependencyHell('src/utils2.js');
-return {
+const { printHelloWorld } = include('src/utils2.js');
+module.exports = {
   printHelloWorld,
 };

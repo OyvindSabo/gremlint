@@ -7,8 +7,8 @@ let importQueue = ['src/index.js'];
 
 let output = `
 <script>
-const dependencyHell = {}
-const createDependencyHell = path => dependencyHell[path];
+const modules = {}
+const include = path => modules[path];
 `;
 
 while (importQueue.length) {
@@ -31,12 +31,14 @@ topologicallyOrderedFiles.forEach(({ path, content }) => {
     path === 'src/index.js'
       ? `
 window.addEventListener('load', () => {
-${content}  
+${content}
 })
 `
       : `
-dependencyHell['${path}'] = (() => {
-${content}
+modules['${path}'] = (() => {
+  const module = { exports: {} };
+  ${content}
+  return module.exports;
 })();
 `;
 });

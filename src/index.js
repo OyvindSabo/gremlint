@@ -1,5 +1,20 @@
-const { printHelloWorld } = createDependencyHell('src/utils.js');
+const { Router } = include('src/libraries/router/Router.js');
+const { Observable } = include('src/libraries/observable/Observable.js');
+const { App } = include('src/app/App.js');
 
-const div = document.createElement('div');
-div.innerText = printHelloWorld();
-document.body.appendChild(div);
+const router = new Router({
+  '/': 'Gremlint - Gremlin query formatter',
+  '/test-cases': 'Gremlint - Test cases',
+});
+
+const state = {
+  queryInput$: new Observable(''),
+  queryOutput$: new Observable(''),
+};
+
+Object.assign(document.body.style, {
+  fontFamily: 'Sans-Serif',
+  margin: '0px',
+});
+
+document.body.appendChild(App({ state, currentRoute$: router.currentRoute$ }));

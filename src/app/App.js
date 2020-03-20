@@ -534,6 +534,10 @@ const TestCases = ({ state }) =>
     })
   );
 
+const { QueryFormatter } = include(
+  'src/views/queryFormatter/QueryFormatter.js'
+);
+
 const App = ({ state, currentRoute$ }) =>
   CenteredContainer(
     Navigator(
@@ -542,7 +546,7 @@ const App = ({ state, currentRoute$ }) =>
     ),
     Switch$(currentRoute$)(
       '/',
-      CodeFormatter({ state }),
+      QueryFormatter({ state }),
       '/test-cases',
       TestCases({ state })
     )

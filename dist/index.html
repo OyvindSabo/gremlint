@@ -267,6 +267,24 @@ modules['src/components/centeredContainer/CenteredContainer.js'] = (() => {
   return module.exports;
 })();
 
+modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
+  const module = { exports: {} };
+  const QueryFormatter = ({ state }) =>
+  div$(
+    QueryInput(state.queryInput$).onInput(({ value }) => {
+      state.queryInput$.value = value;
+      state.queryOutput$.value = formatQuery(value);
+    }),
+    QueryOutput(state.queryOutput$)
+  );
+
+module.exports = {
+  QueryFormatter,
+};
+
+  return module.exports;
+})();
+
 modules['src/app/App.js'] = (() => {
   const module = { exports: {} };
   //const { CenteredContainer } = include('src/components/centeredContainer/CenteredContainer.js');
@@ -805,6 +823,10 @@ const TestCases = ({ state }) =>
     })
   );
 
+const { QueryFormatter } = include(
+  'src/views/queryFormatter/QueryFormatter.js'
+);
+
 const App = ({ state, currentRoute$ }) =>
   CenteredContainer(
     Navigator(
@@ -813,7 +835,7 @@ const App = ({ state, currentRoute$ }) =>
     ),
     Switch$(currentRoute$)(
       '/',
-      CodeFormatter({ state }),
+      QueryFormatter({ state }),
       '/test-cases',
       TestCases({ state })
     )

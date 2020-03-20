@@ -2,7 +2,6 @@
  * @param {{ content: string; dependencies: string[] }} importedFilePaths
  */
 const getOrderedListOfFiles = importedFilePaths => {
-  console.log('importedFilePaths: ', importedFilePaths);
   const orderedListOfFiles = [];
   const handledPaths = [];
   let remainingFiles = Object.entries(importedFilePaths).map(
@@ -30,7 +29,6 @@ const getOrderedListOfFiles = importedFilePaths => {
       );
     });
   }
-  console.log('orderedListOfFiles: ', orderedListOfFiles);
   return orderedListOfFiles;
 };
 

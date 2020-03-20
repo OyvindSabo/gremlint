@@ -1,4 +1,3 @@
-const fs = require('fs');
 const { readContentFromFile, writeContentToFile } = require('./fileUtils');
 const { extractImportPaths } = require('./parseUtils');
 const { getOrderedListOfFiles } = require('./sortUtils');

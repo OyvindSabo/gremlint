@@ -4,6 +4,7 @@ const App = include('src/app/App.js');
 
 const router = new Router({
   '/': 'Gremlint - Gremlin query formatter',
+  '/style-guide': 'Gremlint - Style guide',
   '/test-cases': 'Gremlint - Test cases',
 });
 

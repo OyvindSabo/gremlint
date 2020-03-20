@@ -419,6 +419,17 @@ module.exports = NavigatorLink;
   return module.exports;
 })();
 
+modules['src/views/styleGuide/StyleGuide.js'] = (() => {
+  const module = { exports: {} };
+  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+
+const StyleGuide = () => div$('Style guide');
+
+module.exports = StyleGuide;
+
+  return module.exports;
+})();
+
 modules['src/components/queryOutput/QueryOutput.js'] = (() => {
   const module = { exports: {} };
   const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
@@ -896,7 +907,7 @@ const Nothing$ = () => div$().setStyle({ display: 'none' });
 
 const If$ = (observable, element) => Choose$(observable, element, Nothing$());
 
-const { a$, div$ } = include('src/libraries/fakeReact/FakeReact.js');
+const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
 
 const CenteredContainer = include(
   'src/components/centeredContainer/CenteredContainer.js'
@@ -904,17 +915,21 @@ const CenteredContainer = include(
 const Navigator = include('src/components/navigator/Navigator.js');
 const NavigatorLink = include('src/components/navigatorLink/NavigatorLink.js');
 const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
+const StyleGuide = include('src/views/styleGuide/StyleGuide.js');
 const TestCases = include('src/views/testCases/TestCases.js');
 
 const App = ({ state, currentRoute$ }) =>
   CenteredContainer(
     Navigator(
       NavigatorLink({ title: 'Query formatter', to: '/' }),
+      NavigatorLink({ title: 'Style guide', to: '/style-guide' }),
       NavigatorLink({ title: 'Test cases', to: '/test-cases' })
     ),
     Switch$(currentRoute$)(
       '/',
       QueryFormatter({ state }),
+      '/style-guide',
+      StyleGuide(),
       '/test-cases',
       TestCases({ state })
     )
@@ -932,6 +947,7 @@ const App = include('src/app/App.js');
 
 const router = new Router({
   '/': 'Gremlint - Gremlin query formatter',
+  '/style-guide': 'Gremlint - Style guide',
   '/test-cases': 'Gremlint - Test cases',
 });
 

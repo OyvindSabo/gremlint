@@ -357,17 +357,13 @@ const Nothing$ = () => div$().setStyle({ display: 'none' });
 
 const If$ = (observable, element) => Choose$(observable, element, Nothing$());
 
-const { a$, div$ } = include('src/libraries/fakeReact/FakeReact.js');
-
-const NavigatorLink = ({ title, to }) =>
-  a$(title)
-    .setProps({ href: `#!${to}` })
-    .setStyle({ marginRight: '20px' });
+const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
 
 const CenteredContainer = include(
   'src/components/centeredContainer/CenteredContainer.js'
 );
 const Navigator = include('src/components/navigator/Navigator.js');
+const NavigatorLink = include('src/components/navigatorLink/NavigatorLink.js');
 const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
 const TestCases = include('src/views/testCases/TestCases.js');
 

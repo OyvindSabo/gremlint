@@ -405,6 +405,20 @@ module.exports = Navigator;
   return module.exports;
 })();
 
+modules['src/components/navigatorLink/NavigatorLink.js'] = (() => {
+  const module = { exports: {} };
+  const { a$ } = include('src/libraries/fakeReact/FakeReact.js');
+
+const NavigatorLink = ({ title, to }) =>
+  a$(title)
+    .setProps({ href: `#!${to}` })
+    .setStyle({ marginRight: '20px' });
+
+module.exports = NavigatorLink;
+
+  return module.exports;
+})();
+
 modules['src/components/queryOutput/QueryOutput.js'] = (() => {
   const module = { exports: {} };
   const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
@@ -884,15 +898,11 @@ const If$ = (observable, element) => Choose$(observable, element, Nothing$());
 
 const { a$, div$ } = include('src/libraries/fakeReact/FakeReact.js');
 
-const NavigatorLink = ({ title, to }) =>
-  a$(title)
-    .setProps({ href: `#!${to}` })
-    .setStyle({ marginRight: '20px' });
-
 const CenteredContainer = include(
   'src/components/centeredContainer/CenteredContainer.js'
 );
 const Navigator = include('src/components/navigator/Navigator.js');
+const NavigatorLink = include('src/components/navigatorLink/NavigatorLink.js');
 const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
 const TestCases = include('src/views/testCases/TestCases.js');
 

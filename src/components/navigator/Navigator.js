@@ -1,6 +1,5 @@
-const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+const Padding = include('src/atomicComponents/padding/Padding.js');
 
-const Navigator = (...children) =>
-  div$(...children).setStyle({ padding: '10px 0', marginBottom: '20px' });
+const Navigator = Padding;
 
 module.exports = Navigator;

@@ -364,6 +364,7 @@ const CenteredContainer = include(
 );
 const Navigator = include('src/components/navigator/Navigator.js');
 const NavigatorLink = include('src/components/navigatorLink/NavigatorLink.js');
+const Padding = include('src/atomicComponents/padding/Padding.js');
 const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
 const StyleGuide = include('src/views/styleGuide/StyleGuide.js');
 const TestCases = include('src/views/testCases/TestCases.js');
@@ -375,13 +376,15 @@ const App = ({ state, currentRoute$ }) =>
       NavigatorLink({ title: 'Style guide', to: '/style-guide' }),
       NavigatorLink({ title: 'Test cases', to: '/test-cases' })
     ),
-    Switch$(currentRoute$)(
-      '/',
-      QueryFormatter({ state }),
-      '/style-guide',
-      StyleGuide(),
-      '/test-cases',
-      TestCases({ state })
+    Padding(
+      Switch$(currentRoute$)(
+        '/',
+        QueryFormatter({ state }),
+        '/style-guide',
+        StyleGuide(),
+        '/test-cases',
+        TestCases({ state })
+      )
     )
   );
 

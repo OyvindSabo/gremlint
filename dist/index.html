@@ -386,21 +386,12 @@ modules['src/components/centeredContainer/CenteredContainer.js'] = (() => {
   const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
 
 const CenteredContainer = (...chilren) =>
-  div$(...chilren).setStyle({ margin: 'auto', width: '720px' });
+  div$(...chilren).setStyle({
+    margin: 'auto',
+    maxWidth: '720px',
+  });
 
 module.exports = CenteredContainer;
-
-  return module.exports;
-})();
-
-modules['src/components/navigator/Navigator.js'] = (() => {
-  const module = { exports: {} };
-  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
-
-const Navigator = (...children) =>
-  div$(...children).setStyle({ padding: '10px 0', marginBottom: '20px' });
-
-module.exports = Navigator;
 
   return module.exports;
 })();
@@ -415,6 +406,29 @@ const NavigatorLink = ({ title, to }) =>
     .setStyle({ marginRight: '20px' });
 
 module.exports = NavigatorLink;
+
+  return module.exports;
+})();
+
+modules['src/atomicComponents/padding/Padding.js'] = (() => {
+  const module = { exports: {} };
+  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+
+const Padding = (...children) =>
+  div$(...children).setStyle({ padding: '10px' });
+
+module.exports = Padding;
+
+  return module.exports;
+})();
+
+modules['src/components/navigator/Navigator.js'] = (() => {
+  const module = { exports: {} };
+  const Padding = include('src/atomicComponents/padding/Padding.js');
+
+const Navigator = Padding;
+
+module.exports = Navigator;
 
   return module.exports;
 })();
@@ -921,6 +935,7 @@ const CenteredContainer = include(
 );
 const Navigator = include('src/components/navigator/Navigator.js');
 const NavigatorLink = include('src/components/navigatorLink/NavigatorLink.js');
+const Padding = include('src/atomicComponents/padding/Padding.js');
 const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
 const StyleGuide = include('src/views/styleGuide/StyleGuide.js');
 const TestCases = include('src/views/testCases/TestCases.js');
@@ -932,13 +947,15 @@ const App = ({ state, currentRoute$ }) =>
       NavigatorLink({ title: 'Style guide', to: '/style-guide' }),
       NavigatorLink({ title: 'Test cases', to: '/test-cases' })
     ),
-    Switch$(currentRoute$)(
-      '/',
-      QueryFormatter({ state }),
-      '/style-guide',
-      StyleGuide(),
-      '/test-cases',
-      TestCases({ state })
+    Padding(
+      Switch$(currentRoute$)(
+        '/',
+        QueryFormatter({ state }),
+        '/style-guide',
+        StyleGuide(),
+        '/test-cases',
+        TestCases({ state })
+      )
     )
   );
 

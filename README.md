@@ -20,3 +20,33 @@ The easiest way to use Gremlint is via the official website (https://gremlint.co
 ```
 $ node build
 ```
+
+## For developers
+
+### Compile to single HTML file
+
+The compiled HTML file will end up in `dist/index.html`.
+
+```
+node build
+```
+
+### Continuously compile to single HTML file while editing
+
+The compiled HTML file will end up in `dist/index.html`.
+
+```
+node watch
+```
+
+### Run an individual file
+
+```
+$ node run src/someFile.js
+```
+
+### Run tests
+
+```
+$ node test
+```

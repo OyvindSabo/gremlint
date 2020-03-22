@@ -2,7 +2,7 @@ const { readContentFromFile, writeContentToFile } = require('./fileUtils');
 const { extractImportPaths } = require('./parseUtils');
 const { getOrderedListOfFiles } = require('./sortUtils');
 
-const buildToHtml = () => {
+const build = () => {
   let importedFilePaths = {};
   let importQueue = ['src/index.js'];
 
@@ -49,4 +49,4 @@ modules['${path}'] = (() => {
   writeContentToFile(output, 'dist/index.html');
 };
 
-module.exports = { buildToHtml };
+module.exports = { build };

@@ -1,7 +1,7 @@
-const { build } = require('../build/build');
+const { buildToHtml } = require('../build/build');
 
 const rebuild = () => {
-  build();
+  buildToHtml();
   setTimeout(() => {
     rebuild();
   }, 1000);

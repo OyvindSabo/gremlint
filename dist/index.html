@@ -3,7 +3,205 @@
 const modules = {}
 const include = path => modules[path];
 
-modules['src/libraries/observable/Observable.js'] = (() => {
+modules['src/libs/simpleRouter/SimpleRouter.js'] = (() => {
+  const module = { exports: {} };
+  function SimpleRouter(routes) {
+  /**
+   * @param {string} routes
+   */
+  this.setRoutes = function (routes) {
+    Object.entries(routes).forEach(([route, title]) => {
+      this.routes[route] = route;
+      this.titles[route] = title;
+      if (route === '/') {
+        this.routes[''] = route;
+        this.titles[''] = title;
+      }
+    });
+    this.syncWithHash();
+  };
+  SimpleRouter.getTokens = function (hash) {
+    return hash
+      .split('/')
+      .filter(Boolean)
+      .filter((element) => element !== '#')
+      .filter((element) => element !== '#!');
+  };
+  /**
+   * @param {string} token
+   * @returns {boolean}
+   */
+  SimpleRouter.isParameterRouteToken = function (token) {
+    if (
+      token.indexOf('<') !== 0 ||
+      !token.slice(2, -4).includes(':') ||
+      token.indexOf('>') !== token.length - 1
+    ) {
+      return false;
+    }
+    const [parameter, type] = token
+      .slice(token.indexOf('<') + 1, token.indexOf('>'))
+      .split(':');
+
+    if (!['int', 'string', 'number'].includes(type)) {
+      return false;
+    }
+    return true;
+  };
+  SimpleRouter.appendTokenToHash = function (hash, token) {
+    return `${hash}/${token}`;
+  };
+  SimpleRouter.parseParameterRouteToken = function (token) {
+    const [parameter, type] = token
+      .slice(token.indexOf('<') + 1, token.indexOf('>'))
+      .split(':');
+    return {
+      parameter,
+      type,
+    };
+  };
+  // (hash: string, route: string) => false | { [key: string]: number | string }
+  SimpleRouter.getMatch = function (hash, route) {
+    const hashTokens = SimpleRouter.getTokens(hash);
+    const routeTokens = SimpleRouter.getTokens(route);
+    const params = {};
+    let reconstructedHash = '#!';
+    if (hashTokens.length !== routeTokens.length) return false;
+    for (let i of Object.keys(hashTokens)) {
+      const hashToken = hashTokens[i];
+      const routeToken = routeTokens[i];
+      if (SimpleRouter.isParameterRouteToken(routeToken)) {
+        const { parameter, type } = SimpleRouter.parseParameterRouteToken(
+          routeToken
+        );
+        if (type === 'int') {
+          if (!Router.isInt(hashToken)) return false;
+          params[parameter] = parseInt(hashToken);
+          reconstructedHash = SimpleRouter.appendTokenToHash(
+            reconstructedHash,
+            hashToken
+          );
+        } else if (type === 'number' && !Router.isNumber(hasToken)) {
+          if (!Router.isNumber(hashToken)) return false;
+          params[parameter] = Number(hashToken);
+          reconstructedHash = SimpleRouter.appendTokenToHash(
+            reconstructedHash,
+            hashToken
+          );
+        } else if (type === 'string') {
+          params[parameter] = hashToken;
+          reconstructedHash = SimpleRouter.appendTokenToHash(
+            reconstructedHash,
+            hashToken
+          );
+        }
+      } else {
+        if (hashToken !== routeToken) return false;
+        reconstructedHash = SimpleRouter.appendTokenToHash(
+          reconstructedHash,
+          hashToken
+        );
+      }
+    }
+    return { params, reconstructedHash };
+  };
+  SimpleRouter.getRouteAndParamsFromHash = function (hash, routes) {
+    for (let route of Object.keys(routes)) {
+      const match = SimpleRouter.getMatch(hash, route);
+      if (match) {
+        const { params, reconstructedHash } = match;
+        return { route, params, reconstructedHash };
+      }
+    }
+    return { route: '', params: {}, reconstructedHash: '' };
+  };
+  /**
+   * @param {Object.<string, number | string>} params
+   */
+  this.setParams = function (params) {
+    this.params = params;
+    // Todo: Maybe dispatch some kind of event
+  };
+  this.setCurrentRoute = function (route) {
+    this.currentRoute = route;
+  };
+  this.setCurrentTitle = function (title) {
+    this.currentTitle = title;
+  };
+  SimpleRouter.removeHash = function () {
+    return history.replaceState(null, null, ' ');
+  };
+  this.syncWithHash = function () {
+    const { hash } = location;
+    const {
+      route,
+      params,
+      reconstructedHash,
+    } = SimpleRouter.getRouteAndParamsFromHash(hash, this.routes);
+    this.setParams(params);
+    this.setCurrentRoute(this.routes[route]);
+    this.setCurrentTitle(this.titles[route]);
+    if (reconstructedHash === '#!') {
+      SimpleRouter.removeHash();
+    } else {
+      history.replaceState(undefined, undefined, reconstructedHash);
+    }
+    document.title = this.currentTitle;
+  };
+  this.params = {};
+  this.currentRoute = '';
+  this.routes = {};
+  this.titles = {};
+  this.hashChangeListeners = [];
+  this.setRoutes(routes);
+  window.addEventListener('hashchange', () => {
+    this.syncWithHash();
+    this.callHashChangeListeners();
+  });
+  /**
+   * @param {string} route
+   * One of the registered routes, without hashbang
+   */
+  this.navigateTo = (route) => {
+    location.hash = `#!${route}`;
+  };
+
+  this.refresh = () => this.syncWithHash();
+
+  // @possiblyNumber: string
+  SimpleRouter.isNumber = function (possiblyNumber) {
+    return !isNaN(Number(possiblyNumber));
+  };
+  SimpleRouter.isInt = function (possiblyInt) {
+    return (
+      SimpleRouter.isNumber(possiblyInt) &&
+      parseInt(possiblyInt) === Number(possiblyInt)
+    );
+  };
+  this.addHashChangeListener = (callback) => {
+    this.hashChangeListeners.push(callback);
+    this.callHashChangeListeners();
+  };
+  this.callHashChangeListeners = () => {
+    this.hashChangeListeners.forEach((hashChangeListener) =>
+      hashChangeListener({
+        params: this.params,
+        currentRoute: this.currentRoute,
+      })
+    );
+  };
+  this.getParams = () => this.params;
+  this.getCurrentTitle = () => this.currentTitle;
+  SimpleRouter.isProp = (propsOrChild) =>
+    !(propsOrChild instanceof HTMLElement || typeof propsOrChild === 'string');
+}
+
+module.exports = SimpleRouter;
+
+  return module.exports;
+})();
+
+modules['src/libs/observable/Observable.js'] = (() => {
   const module = { exports: {} };
   class Observable {
   constructor(value) {
@@ -37,233 +235,13 @@ module.exports = Observable;
   return module.exports;
 })();
 
-modules['src/libraries/router/Router.js'] = (() => {
+modules['src/libs/fakeReact/FakeReact.js'] = (() => {
   const module = { exports: {} };
-  const Observable = include('src/libraries/observable/Observable.js');
-
-function Router(routes) {
-  /**
-   * @param {string} routes
-   */
-  this.setRoutes = function(routes) {
-    Object.entries(routes).forEach(([route, title]) => {
-      this.routes[route] = route;
-      this.titles[route] = title;
-      if (route === '/') {
-        this.routes[''] = route;
-        this.titles[''] = title;
-      }
-    });
-    this.syncWithHash();
-  };
-  Router.getTokens = function(hash) {
-    return hash
-      .split('/')
-      .filter(Boolean)
-      .filter(element => element !== '#')
-      .filter(element => element !== '#!');
-  };
-  /**
-   * @param {string} token
-   * @returns {boolean}
-   */
-  Router.isParameterRouteToken = function(token) {
-    if (
-      token.indexOf('<') !== 0 ||
-      !token.slice(2, -4).includes(':') ||
-      token.indexOf('>') !== token.length - 1
-    ) {
-      return false;
-    }
-    const [parameter, type] = token
-      .slice(token.indexOf('<') + 1, token.indexOf('>'))
-      .split(':');
-
-    if (!['int', 'string', 'number'].includes(type)) {
-      return false;
-    }
-    return true;
-  };
-  Router.appendTokenToHash = function(hash, token) {
-    return `${hash}/${token}`;
-  };
-  Router.parseParameterRouteToken = function(token) {
-    const [parameter, type] = token
-      .slice(token.indexOf('<') + 1, token.indexOf('>'))
-      .split(':');
-    return {
-      parameter,
-      type,
-    };
-  };
-  // (hash: string, route: string) => false | { [key: string]: number | string }
-  Router.getMatch = function(hash, route) {
-    const hashTokens = Router.getTokens(hash);
-    const routeTokens = Router.getTokens(route);
-    const params = {};
-    let reconstructedHash = '#!';
-    if (hashTokens.length !== routeTokens.length) return false;
-    for (let i of Object.keys(hashTokens)) {
-      const hashToken = hashTokens[i];
-      const routeToken = routeTokens[i];
-      if (Router.isParameterRouteToken(routeToken)) {
-        const { parameter, type } = Router.parseParameterRouteToken(routeToken);
-        if (type === 'int') {
-          if (!Router.isInt(hashToken)) return false;
-          params[parameter] = parseInt(hashToken);
-          reconstructedHash = Router.appendTokenToHash(
-            reconstructedHash,
-            hashToken
-          );
-        } else if (type === 'number' && !Router.isNumber(hasToken)) {
-          if (!Router.isNumber(hashToken)) return false;
-          params[parameter] = Number(hashToken);
-          reconstructedHash = Router.appendTokenToHash(
-            reconstructedHash,
-            hashToken
-          );
-        } else if (type === 'string') {
-          params[parameter] = hashToken;
-          reconstructedHash = Router.appendTokenToHash(
-            reconstructedHash,
-            hashToken
-          );
-        }
-      } else {
-        if (hashToken !== routeToken) return false;
-        reconstructedHash = Router.appendTokenToHash(
-          reconstructedHash,
-          hashToken
-        );
-      }
-    }
-    return { params, reconstructedHash };
-  };
-  Router.getRouteAndParamsFromHash = function(hash, routes) {
-    for (let route of Object.keys(routes)) {
-      const match = Router.getMatch(hash, route);
-      if (match) {
-        const { params, reconstructedHash } = match;
-        return { route, params, reconstructedHash };
-      }
-    }
-    return { route: '', params: {}, reconstructedHash: '' };
-  };
-  /**
-   * @param {Object.<string, number | string>} params
-   */
-  this.setParams = function(params) {
-    this.params = params;
-    // Todo: Maybe dispatch some kind of event
-  };
-  this.setCurrentRoute = function(route) {
-    this.currentRoute$.value = route;
-  };
-  this.setCurrentTitle = function(title) {
-    this.currentTitle = title;
-  };
-  Router.removeHash = function() {
-    return history.replaceState(null, null, ' ');
-  };
-  // Rather than passing data, this one should pass a string saying which attribute has been updated
-  this.emit = function() {
-    this.observers.forEach(observer => {
-      if (!observer)
-        console.warn('Non-existing element registered as router observer');
-
-      observer({ currentRoute$: this.currentRoute$, params: this.params });
-    });
-  };
-  this.syncWithHash = function() {
-    const { hash } = location;
-    const {
-      route,
-      params,
-      reconstructedHash,
-    } = Router.getRouteAndParamsFromHash(hash, this.routes);
-    this.setParams(params);
-    this.setCurrentRoute(this.routes[route]);
-    this.setCurrentTitle(this.titles[route]);
-    if (reconstructedHash === '#!') {
-      Router.removeHash();
-    } else {
-      history.replaceState(undefined, undefined, reconstructedHash);
-    }
-    document.title = this.currentTitle;
-    this.emit();
-  };
-  this.params = {};
-  this.currentRoute$ = new Observable('');
-  this.routes = {};
-  this.titles = {};
-  this.observers = [];
-  this.hashChangeListeners = [];
-  this.setRoutes(routes);
-  window.addEventListener('hashchange', () => {
-    this.syncWithHash();
-    this.callHashChangeListeners();
-  });
-  /**
-   * @param {string} route
-   * One of the registered routes, without hashbang
-   */
-  this.navigateTo = route => {
-    location.hash = `#!${route}`;
-  };
-
-  this.refresh = () => this.syncWithHash();
-
-  // @possiblyNumber: string
-  Router.isNumber = function(possiblyNumber) {
-    return !isNaN(Number(possiblyNumber));
-  };
-  Router.isInt = function(possiblyInt) {
-    return (
-      Router.isNumber(possiblyInt) &&
-      parseInt(possiblyInt) === Number(possiblyInt)
-    );
-  };
-  this.onHashChange = callback => {
-    this.hashChangeListeners.push(callback);
-    this.callHashChangeListeners();
-  };
-  this.callHashChangeListeners = function() {
-    this.hashChangeListeners.forEach(hashChangeListener =>
-      hashChangeListener({
-        params: this.params,
-        currentRoute$: this.currentRoute$,
-      })
-    );
-  };
-  this.getParams = () => this.params;
-  this.getCurrentTitle = () => this.currentTitle;
-  Router.isProp = propsOrChild =>
-    !(propsOrChild instanceof HTMLElement || typeof propsOrChild === 'string');
-
-  /**
-   * @param {function({ params: Object.<string, string | number> }): void} observer
-   */
-  this.subscribe = observer => {
-    observer({
-      currentRoute$: this.currentRoute$,
-      params: this.params,
-    });
-    this.observers.push(observer);
-  };
-}
-
-module.exports = Router;
-
-  return module.exports;
-})();
-
-modules['src/libraries/fakeReact/FakeReact.js'] = (() => {
-  const module = { exports: {} };
-  const Observable = include('src/libraries/observable/Observable.js');
+  const Observable = include('src/libs/observable/Observable.js');
 
 const createElement$ = (elementType, ...observables) => {
   const element = document.createElement(elementType);
-  observables.flat().forEach(observable => {
+  observables.flat().forEach((observable) => {
     if (
       // If it is observable value
       observable instanceof Observable &&
@@ -289,7 +267,7 @@ const createElement$ = (elementType, ...observables) => {
   });
   // Note that styleObject$ is an object with observable values, not an observable object
   // TODO: It should also be possible to set the style as a non-observable object
-  element.setStyle = styleObject$ => {
+  element.setStyle = (styleObject$) => {
     Object.entries(styleObject$).forEach(([styleProperty, styleValue$]) => {
       if (styleValue$ instanceof Observable) {
         element.style[styleProperty] = styleValue$.value;
@@ -302,7 +280,7 @@ const createElement$ = (elementType, ...observables) => {
     });
     return element;
   };
-  element.setProps = propsObject => {
+  element.setProps = (propsObject) => {
     Object.entries(propsObject).forEach(([propKey, propValue$]) => {
       if (propValue$ instanceof Observable) {
         element[propKey] = propValue$.value;
@@ -315,20 +293,20 @@ const createElement$ = (elementType, ...observables) => {
     });
     return element;
   };
-  element.onClick = clickCallback => {
+  element.onClick = (clickCallback) => {
     element.style.cursor = 'pointer';
     element.onclick = () => clickCallback(element);
     return element;
   };
-  element.onMouseEnter = mouseEnterCallback => {
+  element.onMouseEnter = (mouseEnterCallback) => {
     element.onmouseenter = () => mouseEnterCallback(element);
     return element;
   };
-  element.onMouseLeave = mouseLeaveCallback => {
+  element.onMouseLeave = (mouseLeaveCallback) => {
     element.onmouseleave = () => mouseLeaveCallback(element);
     return element;
   };
-  element.onInput = inputCallback => {
+  element.onInput = (inputCallback) => {
     element.addEventListener('input', () => inputCallback(element));
     return element;
   };
@@ -383,7 +361,7 @@ module.exports = {
 
 modules['src/components/centeredContainer/CenteredContainer.js'] = (() => {
   const module = { exports: {} };
-  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+  const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const CenteredContainer = (...chilren) =>
   div$(...chilren).setStyle({
@@ -398,7 +376,7 @@ module.exports = CenteredContainer;
 
 modules['src/components/navigatorLink/NavigatorLink.js'] = (() => {
   const module = { exports: {} };
-  const { a$ } = include('src/libraries/fakeReact/FakeReact.js');
+  const { a$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const NavigatorLink = ({ title, to }) =>
   a$(title)
@@ -412,7 +390,7 @@ module.exports = NavigatorLink;
 
 modules['src/atomicComponents/padding/Padding.js'] = (() => {
   const module = { exports: {} };
-  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+  const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const Padding = (...children) =>
   div$(...children).setStyle({ padding: '10px' });
@@ -435,7 +413,7 @@ module.exports = Navigator;
 
 modules['src/views/styleGuide/StyleGuide.js'] = (() => {
   const module = { exports: {} };
-  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+  const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const StyleGuide = () => div$('Style guide');
 
@@ -444,9 +422,520 @@ module.exports = StyleGuide;
   return module.exports;
 })();
 
+modules['src/libs/simpleHTML/SimpleHTML.js'] = (() => {
+  const module = { exports: {} };
+  const doAddInnerShadow = (element) => {
+  element.style.boxShadow = 'inset rgba(0, 0, 0, 0.25) 0 0 10px -5px';
+};
+
+const doAddShadow = (element) => {
+  element.style.boxShadow = 'rgba(0, 0, 0, 0.25) 0 0 10px -5px';
+};
+
+const doPatchChildren = (
+  element,
+  newChildren,
+  compareFunction = (a, b) => a === b
+) => {
+  newChildren.forEach((newChild, index) => {
+    // If the new child node already exists on the correct index, jump to next iteration
+    if (compareFunction(newChild, element.childNodes[index])) return;
+
+    // As long as there is an old child node at the current index which does not correspond to any of the new childNodes, remove it
+    while (
+      element.childNodes[index] &&
+      !newChildren.some((newChild) =>
+        compareFunction(newChild, element.childNodes[index])
+      )
+    ) {
+      element.removeChild(element.childNodes[index]);
+    }
+
+    // Insert the new child node at the correct position
+    if (element.childNodes[index]) {
+      element.insertBefore(newChild, element.childNodes[index]);
+      return;
+    }
+    // TODO: Find out why this is needed
+    if (!(newChild.contains && newChild.contains(element))) {
+      element.append(newChild);
+    }
+    return;
+  });
+
+  // Remove any superfluous old nodes which don't correspond to the new nodes
+  while (newChildren.length < element.childNodes.length) {
+    element.removeChild(element.childNodes[newChildren.length]);
+  }
+};
+
+const flatten = (items) => {
+  const flat = [];
+
+  items.forEach((item) => {
+    if (Array.isArray(item)) {
+      flat.push(...flatten(item));
+    } else {
+      flat.push(item);
+    }
+  });
+
+  return flat;
+};
+
+const compose = (elementType, getProps, children) => {
+  const element = document.createElement(elementType);
+
+  // Assign props
+  if (typeof getProps === 'function') {
+    Object.assign(element, getProps());
+  } else {
+    Object.assign(element, getProps);
+  }
+
+  // Append children
+  element.append(...flatten(children).filter(Boolean));
+
+  element.update = () => {
+    // We update the props only if they are provided as a function. Otherwise they are static.
+    if (typeof getProps === 'function') {
+      if (element.setSelectionRange) {
+        const { selectionStart, selectionEnd } = element;
+        element.setSelectionRange(selectionStart, selectionEnd);
+      } else {
+        Object.assign(element, getProps());
+      }
+    }
+
+    Array.from(element.childNodes).forEach((childNode) => {
+      // We check that the parent node exists because a previous sibling might
+      // be a logic element which has unmounted a later element
+      if (typeof childNode.update === 'function' && childNode.parentNode) {
+        childNode.update();
+      }
+    });
+  };
+  return element;
+};
+
+const createContentsContainer = () => {
+  const element = Object.assign(document.createElement('div'), {
+    style: 'display: contents;',
+  });
+  return element;
+};
+
+const Each = (getArray, mappingFunction) => {
+  const logicElement = createContentsContainer();
+  let array = getArray();
+  const childNodes = flatten(
+    array.map((_, i) =>
+      mappingFunction(
+        () => getArray()[i],
+        () => i,
+        getArray
+      )
+    )
+  );
+
+  logicElement.append(...childNodes);
+
+  logicElement.update = () => {
+    const newArray = getArray();
+
+    if (newArray.length === array.length) {
+      Array.from(logicElement.childNodes).forEach((childNode) => {
+        if (typeof childNode.update === 'function') {
+          childNode.update();
+        }
+      });
+      return;
+    }
+
+    // If some elements should be added
+    if (newArray.length > array.length) {
+      Array.from(logicElement.childNodes).forEach((childNode) => {
+        if (typeof childNode.update === 'function') {
+          childNode.update();
+        }
+      });
+
+      const newChildNodes = flatten(
+        newArray.slice(array.length).map((_, _i) => {
+          const i = _i + array.length;
+          return mappingFunction(
+            () => getArray()[i],
+            () => i,
+            getArray
+          );
+        })
+      );
+
+      logicElement.append(...newChildNodes);
+
+      array = newArray;
+      return;
+    }
+
+    // If some elements should be removed
+    if (newArray.length < array.length) {
+      // Even if we already have nodes which can be updated to match the new
+      // child nodes, we need to see how many nodes we should keep, since each
+      // item in the array can potentially be mapped to several nodes.
+      const newChildNodes = flatten(
+        newArray.map((_, i) =>
+          mappingFunction(
+            () => getArray()[i],
+            () => i,
+            getArray
+          )
+        )
+      );
+
+      // Remove superfluous nodes
+      const childrenToBeRemoved = Array.from(logicElement.childNodes).slice(
+        newChildNodes.length
+      );
+      childrenToBeRemoved.forEach((childNodeToBeRemoved) => {
+        logicElement.removeChild(childNodeToBeRemoved);
+      });
+
+      // Update variables
+      array = newArray;
+
+      // Update current child nodes
+      Array.from(logicElement.childNodes).forEach((childNode) => {
+        if (typeof childNode.update === 'function') {
+          childNode.update();
+        }
+      });
+    }
+  };
+
+  return logicElement;
+};
+
+const If = (getCondition, getThenChildNodes, getElseChildNodes = () => []) => {
+  const logicElement = createContentsContainer();
+  let condition = getCondition();
+  const childNodes = condition
+    ? flatten(getThenChildNodes()).filter(Boolean)
+    : flatten(getElseChildNodes()).filter(Boolean);
+
+  logicElement.append(...childNodes);
+
+  logicElement.update = () => {
+    if (condition && getCondition()) {
+      Array.from(logicElement.childNodes).forEach((childNode) => {
+        if (typeof childNode.update === 'function') {
+          childNode.update();
+        }
+      });
+      return;
+    }
+    if (!condition && getCondition()) {
+      condition = true;
+      const thenChildNodes = flatten(getThenChildNodes()).filter(Boolean);
+      // Remove the old children
+      logicElement.innerHTML = '';
+
+      // Add the new children after the logic element
+      logicElement.append(...thenChildNodes);
+      return;
+    }
+    if (condition && !getCondition()) {
+      condition = false;
+      const elseChildNodes = flatten(getElseChildNodes()).filter(Boolean);
+      // Remove the old children
+      logicElement.innerHTML = '';
+
+      // Add the new children
+      logicElement.append(...elseChildNodes);
+      return;
+    }
+  };
+  return logicElement;
+};
+
+class SimpleHTML {
+  static isProp = (propsOrChild) =>
+    !(propsOrChild instanceof HTMLElement || typeof propsOrChild === 'string');
+  static makeElement(elementType, propsOrChild, ...maybeAllChildren) {
+    const element = document.createElement(elementType);
+    const hasProps = SimpleHTML.isProp(propsOrChild);
+    const props = hasProps ? propsOrChild || {} : {};
+    const children = hasProps
+      ? maybeAllChildren
+      : [propsOrChild, ...maybeAllChildren];
+    Object.entries(props).forEach(([attribute, value]) => {
+      if (attribute === 'style') {
+        Object.assign(element.style, value);
+      } else if (attribute === 'onClick') {
+        element.onclick = value;
+      } else if (attribute === 'onInput') {
+        element.oninput = value;
+      } else {
+        element[attribute] = value;
+      }
+    });
+    children
+      .filter(Boolean)
+      .map((child) =>
+        typeof child === 'string' ? document.createTextNode(child) : child
+      )
+      .forEach((child) => {
+        element.appendChild(child);
+      });
+    return element;
+  }
+}
+
+const doMerge = (oldElement, newElement) => {
+  if (!oldElement.parentNode) return;
+
+  const oldChildren = Array.from(oldElement.childNodes);
+  const newChildren = Array.from(newElement.childNodes);
+  newChildren.forEach((newChild, i) => {
+    let foundMatchingOldChild = false;
+    while (oldChildren.length && !foundMatchingOldChild) {
+      oldChild = oldChildren.shift();
+      if (
+        oldChild.component === newChild.component &&
+        oldChild instanceof Element
+      ) {
+        const selectionStart = oldChild.selectionStart;
+        const selectionEnd = oldChild.selectionEnd;
+        oldChild.value = newChild.value;
+        oldChild.selectionStart = selectionStart;
+        oldChild.selectionEnd = selectionEnd;
+
+        oldChild.update(...newChild.propsAndChildren);
+        if (Object.keys(newChild.propsAndChildren[0]).includes('style')) {
+          if (!oldChild.style) {
+            Object.keys(oldChild.parentNode.style).forEach((property) => {
+              if (!newChild.propsAndChildren[0].style[property]) {
+                oldChild.parentNode.style[property] = null;
+              }
+            });
+            Object.assign(
+              oldChild.parentNode.style,
+              newChild.propsAndChildren[0].style
+            );
+          } else {
+            Object.keys(oldChild.parentNode.style).forEach((property) => {
+              if (!newChild.propsAndChildren[0].style[property]) {
+                oldChild.style[property] = null;
+              }
+            });
+            Object.assign(oldChild.style, newChild.propsAndChildren[0].style);
+          }
+        }
+        oldChild.innerText = newChild.innerText;
+
+        foundMatchingOldChild = true;
+      } else if (
+        !(oldChild instanceof Element) &&
+        !(newChild instanceof Element)
+      ) {
+        if (oldChild.data === newChild.data) {
+          foundMatchingOldChild = true;
+        } else {
+          oldChild.data = newChild.data;
+        }
+        foundMatchingOldChild = true;
+      } else {
+        oldElement.removeChild(oldChild);
+      }
+    }
+    if (!foundMatchingOldChild) {
+      while (oldElement.childNodes[i]) {
+        oldElement.removeChild(oldElement.childNodes[i]);
+      }
+      oldElement.appendChild(newChild);
+    }
+  });
+  while (newChildren.length < oldElement.childNodes.length) {
+    oldElement.removeChild(oldElement.childNodes[newChildren.length]);
+  }
+};
+
+const defineComponent = (elementFunction) => {
+  const component = (...propsAndChildren) => {
+    const element = elementFunction(...propsAndChildren);
+    element.component = component;
+    element.propsAndChildren = propsAndChildren;
+    element.update = (...newPropsAndChildren) => {
+      element.propsAndChildren = newPropsAndChildren;
+      doMerge(element, component(...newPropsAndChildren));
+    };
+    return element;
+  };
+  return component;
+};
+
+const div = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('div', props, ...children)
+);
+
+const span = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('span', props, ...children)
+);
+
+const a = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('a', props, ...children)
+);
+
+const p = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('p', props, ...children)
+);
+
+const h1 = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('h1', props, ...children)
+);
+
+const h2 = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('h2', props, ...children)
+);
+
+const img = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('img', props, ...children)
+);
+
+const form = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('form', props, ...children)
+);
+
+const input = defineComponent((props) =>
+  SimpleHTML.makeElement('input', props)
+);
+
+const textarea = defineComponent((props) =>
+  SimpleHTML.makeElement('textarea', props)
+);
+
+const br = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('br', props, ...children)
+);
+
+const button = defineComponent((props, ...children) =>
+  SimpleHTML.makeElement('button', props, ...children)
+);
+// And so on, fill in more as needed...
+
+module.exports = {
+  doMerge,
+  compose,
+  Each,
+  If,
+  defineComponent,
+  div,
+  span,
+  a,
+  p,
+  h1,
+  h2,
+  img,
+  form,
+  input,
+  textarea,
+  br,
+  button,
+  doAddInnerShadow,
+  doAddShadow,
+  doPatchChildren,
+};
+
+  return module.exports;
+})();
+
+modules['src/router/Router.js'] = (() => {
+  const module = { exports: {} };
+  const SimpleRouter = include('src/libs/simpleRouter/SimpleRouter.js');
+
+const router = new SimpleRouter({
+  '/': 'Gremlint - Gremlin query formatter',
+  '/style-guide': 'Gremlint - Style guide',
+});
+
+const getCurrentRoute = () => router.currentRoute;
+const addHashChangeListener = (hashChangeListener) => {
+  router.addHashChangeListener(hashChangeListener);
+};
+
+module.exports = {
+  getCurrentRoute,
+  addHashChangeListener,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/simpleState/SimpleState.js'] = (() => {
+  const module = { exports: {} };
+  const simpleState = (initialState) => {
+  const state = initialState;
+  const stateChangeCallbacks = [];
+  const emit = () => {
+    stateChangeCallbacks.forEach((stateChangeCallback) => {
+      stateChangeCallback({ state, setState });
+    });
+  };
+  const setState = (newState) => {
+    Object.assign(state, newState);
+    emit();
+  };
+  const addStateChangeListener = (stateChangeCallback) => {
+    const element = { state, setState };
+    stateChangeCallbacks.push(stateChangeCallback);
+    return element;
+  };
+  return {
+    state,
+    setState,
+    addStateChangeListener,
+  };
+};
+
+module.exports = simpleState;
+
+  return module.exports;
+})();
+
+modules['src/store/Store.js'] = (() => {
+  const module = { exports: {} };
+  const simpleState = include('src/libs/simpleState/SimpleState.js');
+
+const { state, setState, addStateChangeListener } = simpleState({
+  queryInput: '',
+  queryOutput: '',
+  currentRoute: '/',
+});
+
+const getQueryInput = () => state.queryInput;
+const setQueryInput = (queryInput) => setState({ queryInput });
+
+const getQueryOutput = () => state.queryOutput;
+const setQueryOutput = (queryOutput) => setState({ queryOutput });
+
+const getCurrentRoute = () => state.currentRoute;
+const setCurrentRoute = (currentRoute) => setState({ currentRoute });
+
+module.exports = {
+  addStateChangeListener,
+  getQueryInput,
+  setQueryInput,
+  getQueryOutput,
+  setQueryOutput,
+  getCurrentRoute,
+  setCurrentRoute,
+};
+
+  return module.exports;
+})();
+
 modules['src/components/queryOutput/QueryOutput.js'] = (() => {
   const module = { exports: {} };
-  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+  const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const QueryOutput = (...children) =>
   div$(...children).setStyle({
@@ -461,7 +950,7 @@ module.exports = QueryOutput;
   return module.exports;
 })();
 
-modules['src/libraries/gremlint/Gremlint.js'] = (() => {
+modules['src/libs/gremlint/Gremlint.js'] = (() => {
   const module = { exports: {} };
   const pipe = value => (...fns) => fns.reduce((value, fn) => fn(value), value);
 
@@ -476,14 +965,14 @@ module.exports = {
 
 modules['src/views/testCases/TestCases.js'] = (() => {
   const module = { exports: {} };
-  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+  const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 const QueryOutput = include('src/components/queryOutput/QueryOutput.js');
-const { formatQuery } = include('src/libraries/gremlint/Gremlint.js');
+const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
 const testCases = [`g.V().hasLabel('application')`, `g.V().limit(10)`];
 const TestCases = ({ state }) =>
   div$(
-    ...testCases.map(query => {
+    ...testCases.map((query) => {
       const formattedQuery = formatQuery(query);
       return div$(
         QueryOutput(query).setStyle({
@@ -501,12 +990,91 @@ module.exports = TestCases;
   return module.exports;
 })();
 
+modules['src/libs/simpleColorPalette/SimpleColorPalette.js'] = (() => {
+  const module = { exports: {} };
+  const TextColor = 'slategray';
+const HighlightedTextColor = 'darkslategray';
+const DisabledTextColor = 'lightgray';
+const HighlightColor = 'yellowgreen';
+
+module.exports = {
+  TextColor,
+  HighlightedTextColor,
+  DisabledTextColor,
+  HighlightColor,
+};
+
+  return module.exports;
+})();
+
+modules['src/components/navigationButton/NavigationButton.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { HighlightedTextColor, TextColor, HighlightColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+
+const NavigationButton = (getProps) => {
+  let isHovered = false;
+
+  const getIsHovered = () => isHovered;
+  const setIsHovered = (value) => {
+    isHovered = value;
+    element.update();
+  };
+
+  const getIsSelected = () => getProps().isSelected;
+  const getHref = () => getProps().href;
+  const getLabel = () => getProps().label;
+
+  const getSpanStyle = () => `
+    display: inline-block;
+    text-align: center;
+    box-sizing: border-box;
+    width: 160px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 15px;
+    border-bottom: ${getIsSelected() ? `2px solid ${HighlightColor}` : 'none'};
+  `;
+
+  const getAStyle = () => `
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    color: ${
+      getIsSelected() || getIsHovered() ? HighlightedTextColor : TextColor
+    };
+  `;
+
+  const element = compose('span', () => ({ style: getSpanStyle() }), [
+    compose(
+      'a',
+      () => ({
+        href: getHref(),
+        innerText: getLabel(),
+        style: getAStyle(),
+        onmouseenter: () => setIsHovered(true),
+        onmouseleave: () => setIsHovered(false),
+      }),
+      []
+    ),
+  ]);
+
+  return element;
+};
+
+module.exports = NavigationButton;
+
+  return module.exports;
+})();
+
 modules['src/components/queryInput/atoms.js'] = (() => {
   const module = { exports: {} };
-  const { textArea$ } = include('src/libraries/fakeReact/FakeReact.js');
+  const { textArea$ } = include('src/libs/fakeReact/FakeReact.js');
 
-const ExpandableTextArea = value =>
-  textArea$(value).onInput(textArea => {
+const ExpandableTextArea = (value) =>
+  textArea$(value).onInput((textArea) => {
     const previousClientHeight = textArea.clientHeight;
     const { scrollX, scrollY } = window;
     textArea.setStyle({ height: 'auto' });
@@ -548,10 +1116,10 @@ module.exports = QueryInput;
 
 modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
   const module = { exports: {} };
-  const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+  const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 const QueryInput = include('src/components/queryInput/QueryInput.js');
 const QueryOutput = include('src/components/queryOutput/QueryOutput.js');
-const { formatQuery } = include('src/libraries/gremlint/Gremlint.js');
+const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
 const QueryFormatter = ({ state }) =>
   div$(
@@ -569,20 +1137,20 @@ module.exports = QueryFormatter;
 
 modules['src/app/App.js'] = (() => {
   const module = { exports: {} };
-  const Observable = include('src/libraries/observable/Observable.js');
+  /*const Observable = include('src/libs/observable/Observable.js');
 
 // Currently needs at least two arguments
 const add$ = (...observables) => {
   const sum = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .reduce((a, b) => a + b);
   const sum$ = new Observable(sum);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const sum = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .reduce((a, b) => a + b);
@@ -595,15 +1163,15 @@ const add$ = (...observables) => {
 // Currently needs at least two arguments
 const subtract$ = (...observables) => {
   const difference = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .reduce((a, b) => a - b);
   const difference$ = new Observable(difference);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const difference = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .reduce((a, b) => a - b);
@@ -616,15 +1184,15 @@ const subtract$ = (...observables) => {
 // Currently needs at least two arguments
 const multiply$ = (...observables) => {
   const product = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .reduce((a, b) => a * b);
   const product$ = new Observable(product);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const product = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .reduce((a, b) => a * b);
@@ -637,15 +1205,15 @@ const multiply$ = (...observables) => {
 // Currently needs at least two arguments
 const divide$ = (...observables) => {
   const quotient = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .reduce((a, b) => a / b);
   const quotient$ = new Observable(quotient);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const quotient = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .reduce((a, b) => a / b);
@@ -657,9 +1225,7 @@ const divide$ = (...observables) => {
 
 const choose$ = (observable, option1, option2) => {
   const result$ = new Observable(
-    (observable instanceof Observable
-    ? observable.value
-    : observable)
+    (observable instanceof Observable ? observable.value : observable)
       ? option1 instanceof Observable
         ? option1.value
         : option1
@@ -668,13 +1234,13 @@ const choose$ = (observable, option1, option2) => {
       : option2
   );
   [observable, option1, option2]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         // TODO: Make it possible to set a specific child of an observable
-        result$.value = (observable instanceof Observable
-        ? observable.value
-        : observable)
+        result$.value = (
+          observable instanceof Observable ? observable.value : observable
+        )
           ? option1 instanceof Observable
             ? option1.value
             : option1
@@ -688,17 +1254,17 @@ const choose$ = (observable, option1, option2) => {
 
 const eq$ = (...observables) => {
   const equality = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .every((element, _, array) => element === array[0]);
   const equality$ = new Observable(equality);
   observables
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const equality = observables
-          .map(observable =>
+          .map((observable) =>
             observable instanceof Observable ? observable.value : observable
           )
           .every((element, _, array) => element === array[0]);
@@ -710,17 +1276,17 @@ const eq$ = (...observables) => {
 
 const neq$ = (...observables) => {
   const inequality = !observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .every((element, _, array) => element === array[0]);
   const inequality$ = new Observable(inequality);
   observables
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const inequality = !observables
-          .map(observable =>
+          .map((observable) =>
             observable instanceof Observable ? observable.value : observable
           )
           .every((element, _, array) => element === array[0]);
@@ -737,8 +1303,8 @@ const gt$ = (value1$, value2$) => {
   const isGreaterThan$ = new Observable(value1 > value2);
 
   [value1$, value2$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const value1 = value1$ instanceof Observable ? value1$.value : value1$;
         const value2 = value2$ instanceof Observable ? value2$.value : value2$;
@@ -756,8 +1322,8 @@ const lt$ = (value1$, value2$) => {
   const isLessThan$ = new Observable(value1 < value2);
 
   [value1$, value2$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const value1 = value1$ instanceof Observable ? value1$.value : value1$;
         const value2 = value2$ instanceof Observable ? value2$.value : value2$;
@@ -768,7 +1334,7 @@ const lt$ = (value1$, value2$) => {
   return isLessThan$;
 };
 
-const not$ = observable => {
+const not$ = (observable) => {
   const conditional =
     observable instanceof Observable ? observable.value : observable;
   const opposite$ = new Observable(!conditional);
@@ -782,15 +1348,15 @@ const not$ = observable => {
 
 const or$ = (...observables) => {
   const someTruthy = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .some(Boolean);
   const someTruthy$ = new Observable(someTruthy);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const someTruthy = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .some(Boolean);
@@ -809,8 +1375,8 @@ const slice$ = (stringOrArray$, start$, stop$) => {
   const stop = stop$ instanceof Observable ? stop$.value : stop$;
   const slicedStringOrArray$ = new Observable(stringOrArray.slice(start, stop));
   [stringOrArray$, start$, stop$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const stringOrArray =
           stringOrArray$ instanceof Observable
@@ -830,8 +1396,8 @@ const split$ = (string$, separator$) => {
     separator$ instanceof Observable ? separator$.value : separator$;
   const splitString$ = new Observable(string.split(separator));
   [string$, separator$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const string = string$ instanceof Observable ? string$.value : string$;
         const separator =
@@ -848,8 +1414,8 @@ const join$ = (array$, separator$) => {
     separator$ instanceof Observable ? separator$.value : separator$;
   const joinedArray$ = new Observable(array.join(separator));
   [array$, separator$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const array = array$ instanceof Observable ? array$.value : array$;
         const separator =
@@ -860,7 +1426,7 @@ const join$ = (array$, separator$) => {
   return joinedArray$;
 };
 
-const length$ = stringOrArray$ => {
+const length$ = (stringOrArray$) => {
   const stringOrArray =
     stringOrArray$ instanceof Observable
       ? stringOrArray$.value
@@ -889,17 +1455,17 @@ const toArray$ = (...observables) => {
 };
 
 const Choose$ = (observable, element1, element2) => {
-  let element = (observable instanceof Observable
-  ? observable.value
-  : observable)
+  let element = (
+    observable instanceof Observable ? observable.value : observable
+  )
     ? element1
     : element2;
   if (observable instanceof Observable) {
     window.addEventListener(observable.id, ({ detail }) => {
       // TODO: Make it possible to set a specific child of an observable
-      newElement = (observable instanceof Observable
-      ? observable.value
-      : observable)
+      newElement = (
+        observable instanceof Observable ? observable.value : observable
+      )
         ? element1
         : element2;
 
@@ -912,7 +1478,7 @@ const Choose$ = (observable, element1, element2) => {
   return element;
 };
 
-const Switch$ = statement$ => (...clauses) => {
+const Switch$ = (statement$) => (...clauses) => {
   const cases = clauses.filter((_, i) => i % 2 === 0);
   const elements = clauses.filter((_, i) => i % 2 !== 0);
   return cases.map((theCase, i) => {
@@ -928,7 +1494,7 @@ const Nothing$ = () => div$().setStyle({ display: 'none' });
 
 const If$ = (observable, element) => Choose$(observable, element, Nothing$());
 
-const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const CenteredContainer = include(
   'src/components/centeredContainer/CenteredContainer.js'
@@ -957,7 +1523,43 @@ const App = ({ state, currentRoute$ }) =>
         TestCases({ state })
       )
     )
-  );
+  );*/
+
+const NavigationButton = include(
+  'src/components/navigationButton/NavigationButton.js'
+);
+const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { addHashChangeListener, getCurrentRoute } = include(
+  'src/router/Router.js'
+);
+
+const EnhancedNavigationButton = (getProps) => {
+  const element = NavigationButton(getProps);
+  addHashChangeListener(() => element.update());
+  return element;
+};
+
+const getQueryFormatterButtonProps = () => ({
+  isSelected: getCurrentRoute() === '/',
+  label: 'Query formatter',
+  href: '#!/',
+});
+
+const getStyleGuideButtonProps = () => ({
+  isSelected: getCurrentRoute() === '/style-guide',
+  label: 'Style guide',
+  href: '#!/style-guide',
+});
+
+const App = (getProps) => {
+  const element = compose('div', { style: 'width: 800px; margin: auto;' }, [
+    compose('div', { style: 'height: 40px' }, [
+      EnhancedNavigationButton(getQueryFormatterButtonProps),
+      EnhancedNavigationButton(getStyleGuideButtonProps),
+    ]),
+  ]);
+  return element;
+};
 
 module.exports = App;
 
@@ -965,27 +1567,24 @@ module.exports = App;
 })();
 
 window.addEventListener('load', () => {
-const Router = include('src/libraries/router/Router.js');
-const Observable = include('src/libraries/observable/Observable.js');
+const SimpleRouter = include('src/libs/simpleRouter/SimpleRouter.js');
+const Observable = include('src/libs/observable/Observable.js');
 const App = include('src/app/App.js');
+const Store = include('src/store/Store.js');
 
-const router = new Router({
+const router = new SimpleRouter({
   '/': 'Gremlint - Gremlin query formatter',
   '/style-guide': 'Gremlint - Style guide',
-  '/test-cases': 'Gremlint - Test cases',
 });
 
-const state = {
-  queryInput$: new Observable(''),
-  queryOutput$: new Observable(''),
-};
+const app = App(() => ({}));
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',
   margin: '0px',
 });
 
-document.body.appendChild(App({ state, currentRoute$: router.currentRoute$ }));
+document.body.appendChild(app);
 
 })
 </script>

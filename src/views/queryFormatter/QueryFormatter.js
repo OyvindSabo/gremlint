@@ -1,7 +1,7 @@
-const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 const QueryInput = include('src/components/queryInput/QueryInput.js');
 const QueryOutput = include('src/components/queryOutput/QueryOutput.js');
-const { formatQuery } = include('src/libraries/gremlint/Gremlint.js');
+const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
 const QueryFormatter = ({ state }) =>
   div$(

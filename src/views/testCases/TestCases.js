@@ -1,11 +1,11 @@
-const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 const QueryOutput = include('src/components/queryOutput/QueryOutput.js');
-const { formatQuery } = include('src/libraries/gremlint/Gremlint.js');
+const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
 const testCases = [`g.V().hasLabel('application')`, `g.V().limit(10)`];
 const TestCases = ({ state }) =>
   div$(
-    ...testCases.map(query => {
+    ...testCases.map((query) => {
       const formattedQuery = formatQuery(query);
       return div$(
         QueryOutput(query).setStyle({

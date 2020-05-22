@@ -1,8 +1,8 @@
-const Observable = include('src/libraries/observable/Observable.js');
+const Observable = include('src/libs/observable/Observable.js');
 
 const createElement$ = (elementType, ...observables) => {
   const element = document.createElement(elementType);
-  observables.flat().forEach(observable => {
+  observables.flat().forEach((observable) => {
     if (
       // If it is observable value
       observable instanceof Observable &&
@@ -28,7 +28,7 @@ const createElement$ = (elementType, ...observables) => {
   });
   // Note that styleObject$ is an object with observable values, not an observable object
   // TODO: It should also be possible to set the style as a non-observable object
-  element.setStyle = styleObject$ => {
+  element.setStyle = (styleObject$) => {
     Object.entries(styleObject$).forEach(([styleProperty, styleValue$]) => {
       if (styleValue$ instanceof Observable) {
         element.style[styleProperty] = styleValue$.value;
@@ -41,7 +41,7 @@ const createElement$ = (elementType, ...observables) => {
     });
     return element;
   };
-  element.setProps = propsObject => {
+  element.setProps = (propsObject) => {
     Object.entries(propsObject).forEach(([propKey, propValue$]) => {
       if (propValue$ instanceof Observable) {
         element[propKey] = propValue$.value;
@@ -54,20 +54,20 @@ const createElement$ = (elementType, ...observables) => {
     });
     return element;
   };
-  element.onClick = clickCallback => {
+  element.onClick = (clickCallback) => {
     element.style.cursor = 'pointer';
     element.onclick = () => clickCallback(element);
     return element;
   };
-  element.onMouseEnter = mouseEnterCallback => {
+  element.onMouseEnter = (mouseEnterCallback) => {
     element.onmouseenter = () => mouseEnterCallback(element);
     return element;
   };
-  element.onMouseLeave = mouseLeaveCallback => {
+  element.onMouseLeave = (mouseLeaveCallback) => {
     element.onmouseleave = () => mouseLeaveCallback(element);
     return element;
   };
-  element.onInput = inputCallback => {
+  element.onInput = (inputCallback) => {
     element.addEventListener('input', () => inputCallback(element));
     return element;
   };

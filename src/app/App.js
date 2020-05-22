@@ -1,17 +1,17 @@
-const Observable = include('src/libraries/observable/Observable.js');
+/*const Observable = include('src/libs/observable/Observable.js');
 
 // Currently needs at least two arguments
 const add$ = (...observables) => {
   const sum = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .reduce((a, b) => a + b);
   const sum$ = new Observable(sum);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const sum = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .reduce((a, b) => a + b);
@@ -24,15 +24,15 @@ const add$ = (...observables) => {
 // Currently needs at least two arguments
 const subtract$ = (...observables) => {
   const difference = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .reduce((a, b) => a - b);
   const difference$ = new Observable(difference);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const difference = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .reduce((a, b) => a - b);
@@ -45,15 +45,15 @@ const subtract$ = (...observables) => {
 // Currently needs at least two arguments
 const multiply$ = (...observables) => {
   const product = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .reduce((a, b) => a * b);
   const product$ = new Observable(product);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const product = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .reduce((a, b) => a * b);
@@ -66,15 +66,15 @@ const multiply$ = (...observables) => {
 // Currently needs at least two arguments
 const divide$ = (...observables) => {
   const quotient = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .reduce((a, b) => a / b);
   const quotient$ = new Observable(quotient);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const quotient = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .reduce((a, b) => a / b);
@@ -86,9 +86,7 @@ const divide$ = (...observables) => {
 
 const choose$ = (observable, option1, option2) => {
   const result$ = new Observable(
-    (observable instanceof Observable
-    ? observable.value
-    : observable)
+    (observable instanceof Observable ? observable.value : observable)
       ? option1 instanceof Observable
         ? option1.value
         : option1
@@ -97,13 +95,13 @@ const choose$ = (observable, option1, option2) => {
       : option2
   );
   [observable, option1, option2]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         // TODO: Make it possible to set a specific child of an observable
-        result$.value = (observable instanceof Observable
-        ? observable.value
-        : observable)
+        result$.value = (
+          observable instanceof Observable ? observable.value : observable
+        )
           ? option1 instanceof Observable
             ? option1.value
             : option1
@@ -117,17 +115,17 @@ const choose$ = (observable, option1, option2) => {
 
 const eq$ = (...observables) => {
   const equality = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .every((element, _, array) => element === array[0]);
   const equality$ = new Observable(equality);
   observables
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const equality = observables
-          .map(observable =>
+          .map((observable) =>
             observable instanceof Observable ? observable.value : observable
           )
           .every((element, _, array) => element === array[0]);
@@ -139,17 +137,17 @@ const eq$ = (...observables) => {
 
 const neq$ = (...observables) => {
   const inequality = !observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .every((element, _, array) => element === array[0]);
   const inequality$ = new Observable(inequality);
   observables
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const inequality = !observables
-          .map(observable =>
+          .map((observable) =>
             observable instanceof Observable ? observable.value : observable
           )
           .every((element, _, array) => element === array[0]);
@@ -166,8 +164,8 @@ const gt$ = (value1$, value2$) => {
   const isGreaterThan$ = new Observable(value1 > value2);
 
   [value1$, value2$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const value1 = value1$ instanceof Observable ? value1$.value : value1$;
         const value2 = value2$ instanceof Observable ? value2$.value : value2$;
@@ -185,8 +183,8 @@ const lt$ = (value1$, value2$) => {
   const isLessThan$ = new Observable(value1 < value2);
 
   [value1$, value2$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const value1 = value1$ instanceof Observable ? value1$.value : value1$;
         const value2 = value2$ instanceof Observable ? value2$.value : value2$;
@@ -197,7 +195,7 @@ const lt$ = (value1$, value2$) => {
   return isLessThan$;
 };
 
-const not$ = observable => {
+const not$ = (observable) => {
   const conditional =
     observable instanceof Observable ? observable.value : observable;
   const opposite$ = new Observable(!conditional);
@@ -211,15 +209,15 @@ const not$ = observable => {
 
 const or$ = (...observables) => {
   const someTruthy = observables
-    .map(observable =>
+    .map((observable) =>
       observable instanceof Observable ? observable.value : observable
     )
     .some(Boolean);
   const someTruthy$ = new Observable(someTruthy);
-  observables.forEach(observable => {
+  observables.forEach((observable) => {
     window.addEventListener(observable.id, ({ detail }) => {
       const someTruthy = observables
-        .map(observable =>
+        .map((observable) =>
           observable instanceof Observable ? observable.value : observable
         )
         .some(Boolean);
@@ -238,8 +236,8 @@ const slice$ = (stringOrArray$, start$, stop$) => {
   const stop = stop$ instanceof Observable ? stop$.value : stop$;
   const slicedStringOrArray$ = new Observable(stringOrArray.slice(start, stop));
   [stringOrArray$, start$, stop$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const stringOrArray =
           stringOrArray$ instanceof Observable
@@ -259,8 +257,8 @@ const split$ = (string$, separator$) => {
     separator$ instanceof Observable ? separator$.value : separator$;
   const splitString$ = new Observable(string.split(separator));
   [string$, separator$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const string = string$ instanceof Observable ? string$.value : string$;
         const separator =
@@ -277,8 +275,8 @@ const join$ = (array$, separator$) => {
     separator$ instanceof Observable ? separator$.value : separator$;
   const joinedArray$ = new Observable(array.join(separator));
   [array$, separator$]
-    .filter(observable => observable instanceof Observable)
-    .forEach(observable => {
+    .filter((observable) => observable instanceof Observable)
+    .forEach((observable) => {
       window.addEventListener(observable.id, ({ detail }) => {
         const array = array$ instanceof Observable ? array$.value : array$;
         const separator =
@@ -289,7 +287,7 @@ const join$ = (array$, separator$) => {
   return joinedArray$;
 };
 
-const length$ = stringOrArray$ => {
+const length$ = (stringOrArray$) => {
   const stringOrArray =
     stringOrArray$ instanceof Observable
       ? stringOrArray$.value
@@ -318,17 +316,17 @@ const toArray$ = (...observables) => {
 };
 
 const Choose$ = (observable, element1, element2) => {
-  let element = (observable instanceof Observable
-  ? observable.value
-  : observable)
+  let element = (
+    observable instanceof Observable ? observable.value : observable
+  )
     ? element1
     : element2;
   if (observable instanceof Observable) {
     window.addEventListener(observable.id, ({ detail }) => {
       // TODO: Make it possible to set a specific child of an observable
-      newElement = (observable instanceof Observable
-      ? observable.value
-      : observable)
+      newElement = (
+        observable instanceof Observable ? observable.value : observable
+      )
         ? element1
         : element2;
 
@@ -341,7 +339,7 @@ const Choose$ = (observable, element1, element2) => {
   return element;
 };
 
-const Switch$ = statement$ => (...clauses) => {
+const Switch$ = (statement$) => (...clauses) => {
   const cases = clauses.filter((_, i) => i % 2 === 0);
   const elements = clauses.filter((_, i) => i % 2 !== 0);
   return cases.map((theCase, i) => {
@@ -357,7 +355,7 @@ const Nothing$ = () => div$().setStyle({ display: 'none' });
 
 const If$ = (observable, element) => Choose$(observable, element, Nothing$());
 
-const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const CenteredContainer = include(
   'src/components/centeredContainer/CenteredContainer.js'
@@ -386,6 +384,42 @@ const App = ({ state, currentRoute$ }) =>
         TestCases({ state })
       )
     )
-  );
+  );*/
+
+const NavigationButton = include(
+  'src/components/navigationButton/NavigationButton.js'
+);
+const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { addHashChangeListener, getCurrentRoute } = include(
+  'src/router/Router.js'
+);
+
+const EnhancedNavigationButton = (getProps) => {
+  const element = NavigationButton(getProps);
+  addHashChangeListener(() => element.update());
+  return element;
+};
+
+const getQueryFormatterButtonProps = () => ({
+  isSelected: getCurrentRoute() === '/',
+  label: 'Query formatter',
+  href: '#!/',
+});
+
+const getStyleGuideButtonProps = () => ({
+  isSelected: getCurrentRoute() === '/style-guide',
+  label: 'Style guide',
+  href: '#!/style-guide',
+});
+
+const App = (getProps) => {
+  const element = compose('div', { style: 'width: 800px; margin: auto;' }, [
+    compose('div', { style: 'height: 40px' }, [
+      EnhancedNavigationButton(getQueryFormatterButtonProps),
+      EnhancedNavigationButton(getStyleGuideButtonProps),
+    ]),
+  ]);
+  return element;
+};
 
 module.exports = App;

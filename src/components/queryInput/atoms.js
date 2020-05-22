@@ -1,7 +1,7 @@
-const { textArea$ } = include('src/libraries/fakeReact/FakeReact.js');
+const { textArea$ } = include('src/libs/fakeReact/FakeReact.js');
 
-const ExpandableTextArea = value =>
-  textArea$(value).onInput(textArea => {
+const ExpandableTextArea = (value) =>
+  textArea$(value).onInput((textArea) => {
     const previousClientHeight = textArea.clientHeight;
     const { scrollX, scrollY } = window;
     textArea.setStyle({ height: 'auto' });

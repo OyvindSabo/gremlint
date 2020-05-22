@@ -1,4 +1,4 @@
-const { div$ } = include('src/libraries/fakeReact/FakeReact.js');
+const { div$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const StyleGuide = () => div$('Style guide');
 

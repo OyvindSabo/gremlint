@@ -1,4 +1,4 @@
-const { a$ } = include('src/libraries/fakeReact/FakeReact.js');
+const { a$ } = include('src/libs/fakeReact/FakeReact.js');
 
 const NavigatorLink = ({ title, to }) =>
   a$(title)

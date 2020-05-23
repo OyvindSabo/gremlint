@@ -12,7 +12,6 @@ const getCodeStyle = () => `
   padding: 10px;
   border: none;
   resize: none;
-  width: 100%;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
   white-space: pre-wrap;
 `;
@@ -23,10 +22,10 @@ const Code = (getProps) => {
     compose('div', { style: getCodeStyle() }, [
       compose(
         'span',
-        {
+        () => ({
           style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
           innerText: getInnerText(),
-        },
+        }),
         []
       ),
     ]),

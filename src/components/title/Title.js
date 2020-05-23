@@ -5,16 +5,20 @@ const { TextColor } = include(
 
 const Title = (getProps) => {
   const getInnerText = () => getProps().innerText;
-  const element = compose('div', { style: 'padding: 10px;' }, [
-    compose(
-      'span',
-      {
-        style: `color: ${TextColor}; line-height: 30px; font-size: 25px;`,
-        innerText: getInnerText(),
-      },
-      []
-    ),
-  ]);
+  const element = compose(
+    'div',
+    { style: getInnerText() ? 'padding: 10px;' : '' },
+    [
+      compose(
+        'span',
+        {
+          style: `color: ${TextColor}; line-height: 30px; font-size: 25px;`,
+          innerText: getInnerText(),
+        },
+        []
+      ),
+    ]
+  );
   return element;
 };
 

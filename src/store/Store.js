@@ -1,4 +1,5 @@
 const Observable = include('src/libs/observable/Observable.js');
+const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
 const queryInput$ = new Observable('');
 const getQueryInput = () => queryInput$.value;
@@ -17,6 +18,10 @@ const setQueryOutput = (queryOutput) => {
 const addQueryOutputChangeListener = (callback) => {
   addEventListener(queryOutput$.id, callback);
 };
+
+addQueryInputChangeListener(({ detail }) => {
+  setQueryOutput(formatQuery(detail));
+});
 
 module.exports = {
   getQueryInput,

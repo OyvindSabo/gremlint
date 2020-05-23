@@ -37,40 +37,6 @@ module.exports = Observable;
   return module.exports;
 })();
 
-modules['src/store/Store.js'] = (() => {
-  const module = { exports: {} };
-  const Observable = include('src/libs/observable/Observable.js');
-
-const queryInput$ = new Observable('');
-const getQueryInput = () => queryInput$.value;
-const setQueryInput = (queryInput) => {
-  queryInput$.value = queryInput;
-};
-const addQueryInputChangeListener = (callback) => {
-  addEventListener(queryInput$.id, callback);
-};
-
-const queryOutput$ = new Observable('');
-const getQueryOutput = () => queryOutput$.value;
-const setQueryOutput = (queryOutput) => {
-  queryOutput$.value = queryOutput;
-};
-const addQueryOutputChangeListener = (callback) => {
-  addEventListener(queryOutput$.id, callback);
-};
-
-module.exports = {
-  getQueryInput,
-  setQueryInput,
-  addQueryInputChangeListener,
-  getQueryOutput,
-  setQueryOutput,
-  addQueryOutputChangeListener,
-};
-
-  return module.exports;
-})();
-
 modules['src/libs/simpleHTML/SimpleHTML.js'] = (() => {
   const module = { exports: {} };
   const doAddInnerShadow = (element) => {
@@ -493,6 +459,58 @@ module.exports = {
   doAddInnerShadow,
   doAddShadow,
   doPatchChildren,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/Gremlint.js'] = (() => {
+  const module = { exports: {} };
+  const pipe = (value) => (...fns) => fns.reduce((value, fn) => fn(value), value);
+
+const formatQuery = (query, config = { maxLineLength: 80 }) => pipe(query)();
+
+module.exports = {
+  formatQuery,
+};
+
+  return module.exports;
+})();
+
+modules['src/store/Store.js'] = (() => {
+  const module = { exports: {} };
+  const Observable = include('src/libs/observable/Observable.js');
+const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
+
+const queryInput$ = new Observable('');
+const getQueryInput = () => queryInput$.value;
+const setQueryInput = (queryInput) => {
+  queryInput$.value = queryInput;
+};
+const addQueryInputChangeListener = (callback) => {
+  addEventListener(queryInput$.id, callback);
+};
+
+const queryOutput$ = new Observable('');
+const getQueryOutput = () => queryOutput$.value;
+const setQueryOutput = (queryOutput) => {
+  queryOutput$.value = queryOutput;
+};
+const addQueryOutputChangeListener = (callback) => {
+  addEventListener(queryOutput$.id, callback);
+};
+
+addQueryInputChangeListener(({ detail }) => {
+  setQueryOutput(formatQuery(detail));
+});
+
+module.exports = {
+  getQueryInput,
+  setQueryInput,
+  addQueryInputChangeListener,
+  getQueryOutput,
+  setQueryOutput,
+  addQueryOutputChangeListener,
 };
 
   return module.exports;
@@ -1199,7 +1217,7 @@ const getQueryInputStyle = () => `
 const QueryInput = (getProps) => {
   const getOnInput = () => getProps().oninput;
   const getValue = () => getProps().value;
-  return compose('div', {}, [
+  return compose('div', { style: 'padding: 10px;' }, [
     compose(
       'textarea',
       () => ({
@@ -1217,18 +1235,67 @@ module.exports = QueryInput;
   return module.exports;
 })();
 
+modules['src/components/code/Code.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { TextColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+
+const getCodeStyle = () => `
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  background: rgba(0, 0, 0, 0.05);
+  outline: none;
+  font-size: 15px;
+  padding: 10px;
+  border: none;
+  resize: none;
+  box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
+  white-space: pre-wrap;
+`;
+
+const Code = (getProps) => {
+  const getInnerText = () => getProps().innerText;
+  const element = compose('div', { style: 'padding: 10px;' }, [
+    compose('div', { style: getCodeStyle() }, [
+      compose(
+        'span',
+        () => ({
+          style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
+          innerText: getInnerText(),
+        }),
+        []
+      ),
+    ]),
+  ]);
+  return element;
+};
+
+module.exports = Code;
+
+  return module.exports;
+})();
+
 modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
   const module = { exports: {} };
   const QueryInput = include('src/components/queryInput/QueryInput.js');
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { getQueryInput, setQueryInput } = include('src/store/Store.js');
+const Code = include('src/components/code/Code.js');
+const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { getQueryInput, setQueryInput, getQueryOutput } = include(
+  'src/store/Store.js'
+);
 
 const QueryFormatter = () => {
-  const element = compose('div', { style: 'padding: 10px;' }, [
+  const element = compose('div', {}, [
     QueryInput(() => ({
       value: getQueryInput(),
       oninput: ({ target }) => setQueryInput(target.value),
     })),
+    If(
+      () => getQueryOutput(),
+      () => [Code(() => ({ innerText: getQueryOutput() }))]
+    ),
   ]);
   return element;
 };
@@ -1247,16 +1314,20 @@ const { TextColor } = include(
 
 const Title = (getProps) => {
   const getInnerText = () => getProps().innerText;
-  const element = compose('div', { style: 'padding: 10px;' }, [
-    compose(
-      'span',
-      {
-        style: `color: ${TextColor}; line-height: 30px; font-size: 25px;`,
-        innerText: getInnerText(),
-      },
-      []
-    ),
-  ]);
+  const element = compose(
+    'div',
+    { style: getInnerText() ? 'padding: 10px;' : '' },
+    [
+      compose(
+        'span',
+        {
+          style: `color: ${TextColor}; line-height: 30px; font-size: 25px;`,
+          innerText: getInnerText(),
+        },
+        []
+      ),
+    ]
+  );
   return element;
 };
 
@@ -1292,49 +1363,6 @@ const Paragraph = (getProps) => {
 };
 
 module.exports = Paragraph;
-
-  return module.exports;
-})();
-
-modules['src/components/code/Code.js'] = (() => {
-  const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { TextColor } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
-
-const getCodeStyle = () => `
-  border-radius: 5px;
-  font-family: "Courier New", Courier, monospace;
-  background: rgba(0, 0, 0, 0.05);
-  outline: none;
-  font-size: 15px;
-  padding: 10px;
-  border: none;
-  resize: none;
-  width: 100%;
-  box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
-  white-space: pre-wrap;
-`;
-
-const Code = (getProps) => {
-  const getInnerText = () => getProps().innerText;
-  const element = compose('div', { style: 'padding: 10px;' }, [
-    compose('div', { style: getCodeStyle() }, [
-      compose(
-        'span',
-        {
-          style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
-          innerText: getInnerText(),
-        },
-        []
-      ),
-    ]),
-  ]);
-  return element;
-};
-
-module.exports = Code;
 
   return module.exports;
 })();
@@ -1449,6 +1477,7 @@ const Router = include('src/router/Router.js');
 const app = App(() => ({}));
 Router.addHashChangeListener(app.update);
 Store.addQueryInputChangeListener(app.update);
+Store.addQueryOutputChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

@@ -17,7 +17,7 @@ const getQueryInputStyle = () => `
 const QueryInput = (getProps) => {
   const getOnInput = () => getProps().oninput;
   const getValue = () => getProps().value;
-  return compose('div', {}, [
+  return compose('div', { style: 'padding: 10px;' }, [
     compose(
       'textarea',
       () => ({

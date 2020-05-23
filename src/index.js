@@ -6,6 +6,7 @@ const Router = include('src/router/Router.js');
 const app = App(() => ({}));
 Router.addHashChangeListener(app.update);
 Store.addQueryInputChangeListener(app.update);
+Store.addQueryOutputChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

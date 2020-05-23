@@ -75,6 +75,7 @@ const compose = (elementType, getProps, children) => {
     if (typeof getProps === 'function') {
       if (element.setSelectionRange) {
         const { selectionStart, selectionEnd } = element;
+        Object.assign(element, getProps());
         element.setSelectionRange(selectionStart, selectionEnd);
       } else {
         Object.assign(element, getProps());

@@ -892,27 +892,6 @@ module.exports = Navigator;
   return module.exports;
 })();
 
-modules['src/components/styleGuideRule/StyleGuideRule.js'] = (() => {
-  const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-
-const StyleGuideRule = (getProps) => {
-  const getTitle = () => getProps().title;
-  const getExplanation = () => getProps().explanation;
-  const getExample = () => getProps().example;
-
-  return compose('div', {}, [
-    compose('h3', () => ({ innerText: getTitle() }), []),
-    compose('p', () => ({ innerText: getExplanation() }), []),
-    compose('pre', () => ({ innerText: getExample() }), []),
-  ]);
-};
-
-module.exports = StyleGuideRule;
-
-  return module.exports;
-})();
-
 modules['src/views/styleGuide/rules/Rules.js'] = (() => {
   const module = { exports: {} };
   const rules = [
@@ -1240,33 +1219,6 @@ module.exports = { rules };
   return module.exports;
 })();
 
-modules['src/views/styleGuide/StyleGuide.js'] = (() => {
-  const module = { exports: {} };
-  const StyleGuideRule = include(
-  'src/components/styleGuideRule/StyleGuideRule.js'
-);
-const { compose, Each, If } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { rules } = include('src/views/styleGuide/rules/Rules.js');
-
-const StyleGuide = () =>
-  compose('div', {}, [
-    Each(
-      () => rules,
-      (getCurrentValue) => [
-        StyleGuideRule(() => ({
-          title: getCurrentValue().title,
-          explanation: getCurrentValue().explanation,
-          example: getCurrentValue().example,
-        })),
-      ]
-    ),
-  ]);
-
-module.exports = StyleGuide;
-
-  return module.exports;
-})();
-
 modules['src/components/queryInput/QueryInput.js'] = (() => {
   const module = { exports: {} };
   const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
@@ -1321,6 +1273,154 @@ const QueryFormatter = () => {
 };
 
 module.exports = QueryFormatter;
+
+  return module.exports;
+})();
+
+modules['src/components/title/Title.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { TextColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+
+const Title = (getProps) => {
+  const getInnerText = () => getProps().innerText;
+  const element = compose('div', { style: 'padding: 10px;' }, [
+    compose(
+      'span',
+      {
+        style: `color: ${TextColor}; line-height: 30px; font-size: 25px;`,
+        innerText: getInnerText(),
+      },
+      []
+    ),
+  ]);
+  return element;
+};
+
+module.exports = Title;
+
+  return module.exports;
+})();
+
+modules['src/components/paragraph/Paragraph.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { TextColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+
+const Paragraph = (getProps) => {
+  const getInnerText = () => getProps().innerText;
+  const element = compose('div', { style: 'padding: 10px;' }, [
+    compose(
+      'span',
+      {
+        style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
+        innerText: getInnerText(),
+      },
+      []
+    ),
+  ]);
+  return element;
+};
+
+module.exports = Paragraph;
+
+  return module.exports;
+})();
+
+modules['src/components/code/Code.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { TextColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+
+const getCodeStyle = () => `
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  background: rgba(0, 0, 0, 0.05);
+  outline: none;
+  font-size: 15px;
+  padding: 10px;
+  border: none;
+  resize: none;
+  width: 100%;
+  box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
+  white-space: pre-wrap;
+`;
+
+const Code = (getProps) => {
+  const getInnerText = () => getProps().innerText;
+  const element = compose('div', { style: 'padding: 10px;' }, [
+    compose('div', { style: getCodeStyle() }, [
+      compose(
+        'span',
+        {
+          style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
+          innerText: getInnerText(),
+        },
+        []
+      ),
+    ]),
+  ]);
+  return element;
+};
+
+module.exports = Code;
+
+  return module.exports;
+})();
+
+modules['src/components/styleGuideRule/StyleGuideRule.js'] = (() => {
+  const module = { exports: {} };
+  const Title = include('src/components/title/Title.js');
+const Paragraph = include('src/components/paragraph/Paragraph.js');
+const Code = include('src/components/code/Code.js');
+const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+
+const StyleGuideRule = (getProps) => {
+  const getTitle = () => getProps().title;
+  const getExplanation = () => getProps().explanation;
+  const getExample = () => getProps().example;
+
+  return compose('div', { style: 'padding: 10px;' }, [
+    Title(() => ({ innerText: getTitle() })),
+    Paragraph(() => ({ innerText: getExplanation() })),
+    Code(() => ({ innerText: getExample() })),
+  ]);
+};
+
+module.exports = StyleGuideRule;
+
+  return module.exports;
+})();
+
+modules['src/views/styleGuide/StyleGuide.js'] = (() => {
+  const module = { exports: {} };
+  const StyleGuideRule = include(
+  'src/components/styleGuideRule/StyleGuideRule.js'
+);
+const { compose, Each, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { rules } = include('src/views/styleGuide/rules/Rules.js');
+
+const StyleGuide = () =>
+  compose('div', {}, [
+    Each(
+      () => rules,
+      (getCurrentValue) => [
+        StyleGuideRule(() => ({
+          title: getCurrentValue().title,
+          explanation: getCurrentValue().explanation,
+          example: getCurrentValue().example,
+        })),
+      ]
+    ),
+  ]);
+
+module.exports = StyleGuide;
 
   return module.exports;
 })();

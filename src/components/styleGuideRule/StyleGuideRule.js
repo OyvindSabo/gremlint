@@ -1,3 +1,6 @@
+const Title = include('src/components/title/Title.js');
+const Paragraph = include('src/components/paragraph/Paragraph.js');
+const Code = include('src/components/code/Code.js');
 const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
 
 const StyleGuideRule = (getProps) => {
@@ -5,10 +8,10 @@ const StyleGuideRule = (getProps) => {
   const getExplanation = () => getProps().explanation;
   const getExample = () => getProps().example;
 
-  return compose('div', {}, [
-    compose('h3', () => ({ innerText: getTitle() }), []),
-    compose('p', () => ({ innerText: getExplanation() }), []),
-    compose('pre', () => ({ innerText: getExample() }), []),
+  return compose('div', { style: 'padding: 10px;' }, [
+    Title(() => ({ innerText: getTitle() })),
+    Paragraph(() => ({ innerText: getExplanation() })),
+    Code(() => ({ innerText: getExample() })),
   ]);
 };
 

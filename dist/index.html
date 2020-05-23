@@ -464,43 +464,6 @@ module.exports = {
   return module.exports;
 })();
 
-modules['src/components/queryInput/QueryInput.js'] = (() => {
-  const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-
-const getQueryInputStyle = () => `
-  height: calc(50vh - 60px);
-  border-radius: 5px;
-  font-family: "Courier New", Courier, monospace;
-  background: rgba(0, 0, 0, 0.05);
-  outline: none;
-  font-size: 15px;
-  padding: 10px;
-  border: none;
-  resize: none;
-  width: 100%;
-  box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
-`;
-
-const QueryInput = (getProps) => {
-  const getOnInput = () => getProps().oninput;
-  const getValue = () => getProps().value;
-  return compose(
-    'textarea',
-    () => ({
-      oninput: getOnInput(),
-      style: getQueryInputStyle(),
-      value: getValue(),
-    }),
-    []
-  );
-};
-
-module.exports = QueryInput;
-
-  return module.exports;
-})();
-
 modules['src/components/spacer/Spacer.js'] = (() => {
   const module = { exports: {} };
   const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
@@ -508,6 +471,423 @@ modules['src/components/spacer/Spacer.js'] = (() => {
 const Spacer = () => compose('div', { style: 'height: 20px' }, []);
 
 module.exports = Spacer;
+
+  return module.exports;
+})();
+
+modules['src/libs/simpleState/SimpleState.js'] = (() => {
+  const module = { exports: {} };
+  const simpleState = (initialState) => {
+  const state = initialState;
+  const stateChangeCallbacks = [];
+  const emit = () => {
+    stateChangeCallbacks.forEach((stateChangeCallback) => {
+      stateChangeCallback({ state, setState });
+    });
+  };
+  const setState = (newState) => {
+    Object.assign(state, newState);
+    emit();
+  };
+  const addStateChangeListener = (stateChangeCallback) => {
+    const element = { state, setState };
+    stateChangeCallbacks.push(stateChangeCallback);
+    return element;
+  };
+  return {
+    state,
+    setState,
+    addStateChangeListener,
+  };
+};
+
+module.exports = simpleState;
+
+  return module.exports;
+})();
+
+modules['src/store/Store.js'] = (() => {
+  const module = { exports: {} };
+  const simpleState = include('src/libs/simpleState/SimpleState.js');
+const Observable = include('src/libs/observable/Observable.js');
+
+const queryInput$ = new Observable('');
+const getQueryInput = () => queryInput$.value;
+const setQueryInput = (queryInput) => {
+  queryInput$.value = queryInput;
+};
+const addQueryInputChangeListener = (callback) => {
+  addEventListener(queryInput$.id, callback);
+};
+
+const queryOutput$ = new Observable('');
+const getQueryOutput = () => queryOutput$.value;
+const setQueryOutput = (queryOutput) => {
+  queryOutput$.value = queryOutput;
+};
+const addQueryOutputChangeListener = (callback) => {
+  addEventListener(queryOutput$.id, callback);
+};
+
+module.exports = {
+  getQueryInput,
+  setQueryInput,
+  addQueryInputChangeListener,
+  getQueryOutput,
+  setQueryOutput,
+  addQueryOutputChangeListener,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/simpleRouter/SimpleRouter.js'] = (() => {
+  const module = { exports: {} };
+  function SimpleRouter(routes) {
+  /**
+   * @param {string} routes
+   */
+  this.setRoutes = function (routes) {
+    Object.entries(routes).forEach(([route, title]) => {
+      this.routes[route] = route;
+      this.titles[route] = title;
+      if (route === '/') {
+        this.routes[''] = route;
+        this.titles[''] = title;
+      }
+    });
+    this.syncWithHash();
+  };
+  SimpleRouter.getTokens = function (hash) {
+    return hash
+      .split('/')
+      .filter(Boolean)
+      .filter((element) => element !== '#')
+      .filter((element) => element !== '#!');
+  };
+  /**
+   * @param {string} token
+   * @returns {boolean}
+   */
+  SimpleRouter.isParameterRouteToken = function (token) {
+    if (
+      token.indexOf('<') !== 0 ||
+      !token.slice(2, -4).includes(':') ||
+      token.indexOf('>') !== token.length - 1
+    ) {
+      return false;
+    }
+    const [parameter, type] = token
+      .slice(token.indexOf('<') + 1, token.indexOf('>'))
+      .split(':');
+
+    if (!['int', 'string', 'number'].includes(type)) {
+      return false;
+    }
+    return true;
+  };
+  SimpleRouter.appendTokenToHash = function (hash, token) {
+    return `${hash}/${token}`;
+  };
+  SimpleRouter.parseParameterRouteToken = function (token) {
+    const [parameter, type] = token
+      .slice(token.indexOf('<') + 1, token.indexOf('>'))
+      .split(':');
+    return {
+      parameter,
+      type,
+    };
+  };
+  // (hash: string, route: string) => false | { [key: string]: number | string }
+  SimpleRouter.getMatch = function (hash, route) {
+    const hashTokens = SimpleRouter.getTokens(hash);
+    const routeTokens = SimpleRouter.getTokens(route);
+    const params = {};
+    let reconstructedHash = '#!';
+    if (hashTokens.length !== routeTokens.length) return false;
+    for (let i of Object.keys(hashTokens)) {
+      const hashToken = hashTokens[i];
+      const routeToken = routeTokens[i];
+      if (SimpleRouter.isParameterRouteToken(routeToken)) {
+        const { parameter, type } = SimpleRouter.parseParameterRouteToken(
+          routeToken
+        );
+        if (type === 'int') {
+          if (!Router.isInt(hashToken)) return false;
+          params[parameter] = parseInt(hashToken);
+          reconstructedHash = SimpleRouter.appendTokenToHash(
+            reconstructedHash,
+            hashToken
+          );
+        } else if (type === 'number' && !Router.isNumber(hasToken)) {
+          if (!Router.isNumber(hashToken)) return false;
+          params[parameter] = Number(hashToken);
+          reconstructedHash = SimpleRouter.appendTokenToHash(
+            reconstructedHash,
+            hashToken
+          );
+        } else if (type === 'string') {
+          params[parameter] = hashToken;
+          reconstructedHash = SimpleRouter.appendTokenToHash(
+            reconstructedHash,
+            hashToken
+          );
+        }
+      } else {
+        if (hashToken !== routeToken) return false;
+        reconstructedHash = SimpleRouter.appendTokenToHash(
+          reconstructedHash,
+          hashToken
+        );
+      }
+    }
+    return { params, reconstructedHash };
+  };
+  SimpleRouter.getRouteAndParamsFromHash = function (hash, routes) {
+    for (let route of Object.keys(routes)) {
+      const match = SimpleRouter.getMatch(hash, route);
+      if (match) {
+        const { params, reconstructedHash } = match;
+        return { route, params, reconstructedHash };
+      }
+    }
+    return { route: '', params: {}, reconstructedHash: '' };
+  };
+  /**
+   * @param {Object.<string, number | string>} params
+   */
+  this.setParams = function (params) {
+    this.params = params;
+    // Todo: Maybe dispatch some kind of event
+  };
+  this.setCurrentRoute = function (route) {
+    this.currentRoute = route;
+  };
+  this.setCurrentTitle = function (title) {
+    this.currentTitle = title;
+  };
+  SimpleRouter.removeHash = function () {
+    return history.replaceState(null, null, ' ');
+  };
+  this.syncWithHash = function () {
+    const { hash } = location;
+    const {
+      route,
+      params,
+      reconstructedHash,
+    } = SimpleRouter.getRouteAndParamsFromHash(hash, this.routes);
+    this.setParams(params);
+    this.setCurrentRoute(this.routes[route]);
+    this.setCurrentTitle(this.titles[route]);
+    if (reconstructedHash === '#!') {
+      SimpleRouter.removeHash();
+    } else {
+      history.replaceState(undefined, undefined, reconstructedHash);
+    }
+    document.title = this.currentTitle;
+  };
+  this.params = {};
+  this.currentRoute = '';
+  this.routes = {};
+  this.titles = {};
+  this.hashChangeListeners = [];
+  this.setRoutes(routes);
+  window.addEventListener('hashchange', () => {
+    this.syncWithHash();
+    this.callHashChangeListeners();
+  });
+  /**
+   * @param {string} route
+   * One of the registered routes, without hashbang
+   */
+  this.navigateTo = (route) => {
+    location.hash = `#!${route}`;
+  };
+
+  this.refresh = () => this.syncWithHash();
+
+  // @possiblyNumber: string
+  SimpleRouter.isNumber = function (possiblyNumber) {
+    return !isNaN(Number(possiblyNumber));
+  };
+  SimpleRouter.isInt = function (possiblyInt) {
+    return (
+      SimpleRouter.isNumber(possiblyInt) &&
+      parseInt(possiblyInt) === Number(possiblyInt)
+    );
+  };
+  this.addHashChangeListener = (callback) => {
+    this.hashChangeListeners.push(callback);
+    this.callHashChangeListeners();
+  };
+  this.callHashChangeListeners = () => {
+    this.hashChangeListeners.forEach((hashChangeListener) =>
+      hashChangeListener({
+        params: this.params,
+        currentRoute: this.currentRoute,
+      })
+    );
+  };
+  this.getParams = () => this.params;
+  this.getCurrentTitle = () => this.currentTitle;
+  SimpleRouter.isProp = (propsOrChild) =>
+    !(propsOrChild instanceof HTMLElement || typeof propsOrChild === 'string');
+}
+
+module.exports = SimpleRouter;
+
+  return module.exports;
+})();
+
+modules['src/router/Router.js'] = (() => {
+  const module = { exports: {} };
+  const SimpleRouter = include('src/libs/simpleRouter/SimpleRouter.js');
+
+const router = new SimpleRouter({
+  '/': 'Gremlint - Gremlin query formatter',
+  '/style-guide': 'Gremlint - Style guide',
+});
+
+const getCurrentRoute = () => router.currentRoute;
+const addHashChangeListener = (hashChangeListener) => {
+  router.addHashChangeListener(hashChangeListener);
+};
+
+module.exports = {
+  getCurrentRoute,
+  addHashChangeListener,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/simpleColorPalette/SimpleColorPalette.js'] = (() => {
+  const module = { exports: {} };
+  const TextColor = 'slategray';
+const HighlightedTextColor = 'darkslategray';
+const DisabledTextColor = 'lightgray';
+const HighlightColor = 'yellowgreen';
+const White = 'white';
+
+module.exports = {
+  TextColor,
+  HighlightedTextColor,
+  DisabledTextColor,
+  HighlightColor,
+  White,
+};
+
+  return module.exports;
+})();
+
+modules['src/components/navigationButton/NavigationButton.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { HighlightedTextColor, TextColor, HighlightColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+
+const NavigationButton = (getProps) => {
+  let isHovered = false;
+
+  const getIsHovered = () => isHovered;
+  const setIsHovered = (value) => {
+    isHovered = value;
+    element.update();
+  };
+
+  const getIsSelected = () => getProps().isSelected;
+  const getHref = () => getProps().href;
+  const getLabel = () => getProps().label;
+
+  const getSpanStyle = () => `
+    display: inline-block;
+    text-align: center;
+    box-sizing: border-box;
+    width: 160px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 15px;
+    border-bottom: ${getIsSelected() ? `2px solid ${HighlightColor}` : 'none'};
+  `;
+
+  const getAStyle = () => `
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    color: ${
+      getIsSelected() || getIsHovered() ? HighlightedTextColor : TextColor
+    };
+  `;
+
+  const element = compose('span', () => ({ style: getSpanStyle() }), [
+    compose(
+      'a',
+      () => ({
+        href: getHref(),
+        innerText: getLabel(),
+        style: getAStyle(),
+        onmouseenter: () => setIsHovered(true),
+        onmouseleave: () => setIsHovered(false),
+      }),
+      []
+    ),
+  ]);
+
+  return element;
+};
+
+module.exports = NavigationButton;
+
+  return module.exports;
+})();
+
+modules['src/components/navigator/Navigator.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
+const NavigationButton = include(
+  'src/components/navigationButton/NavigationButton.js'
+);
+
+const getQueryFormatterButtonProps = (getCurrentRoute) => () => ({
+  isSelected: getCurrentRoute() === '/',
+  label: 'Query formatter',
+  href: '#!/',
+});
+
+const getStyleGuideButtonProps = (getCurrentRoute) => () => ({
+  isSelected: getCurrentRoute() === '/style-guide',
+  label: 'Style guide',
+  href: '#!/style-guide',
+});
+
+const Navigator = (getProps) => {
+  const getCurrentRoute = () => getProps().currentRoute;
+  const element = compose('div', {}, [
+    compose(
+      'div',
+      {
+        style: `background: ${White};
+                height: 40px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;`,
+      },
+      [
+        compose('div', { style: 'width: 800px; margin: auto;' }, [
+          NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
+          NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),
+        ]),
+      ]
+    ),
+    compose('div', { style: 'height:40px;' }, []),
+  ]);
+  return element;
+};
+
+module.exports = Navigator;
 
   return module.exports;
 })();
@@ -860,431 +1240,115 @@ module.exports = { rules };
   return module.exports;
 })();
 
-modules['src/libs/simpleState/SimpleState.js'] = (() => {
+modules['src/views/styleGuide/StyleGuide.js'] = (() => {
   const module = { exports: {} };
-  const simpleState = (initialState) => {
-  const state = initialState;
-  const stateChangeCallbacks = [];
-  const emit = () => {
-    stateChangeCallbacks.forEach((stateChangeCallback) => {
-      stateChangeCallback({ state, setState });
-    });
-  };
-  const setState = (newState) => {
-    Object.assign(state, newState);
-    emit();
-  };
-  const addStateChangeListener = (stateChangeCallback) => {
-    const element = { state, setState };
-    stateChangeCallbacks.push(stateChangeCallback);
-    return element;
-  };
-  return {
-    state,
-    setState,
-    addStateChangeListener,
-  };
-};
-
-module.exports = simpleState;
-
-  return module.exports;
-})();
-
-modules['src/store/Store.js'] = (() => {
-  const module = { exports: {} };
-  const simpleState = include('src/libs/simpleState/SimpleState.js');
-const Observable = include('src/libs/observable/Observable.js');
-
-const queryInput$ = new Observable('');
-const getQueryInput = () => queryInput$.value;
-const setQueryInput = (queryInput) => {
-  queryInput$.value = queryInput;
-};
-const addQueryInputChangeListener = (callback) => {
-  addEventListener(queryInput$.id, callback);
-};
-
-const queryOutput$ = new Observable('');
-const getQueryOutput = () => queryOutput$.value;
-const setQueryOutput = (queryOutput) => {
-  queryOutput$.value = queryOutput;
-};
-const addQueryOutputChangeListener = (callback) => {
-  addEventListener(queryOutput$.id, callback);
-};
-
-module.exports = {
-  getQueryInput,
-  setQueryInput,
-  addQueryInputChangeListener,
-  getQueryOutput,
-  setQueryOutput,
-  addQueryOutputChangeListener,
-};
-
-  return module.exports;
-})();
-
-modules['src/libs/simpleRouter/SimpleRouter.js'] = (() => {
-  const module = { exports: {} };
-  function SimpleRouter(routes) {
-  /**
-   * @param {string} routes
-   */
-  this.setRoutes = function (routes) {
-    Object.entries(routes).forEach(([route, title]) => {
-      this.routes[route] = route;
-      this.titles[route] = title;
-      if (route === '/') {
-        this.routes[''] = route;
-        this.titles[''] = title;
-      }
-    });
-    this.syncWithHash();
-  };
-  SimpleRouter.getTokens = function (hash) {
-    return hash
-      .split('/')
-      .filter(Boolean)
-      .filter((element) => element !== '#')
-      .filter((element) => element !== '#!');
-  };
-  /**
-   * @param {string} token
-   * @returns {boolean}
-   */
-  SimpleRouter.isParameterRouteToken = function (token) {
-    if (
-      token.indexOf('<') !== 0 ||
-      !token.slice(2, -4).includes(':') ||
-      token.indexOf('>') !== token.length - 1
-    ) {
-      return false;
-    }
-    const [parameter, type] = token
-      .slice(token.indexOf('<') + 1, token.indexOf('>'))
-      .split(':');
-
-    if (!['int', 'string', 'number'].includes(type)) {
-      return false;
-    }
-    return true;
-  };
-  SimpleRouter.appendTokenToHash = function (hash, token) {
-    return `${hash}/${token}`;
-  };
-  SimpleRouter.parseParameterRouteToken = function (token) {
-    const [parameter, type] = token
-      .slice(token.indexOf('<') + 1, token.indexOf('>'))
-      .split(':');
-    return {
-      parameter,
-      type,
-    };
-  };
-  // (hash: string, route: string) => false | { [key: string]: number | string }
-  SimpleRouter.getMatch = function (hash, route) {
-    const hashTokens = SimpleRouter.getTokens(hash);
-    const routeTokens = SimpleRouter.getTokens(route);
-    const params = {};
-    let reconstructedHash = '#!';
-    if (hashTokens.length !== routeTokens.length) return false;
-    for (let i of Object.keys(hashTokens)) {
-      const hashToken = hashTokens[i];
-      const routeToken = routeTokens[i];
-      if (SimpleRouter.isParameterRouteToken(routeToken)) {
-        const { parameter, type } = SimpleRouter.parseParameterRouteToken(
-          routeToken
-        );
-        if (type === 'int') {
-          if (!Router.isInt(hashToken)) return false;
-          params[parameter] = parseInt(hashToken);
-          reconstructedHash = SimpleRouter.appendTokenToHash(
-            reconstructedHash,
-            hashToken
-          );
-        } else if (type === 'number' && !Router.isNumber(hasToken)) {
-          if (!Router.isNumber(hashToken)) return false;
-          params[parameter] = Number(hashToken);
-          reconstructedHash = SimpleRouter.appendTokenToHash(
-            reconstructedHash,
-            hashToken
-          );
-        } else if (type === 'string') {
-          params[parameter] = hashToken;
-          reconstructedHash = SimpleRouter.appendTokenToHash(
-            reconstructedHash,
-            hashToken
-          );
-        }
-      } else {
-        if (hashToken !== routeToken) return false;
-        reconstructedHash = SimpleRouter.appendTokenToHash(
-          reconstructedHash,
-          hashToken
-        );
-      }
-    }
-    return { params, reconstructedHash };
-  };
-  SimpleRouter.getRouteAndParamsFromHash = function (hash, routes) {
-    for (let route of Object.keys(routes)) {
-      const match = SimpleRouter.getMatch(hash, route);
-      if (match) {
-        const { params, reconstructedHash } = match;
-        return { route, params, reconstructedHash };
-      }
-    }
-    return { route: '', params: {}, reconstructedHash: '' };
-  };
-  /**
-   * @param {Object.<string, number | string>} params
-   */
-  this.setParams = function (params) {
-    this.params = params;
-    // Todo: Maybe dispatch some kind of event
-  };
-  this.setCurrentRoute = function (route) {
-    this.currentRoute = route;
-  };
-  this.setCurrentTitle = function (title) {
-    this.currentTitle = title;
-  };
-  SimpleRouter.removeHash = function () {
-    return history.replaceState(null, null, ' ');
-  };
-  this.syncWithHash = function () {
-    const { hash } = location;
-    const {
-      route,
-      params,
-      reconstructedHash,
-    } = SimpleRouter.getRouteAndParamsFromHash(hash, this.routes);
-    this.setParams(params);
-    this.setCurrentRoute(this.routes[route]);
-    this.setCurrentTitle(this.titles[route]);
-    if (reconstructedHash === '#!') {
-      SimpleRouter.removeHash();
-    } else {
-      history.replaceState(undefined, undefined, reconstructedHash);
-    }
-    document.title = this.currentTitle;
-  };
-  this.params = {};
-  this.currentRoute = '';
-  this.routes = {};
-  this.titles = {};
-  this.hashChangeListeners = [];
-  this.setRoutes(routes);
-  window.addEventListener('hashchange', () => {
-    this.syncWithHash();
-    this.callHashChangeListeners();
-  });
-  /**
-   * @param {string} route
-   * One of the registered routes, without hashbang
-   */
-  this.navigateTo = (route) => {
-    location.hash = `#!${route}`;
-  };
-
-  this.refresh = () => this.syncWithHash();
-
-  // @possiblyNumber: string
-  SimpleRouter.isNumber = function (possiblyNumber) {
-    return !isNaN(Number(possiblyNumber));
-  };
-  SimpleRouter.isInt = function (possiblyInt) {
-    return (
-      SimpleRouter.isNumber(possiblyInt) &&
-      parseInt(possiblyInt) === Number(possiblyInt)
-    );
-  };
-  this.addHashChangeListener = (callback) => {
-    this.hashChangeListeners.push(callback);
-    this.callHashChangeListeners();
-  };
-  this.callHashChangeListeners = () => {
-    this.hashChangeListeners.forEach((hashChangeListener) =>
-      hashChangeListener({
-        params: this.params,
-        currentRoute: this.currentRoute,
-      })
-    );
-  };
-  this.getParams = () => this.params;
-  this.getCurrentTitle = () => this.currentTitle;
-  SimpleRouter.isProp = (propsOrChild) =>
-    !(propsOrChild instanceof HTMLElement || typeof propsOrChild === 'string');
-}
-
-module.exports = SimpleRouter;
-
-  return module.exports;
-})();
-
-modules['src/router/Router.js'] = (() => {
-  const module = { exports: {} };
-  const SimpleRouter = include('src/libs/simpleRouter/SimpleRouter.js');
-
-const router = new SimpleRouter({
-  '/': 'Gremlint - Gremlin query formatter',
-  '/style-guide': 'Gremlint - Style guide',
-});
-
-const getCurrentRoute = () => router.currentRoute;
-const addHashChangeListener = (hashChangeListener) => {
-  router.addHashChangeListener(hashChangeListener);
-};
-
-module.exports = {
-  getCurrentRoute,
-  addHashChangeListener,
-};
-
-  return module.exports;
-})();
-
-modules['src/libs/simpleColorPalette/SimpleColorPalette.js'] = (() => {
-  const module = { exports: {} };
-  const TextColor = 'slategray';
-const HighlightedTextColor = 'darkslategray';
-const DisabledTextColor = 'lightgray';
-const HighlightColor = 'yellowgreen';
-
-module.exports = {
-  TextColor,
-  HighlightedTextColor,
-  DisabledTextColor,
-  HighlightColor,
-};
-
-  return module.exports;
-})();
-
-modules['src/components/navigationButton/NavigationButton.js'] = (() => {
-  const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { HighlightedTextColor, TextColor, HighlightColor } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+  const StyleGuideRule = include(
+  'src/components/styleGuideRule/StyleGuideRule.js'
 );
+const { compose, Each, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { rules } = include('src/views/styleGuide/rules/Rules.js');
 
-const NavigationButton = (getProps) => {
-  let isHovered = false;
-
-  const getIsHovered = () => isHovered;
-  const setIsHovered = (value) => {
-    isHovered = value;
-    element.update();
-  };
-
-  const getIsSelected = () => getProps().isSelected;
-  const getHref = () => getProps().href;
-  const getLabel = () => getProps().label;
-
-  const getSpanStyle = () => `
-    display: inline-block;
-    text-align: center;
-    box-sizing: border-box;
-    width: 160px;
-    height: 40px;
-    line-height: 40px;
-    font-size: 15px;
-    border-bottom: ${getIsSelected() ? `2px solid ${HighlightColor}` : 'none'};
-  `;
-
-  const getAStyle = () => `
-    text-decoration: none;
-    display: inline-block;
-    width: 100%;
-    color: ${
-      getIsSelected() || getIsHovered() ? HighlightedTextColor : TextColor
-    };
-  `;
-
-  const element = compose('span', () => ({ style: getSpanStyle() }), [
-    compose(
-      'a',
-      () => ({
-        href: getHref(),
-        innerText: getLabel(),
-        style: getAStyle(),
-        onmouseenter: () => setIsHovered(true),
-        onmouseleave: () => setIsHovered(false),
-      }),
-      []
+const StyleGuide = () =>
+  compose('div', {}, [
+    Each(
+      () => rules,
+      (getCurrentValue) => [
+        StyleGuideRule(() => ({
+          title: getCurrentValue().title,
+          explanation: getCurrentValue().explanation,
+          example: getCurrentValue().example,
+        })),
+      ]
     ),
   ]);
 
+module.exports = StyleGuide;
+
+  return module.exports;
+})();
+
+modules['src/components/queryInput/QueryInput.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+
+const getQueryInputStyle = () => `
+  height: calc(50vh - 60px);
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  background: rgba(0, 0, 0, 0.05);
+  outline: none;
+  font-size: 15px;
+  padding: 10px;
+  border: none;
+  resize: none;
+  width: 100%;
+  box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
+`;
+
+const QueryInput = (getProps) => {
+  const getOnInput = () => getProps().oninput;
+  const getValue = () => getProps().value;
+  return compose(
+    'textarea',
+    () => ({
+      oninput: getOnInput(),
+      style: getQueryInputStyle(),
+      value: getValue(),
+    }),
+    []
+  );
+};
+
+module.exports = QueryInput;
+
+  return module.exports;
+})();
+
+modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
+  const module = { exports: {} };
+  const QueryInput = include('src/components/queryInput/QueryInput.js');
+const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { getQueryInput, setQueryInput } = include('src/store/Store.js');
+
+const QueryFormatter = () => {
+  const element = compose('div', {}, [
+    QueryInput(() => ({
+      value: getQueryInput(),
+      oninput: ({ target }) => setQueryInput(target.value),
+    })),
+  ]);
   return element;
 };
 
-module.exports = NavigationButton;
+module.exports = QueryFormatter;
 
   return module.exports;
 })();
 
 modules['src/app/App.js'] = (() => {
   const module = { exports: {} };
-  const NavigationButton = include(
-  'src/components/navigationButton/NavigationButton.js'
-);
-const QueryInput = include('src/components/queryInput/QueryInput.js');
+  const Navigator = include('src/components/navigator/Navigator.js');
 const Spacer = include('src/components/spacer/Spacer.js');
-const StyleGuideRule = include(
-  'src/components/styleGuideRule/StyleGuideRule.js'
-);
-const { compose, Each, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const StyleGuide = include('src/views/styleGuide/StyleGuide.js');
+const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
+const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getCurrentRoute } = include('src/router/Router.js');
-const { getQueryInput, setQueryInput } = include('src/store/Store.js');
-const { rules } = include('src/views/styleGuide/rules/Rules.js');
 
-const getQueryFormatterButtonProps = () => ({
-  isSelected: getCurrentRoute() === '/',
-  label: 'Query formatter',
-  href: '#!/',
-});
+const App = () => {
+  const element = compose('div', {}, [
+    Navigator(() => ({ currentRoute: getCurrentRoute() })),
 
-const getStyleGuideButtonProps = () => ({
-  isSelected: getCurrentRoute() === '/style-guide',
-  label: 'Style guide',
-  href: '#!/style-guide',
-});
-
-const getQueryInputProps = () => ({
-  value: getQueryInput(),
-  oninput: ({ target }) => setQueryInput(target.value),
-});
-
-const App = (getProps) => {
-  const element = compose('div', { style: 'width: 800px; margin: auto;' }, [
-    compose('div', { style: 'height: 40px' }, [
-      NavigationButton(getQueryFormatterButtonProps),
-      NavigationButton(getStyleGuideButtonProps),
+    compose('div', { style: 'width: 800px; margin: auto;' }, [
+      Spacer(() => ({})),
+      If(
+        () => getCurrentRoute() === '/',
+        () => [QueryFormatter(() => ({}))]
+      ),
+      If(
+        () => getCurrentRoute() === '/style-guide',
+        () => [StyleGuide(() => ({}))]
+      ),
     ]),
-    Spacer(() => ({})),
-    If(
-      () => getCurrentRoute() === '/',
-      () => [compose('div', {}, [QueryInput(getQueryInputProps)])]
-    ),
-    If(
-      () => getCurrentRoute() === '/style-guide',
-      () => [
-        compose('div', {}, [
-          Each(
-            () => rules,
-            (getCurrentValue) => [
-              StyleGuideRule(() => ({
-                title: getCurrentValue().title,
-                explanation: getCurrentValue().explanation,
-                example: getCurrentValue().example,
-              })),
-            ]
-          ),
-        ]),
-      ]
-    ),
   ]);
   return element;
 };
@@ -1302,10 +1366,11 @@ const Router = include('src/router/Router.js');
 
 const app = App(() => ({}));
 Router.addHashChangeListener(app.update);
+Store.addQueryInputChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',
-  margin: '0px',
+  margin: '0',
 });
 
 document.body.appendChild(app);

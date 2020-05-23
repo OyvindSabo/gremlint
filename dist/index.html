@@ -464,58 +464,6 @@ module.exports = {
   return module.exports;
 })();
 
-modules['src/libs/gremlint/Gremlint.js'] = (() => {
-  const module = { exports: {} };
-  const pipe = (value) => (...fns) => fns.reduce((value, fn) => fn(value), value);
-
-const formatQuery = (query, config = { maxLineLength: 80 }) => pipe(query)();
-
-module.exports = {
-  formatQuery,
-};
-
-  return module.exports;
-})();
-
-modules['src/store/Store.js'] = (() => {
-  const module = { exports: {} };
-  const Observable = include('src/libs/observable/Observable.js');
-const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
-
-const queryInput$ = new Observable('');
-const getQueryInput = () => queryInput$.value;
-const setQueryInput = (queryInput) => {
-  queryInput$.value = queryInput;
-};
-const addQueryInputChangeListener = (callback) => {
-  addEventListener(queryInput$.id, callback);
-};
-
-const queryOutput$ = new Observable('');
-const getQueryOutput = () => queryOutput$.value;
-const setQueryOutput = (queryOutput) => {
-  queryOutput$.value = queryOutput;
-};
-const addQueryOutputChangeListener = (callback) => {
-  addEventListener(queryOutput$.id, callback);
-};
-
-addQueryInputChangeListener(({ detail }) => {
-  setQueryOutput(formatQuery(detail));
-});
-
-module.exports = {
-  getQueryInput,
-  setQueryInput,
-  addQueryInputChangeListener,
-  getQueryOutput,
-  setQueryOutput,
-  addQueryOutputChangeListener,
-};
-
-  return module.exports;
-})();
-
 modules['src/libs/simpleRouter/SimpleRouter.js'] = (() => {
   const module = { exports: {} };
   function SimpleRouter(routes) {
@@ -1273,6 +1221,67 @@ const Code = (getProps) => {
 };
 
 module.exports = Code;
+
+  return module.exports;
+})();
+
+modules['src/libs/simpleFP/SimpleFP.js'] = (() => {
+  const module = { exports: {} };
+  const pipe = (...fns) => (value) => fns.reduce((value, fn) => fn(value), value);
+
+module.exports = { pipe };
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/Gremlint.js'] = (() => {
+  const module = { exports: {} };
+  const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
+
+const formatQuery = (query, config = { maxLineLength: 80 }) => pipe()(query);
+
+module.exports = {
+  formatQuery,
+};
+
+  return module.exports;
+})();
+
+modules['src/store/Store.js'] = (() => {
+  const module = { exports: {} };
+  const Observable = include('src/libs/observable/Observable.js');
+const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
+
+const queryInput$ = new Observable('');
+const getQueryInput = () => queryInput$.value;
+const setQueryInput = (queryInput) => {
+  queryInput$.value = queryInput;
+};
+const addQueryInputChangeListener = (callback) => {
+  addEventListener(queryInput$.id, callback);
+};
+
+const queryOutput$ = new Observable('');
+const getQueryOutput = () => queryOutput$.value;
+const setQueryOutput = (queryOutput) => {
+  queryOutput$.value = queryOutput;
+};
+const addQueryOutputChangeListener = (callback) => {
+  addEventListener(queryOutput$.id, callback);
+};
+
+addQueryInputChangeListener(({ detail }) => {
+  setQueryOutput(formatQuery(detail));
+});
+
+module.exports = {
+  getQueryInput,
+  setQueryInput,
+  addQueryInputChangeListener,
+  getQueryOutput,
+  setQueryOutput,
+  addQueryOutputChangeListener,
+};
 
   return module.exports;
 })();

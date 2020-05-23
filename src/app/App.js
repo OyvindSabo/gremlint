@@ -3,9 +3,13 @@ const NavigationButton = include(
 );
 const QueryInput = include('src/components/queryInput/QueryInput.js');
 const Spacer = include('src/components/spacer/Spacer.js');
-const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const StyleGuideRule = include(
+  'src/components/styleGuideRule/StyleGuideRule.js'
+);
+const { compose, Each, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getCurrentRoute } = include('src/router/Router.js');
 const { getQueryInput, setQueryInput } = include('src/store/Store.js');
+const { rules } = include('src/views/styleGuide/rules/Rules.js');
 
 const getQueryFormatterButtonProps = () => ({
   isSelected: getCurrentRoute() === '/',
@@ -34,6 +38,23 @@ const App = (getProps) => {
     If(
       () => getCurrentRoute() === '/',
       () => [compose('div', {}, [QueryInput(getQueryInputProps)])]
+    ),
+    If(
+      () => getCurrentRoute() === '/style-guide',
+      () => [
+        compose('div', {}, [
+          Each(
+            () => rules,
+            (getCurrentValue) => [
+              StyleGuideRule(() => ({
+                title: getCurrentValue().title,
+                explanation: getCurrentValue().explanation,
+                example: getCurrentValue().example,
+              })),
+            ]
+          ),
+        ]),
+      ]
     ),
   ]);
   return element;

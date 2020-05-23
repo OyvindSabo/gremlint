@@ -37,6 +37,40 @@ module.exports = Observable;
   return module.exports;
 })();
 
+modules['src/store/Store.js'] = (() => {
+  const module = { exports: {} };
+  const Observable = include('src/libs/observable/Observable.js');
+
+const queryInput$ = new Observable('');
+const getQueryInput = () => queryInput$.value;
+const setQueryInput = (queryInput) => {
+  queryInput$.value = queryInput;
+};
+const addQueryInputChangeListener = (callback) => {
+  addEventListener(queryInput$.id, callback);
+};
+
+const queryOutput$ = new Observable('');
+const getQueryOutput = () => queryOutput$.value;
+const setQueryOutput = (queryOutput) => {
+  queryOutput$.value = queryOutput;
+};
+const addQueryOutputChangeListener = (callback) => {
+  addEventListener(queryOutput$.id, callback);
+};
+
+module.exports = {
+  getQueryInput,
+  setQueryInput,
+  addQueryInputChangeListener,
+  getQueryOutput,
+  setQueryOutput,
+  addQueryOutputChangeListener,
+};
+
+  return module.exports;
+})();
+
 modules['src/libs/simpleHTML/SimpleHTML.js'] = (() => {
   const module = { exports: {} };
   const doAddInnerShadow = (element) => {
@@ -464,83 +498,6 @@ module.exports = {
   return module.exports;
 })();
 
-modules['src/components/spacer/Spacer.js'] = (() => {
-  const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-
-const Spacer = () => compose('div', { style: 'height: 20px' }, []);
-
-module.exports = Spacer;
-
-  return module.exports;
-})();
-
-modules['src/libs/simpleState/SimpleState.js'] = (() => {
-  const module = { exports: {} };
-  const simpleState = (initialState) => {
-  const state = initialState;
-  const stateChangeCallbacks = [];
-  const emit = () => {
-    stateChangeCallbacks.forEach((stateChangeCallback) => {
-      stateChangeCallback({ state, setState });
-    });
-  };
-  const setState = (newState) => {
-    Object.assign(state, newState);
-    emit();
-  };
-  const addStateChangeListener = (stateChangeCallback) => {
-    const element = { state, setState };
-    stateChangeCallbacks.push(stateChangeCallback);
-    return element;
-  };
-  return {
-    state,
-    setState,
-    addStateChangeListener,
-  };
-};
-
-module.exports = simpleState;
-
-  return module.exports;
-})();
-
-modules['src/store/Store.js'] = (() => {
-  const module = { exports: {} };
-  const simpleState = include('src/libs/simpleState/SimpleState.js');
-const Observable = include('src/libs/observable/Observable.js');
-
-const queryInput$ = new Observable('');
-const getQueryInput = () => queryInput$.value;
-const setQueryInput = (queryInput) => {
-  queryInput$.value = queryInput;
-};
-const addQueryInputChangeListener = (callback) => {
-  addEventListener(queryInput$.id, callback);
-};
-
-const queryOutput$ = new Observable('');
-const getQueryOutput = () => queryOutput$.value;
-const setQueryOutput = (queryOutput) => {
-  queryOutput$.value = queryOutput;
-};
-const addQueryOutputChangeListener = (callback) => {
-  addEventListener(queryOutput$.id, callback);
-};
-
-module.exports = {
-  getQueryInput,
-  setQueryInput,
-  addQueryInputChangeListener,
-  getQueryOutput,
-  setQueryOutput,
-  addQueryOutputChangeListener,
-};
-
-  return module.exports;
-})();
-
 modules['src/libs/simpleRouter/SimpleRouter.js'] = (() => {
   const module = { exports: {} };
   function SimpleRouter(routes) {
@@ -788,36 +745,34 @@ const { HighlightedTextColor, TextColor, HighlightColor } = include(
 );
 
 const NavigationButton = (getProps) => {
-  let isHovered = false;
+  const getIsSelected = () => getProps().isSelected;
+  const getHref = () => getProps().href;
+  const getLabel = () => getProps().label;
 
+  let isHovered = false;
   const getIsHovered = () => isHovered;
   const setIsHovered = (value) => {
     isHovered = value;
     element.update();
   };
 
-  const getIsSelected = () => getProps().isSelected;
-  const getHref = () => getProps().href;
-  const getLabel = () => getProps().label;
-
   const getSpanStyle = () => `
     display: inline-block;
-    text-align: center;
+    padding: 10px;
     box-sizing: border-box;
-    width: 160px;
-    height: 40px;
-    line-height: 40px;
-    font-size: 15px;
-    border-bottom: ${getIsSelected() ? `2px solid ${HighlightColor}` : 'none'};
+    width: 140px;
   `;
 
   const getAStyle = () => `
     text-decoration: none;
     display: inline-block;
-    width: 100%;
+    height: 20px;
+    line-height: 20px;
+    font-size: 15px;
     color: ${
       getIsSelected() || getIsHovered() ? HighlightedTextColor : TextColor
     };
+    border-bottom: ${getIsSelected() ? `2px solid ${HighlightColor}` : 'none'};
   `;
 
   const element = compose('span', () => ({ style: getSpanStyle() }), [
@@ -869,17 +824,21 @@ const Navigator = (getProps) => {
       'div',
       {
         style: `background: ${White};
-                height: 40px;
+                box-shadow: ${White} 0 0 10px;
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;`,
       },
       [
-        compose('div', { style: 'width: 800px; margin: auto;' }, [
-          NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
-          NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),
-        ]),
+        compose(
+          'div',
+          { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+          [
+            NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
+            NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),
+          ]
+        ),
       ]
     ),
     compose('div', { style: 'height:40px;' }, []),
@@ -1240,15 +1199,17 @@ const getQueryInputStyle = () => `
 const QueryInput = (getProps) => {
   const getOnInput = () => getProps().oninput;
   const getValue = () => getProps().value;
-  return compose(
-    'textarea',
-    () => ({
-      oninput: getOnInput(),
-      style: getQueryInputStyle(),
-      value: getValue(),
-    }),
-    []
-  );
+  return compose('div', {}, [
+    compose(
+      'textarea',
+      () => ({
+        oninput: getOnInput(),
+        style: getQueryInputStyle(),
+        value: getValue(),
+      }),
+      []
+    ),
+  ]);
 };
 
 module.exports = QueryInput;
@@ -1263,7 +1224,7 @@ const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getQueryInput, setQueryInput } = include('src/store/Store.js');
 
 const QueryFormatter = () => {
-  const element = compose('div', {}, [
+  const element = compose('div', { style: 'padding: 10px;' }, [
     QueryInput(() => ({
       value: getQueryInput(),
       oninput: ({ target }) => setQueryInput(target.value),
@@ -1313,16 +1274,20 @@ const { TextColor } = include(
 
 const Paragraph = (getProps) => {
   const getInnerText = () => getProps().innerText;
-  const element = compose('div', { style: 'padding: 10px;' }, [
-    compose(
-      'span',
-      {
-        style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
-        innerText: getInnerText(),
-      },
-      []
-    ),
-  ]);
+  const element = compose(
+    'div',
+    () => ({ style: getInnerText() ? 'padding: 10px;' : '' }),
+    [
+      compose(
+        'span',
+        {
+          style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
+          innerText: getInnerText(),
+        },
+        []
+      ),
+    ]
+  );
   return element;
 };
 
@@ -1374,11 +1339,23 @@ module.exports = Code;
   return module.exports;
 })();
 
+modules['src/components/spacer/Spacer.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+
+const Spacer = () => compose('div', { style: 'height: 20px' }, []);
+
+module.exports = Spacer;
+
+  return module.exports;
+})();
+
 modules['src/components/styleGuideRule/StyleGuideRule.js'] = (() => {
   const module = { exports: {} };
   const Title = include('src/components/title/Title.js');
 const Paragraph = include('src/components/paragraph/Paragraph.js');
 const Code = include('src/components/code/Code.js');
+const Spacer = include('src/components/spacer/Spacer.js');
 const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
 
 const StyleGuideRule = (getProps) => {
@@ -1386,10 +1363,11 @@ const StyleGuideRule = (getProps) => {
   const getExplanation = () => getProps().explanation;
   const getExample = () => getProps().example;
 
-  return compose('div', { style: 'padding: 10px;' }, [
+  return compose('div', {}, [
     Title(() => ({ innerText: getTitle() })),
     Paragraph(() => ({ innerText: getExplanation() })),
     Code(() => ({ innerText: getExample() })),
+    Spacer(() => ({})),
   ]);
 };
 
@@ -1403,7 +1381,7 @@ modules['src/views/styleGuide/StyleGuide.js'] = (() => {
   const StyleGuideRule = include(
   'src/components/styleGuideRule/StyleGuideRule.js'
 );
-const { compose, Each, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { compose, Each } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { rules } = include('src/views/styleGuide/rules/Rules.js');
 
 const StyleGuide = () =>
@@ -1428,7 +1406,6 @@ module.exports = StyleGuide;
 modules['src/app/App.js'] = (() => {
   const module = { exports: {} };
   const Navigator = include('src/components/navigator/Navigator.js');
-const Spacer = include('src/components/spacer/Spacer.js');
 const StyleGuide = include('src/views/styleGuide/StyleGuide.js');
 const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
 const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
@@ -1438,15 +1415,20 @@ const App = () => {
   const element = compose('div', {}, [
     Navigator(() => ({ currentRoute: getCurrentRoute() })),
 
-    compose('div', { style: 'width: 800px; margin: auto;' }, [
-      Spacer(() => ({})),
-      If(
-        () => getCurrentRoute() === '/',
-        () => [QueryFormatter(() => ({}))]
-      ),
-      If(
-        () => getCurrentRoute() === '/style-guide',
-        () => [StyleGuide(() => ({}))]
+    compose('div', () => ({}), [
+      compose(
+        'div',
+        { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+        [
+          If(
+            () => getCurrentRoute() === '/',
+            () => [QueryFormatter(() => ({}))]
+          ),
+          If(
+            () => getCurrentRoute() === '/style-guide',
+            () => [StyleGuide(() => ({}))]
+          ),
+        ]
       ),
     ]),
   ]);

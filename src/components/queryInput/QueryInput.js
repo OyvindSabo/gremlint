@@ -17,15 +17,17 @@ const getQueryInputStyle = () => `
 const QueryInput = (getProps) => {
   const getOnInput = () => getProps().oninput;
   const getValue = () => getProps().value;
-  return compose(
-    'textarea',
-    () => ({
-      oninput: getOnInput(),
-      style: getQueryInputStyle(),
-      value: getValue(),
-    }),
-    []
-  );
+  return compose('div', {}, [
+    compose(
+      'textarea',
+      () => ({
+        oninput: getOnInput(),
+        style: getQueryInputStyle(),
+        value: getValue(),
+      }),
+      []
+    ),
+  ]);
 };
 
 module.exports = QueryInput;

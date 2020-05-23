@@ -1,4 +1,3 @@
-const simpleState = include('src/libs/simpleState/SimpleState.js');
 const Observable = include('src/libs/observable/Observable.js');
 
 const queryInput$ = new Observable('');

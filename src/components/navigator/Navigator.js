@@ -23,17 +23,21 @@ const Navigator = (getProps) => {
       'div',
       {
         style: `background: ${White};
-                height: 40px;
+                box-shadow: ${White} 0 0 10px;
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;`,
       },
       [
-        compose('div', { style: 'width: 800px; margin: auto;' }, [
-          NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
-          NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),
-        ]),
+        compose(
+          'div',
+          { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+          [
+            NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
+            NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),
+          ]
+        ),
       ]
     ),
     compose('div', { style: 'height:40px;' }, []),

@@ -4,36 +4,34 @@ const { HighlightedTextColor, TextColor, HighlightColor } = include(
 );
 
 const NavigationButton = (getProps) => {
-  let isHovered = false;
+  const getIsSelected = () => getProps().isSelected;
+  const getHref = () => getProps().href;
+  const getLabel = () => getProps().label;
 
+  let isHovered = false;
   const getIsHovered = () => isHovered;
   const setIsHovered = (value) => {
     isHovered = value;
     element.update();
   };
 
-  const getIsSelected = () => getProps().isSelected;
-  const getHref = () => getProps().href;
-  const getLabel = () => getProps().label;
-
   const getSpanStyle = () => `
     display: inline-block;
-    text-align: center;
+    padding: 10px;
     box-sizing: border-box;
-    width: 160px;
-    height: 40px;
-    line-height: 40px;
-    font-size: 15px;
-    border-bottom: ${getIsSelected() ? `2px solid ${HighlightColor}` : 'none'};
+    width: 140px;
   `;
 
   const getAStyle = () => `
     text-decoration: none;
     display: inline-block;
-    width: 100%;
+    height: 20px;
+    line-height: 20px;
+    font-size: 15px;
     color: ${
       getIsSelected() || getIsHovered() ? HighlightedTextColor : TextColor
     };
+    border-bottom: ${getIsSelected() ? `2px solid ${HighlightColor}` : 'none'};
   `;
 
   const element = compose('span', () => ({ style: getSpanStyle() }), [

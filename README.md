@@ -8,18 +8,12 @@ Gremlint is a code formatter which parses Gremlin queries and rewrites them to a
 
 - To make Gremlin queries more readable
 - To make your queries more beautiful
-- Because I have never found a good Gremlin style guide
+- To act as a "living" style guide
 
 ### How do I use it?
 
-The easiest way to use Gremlint is via the official website (https://gremlint.com). Since Gremlint is just a standalone HTML document, you can easily download it and run it locally if you wish.
+The easiest way to use Gremlint is via the official website (https://gremlint.com). Since Gremlint is just a standalone HTML document, you can easily download it and run it locally if you wish (you can find it in `dist/index.html`).
 ![Gremlint.png](https://cdn.steemitimages.com/DQmWnS7cztfduGmCWWMyjfGmMzmdAtmR2w3rmBggfdVAenE/Gremlint.png)
-
-### Build single HTML file
-
-```
-$ node build
-```
 
 ## For developers
 
@@ -28,7 +22,7 @@ $ node build
 The compiled HTML file will end up in `dist/index.html`.
 
 ```
-node build
+$ node build
 ```
 
 ### Continuously compile to single HTML file while editing
@@ -36,7 +30,7 @@ node build
 The compiled HTML file will end up in `dist/index.html`.
 
 ```
-node watch
+$ node watch
 ```
 
 ### Run an individual file

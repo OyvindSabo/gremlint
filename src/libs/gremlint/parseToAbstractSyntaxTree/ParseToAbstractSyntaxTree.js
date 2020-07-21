@@ -54,7 +54,10 @@ const tokenizeOnTopLevelPunctuation = (query) => {
     }
     word += char;
   });
-  return word.split(String.fromCharCode(28)).filter((token) => token !== '');
+  return word
+    .split(String.fromCharCode(28))
+    .filter((token) => token !== '')
+    .map((token) => token.trim());
 };
 
 const tokenize = pipe(tokenizeOnTopLevelPunctuation);
@@ -71,14 +74,18 @@ console.log(
   'tokenizeOnTopLevelPunctuation: ',
   tokenizeOnTopLevelPunctuation(`
     g.V().
-      hasLabel('Application').
-      has('name', 'Gremlint')`)
+      filter(
+        out().
+        hasLabel('Application').
+        has('name', 'Gremlint'))`)
 );
 
 console.log(
   'tokenize: ',
   tokenize(`
     g.V().
-      hasLabel('Application').
-      has('name', 'Gremlint')`)
+      filter(
+        out().
+        hasLabel('Application').
+        has('name', 'Gremlint'))`)
 );

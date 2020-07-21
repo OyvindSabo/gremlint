@@ -1251,7 +1251,7 @@ module.exports = { last, pipe };
   return module.exports;
 })();
 
-modules['src/libs/gremlint/parseToAbstractSyntaxTree/ParseToAbstractSyntaxTree.js'] = (() => {
+modules['src/libs/gremlint/parseToSyntaxTree/ParseToSyntaxTree.js'] = (() => {
   const module = { exports: {} };
   const { last, pipe } = include('src/libs/simpleFP/SimpleFP.js');
 
@@ -1469,7 +1469,7 @@ const getMethodTokenAndArgumentTokensFromMethodInvocation = (token) => {
 
 const tokenize = pipe(tokenizeOnTopLevelPunctuation);
 
-const parseToAbstractSyntaxTree = (query) => {
+const parseToSyntaxTree = (query) => {
   const tokens = tokenizeOnTopLevelPunctuation(query);
   if (tokens.length === 1) {
     const token = tokens[0];
@@ -1480,8 +1480,8 @@ const parseToAbstractSyntaxTree = (query) => {
       } = getMethodTokenAndArgumentTokensFromMethodInvocation(token);
       return {
         type: 'method',
-        method: parseToAbstractSyntaxTree(methodToken),
-        arguments: argumentTokens.map(parseToAbstractSyntaxTree),
+        method: parseToSyntaxTree(methodToken),
+        arguments: argumentTokens.map(parseToSyntaxTree),
       };
     }
     if (isString(token)) {
@@ -1496,12 +1496,13 @@ const parseToAbstractSyntaxTree = (query) => {
     };
   }
   return {
-    steps: tokens.map(parseToAbstractSyntaxTree),
+    type: 'traversal',
+    steps: tokens.map(parseToSyntaxTree),
   };
 };
 
 module.exports = {
-  parseToAbstractSyntaxTree,
+  parseToSyntaxTree,
 };
 
 /*
@@ -1527,9 +1528,9 @@ console.log(
 */
 
 console.log(
-  'parseToAbstractSyntaxTree: ',
+  'parseToSyntaxTree: ',
   JSON.stringify(
-    parseToAbstractSyntaxTree(`
+    parseToSyntaxTree(`
     g.V().
       filter(
         out().
@@ -1543,15 +1544,85 @@ console.log(
   return module.exports;
 })();
 
+modules['src/libs/gremlint/formatSyntaxTree/FormatSyntaxTree.js'] = (() => {
+  const module = { exports: {} };
+  // For each step or argument adds a shouldBeNewlined property, as well as the line's indentation
+const formatSyntaxTree = (config = { maxLineLength: 80 }) => (syntaxTree) => {
+  return syntaxTree;
+};
+
+module.exports = { formatSyntaxTree };
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/recreateQueryFromSyntaxTree/RecreateQueryFromSyntaxTree.js'] = (() => {
+  const module = { exports: {} };
+  const recreateQueryFromSyntaxTree = (syntaxTree) => {
+  if (syntaxTree.type === 'traversal') {
+    return syntaxTree.steps
+      .map((step, index, steps) => {
+        const nextStep = steps[index + 1];
+        if (nextStep === undefined) return recreateQueryFromSyntaxTree(step);
+        return (
+          recreateQueryFromSyntaxTree(step) +
+          (nextStep.shouldBeNewlined ? '.\n' : '.')
+        );
+      })
+      .join('');
+  }
+  if (syntaxTree.type === 'method') {
+    return (
+      recreateQueryFromSyntaxTree(syntaxTree.method) +
+      '(' +
+      syntaxTree.arguments.map((argument, index, arguments) => {
+        const nextArgument = arguments[index + 1];
+        if (nextArgument === undefined) {
+          return recreateQueryFromSyntaxTree(argument);
+        }
+        return (
+          recreateQueryFromSyntaxTree(argument) +
+          (nextArgument.shouldBeNewlined ? ',\n' : ',')
+        );
+      }) +
+      ')'
+    );
+  }
+  if (syntaxTree.type === 'string') {
+    return syntaxTree.string + (syntaxTree.shouldBeNewlined ? '\n' : '');
+  }
+  if (syntaxTree.type === 'word') {
+    return syntaxTree.word + (syntaxTree.shouldBeNewlined ? '\n' : '');
+  }
+  console.log('syntaxTree: ', syntaxTree);
+};
+
+module.exports = {
+  recreateQueryFromSyntaxTree,
+};
+
+  return module.exports;
+})();
+
 modules['src/libs/gremlint/Gremlint.js'] = (() => {
   const module = { exports: {} };
   const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
-const { parseToAbstractSyntaxTree } = include(
-  'src/libs/gremlint/parseToAbstractSyntaxTree/ParseToAbstractSyntaxTree.js'
+const { parseToSyntaxTree } = include(
+  'src/libs/gremlint/parseToSyntaxTree/ParseToSyntaxTree.js'
+);
+const { formatSyntaxTree } = include(
+  'src/libs/gremlint/formatSyntaxTree/FormatSyntaxTree.js'
+);
+const { recreateQueryFromSyntaxTree } = include(
+  'src/libs/gremlint/recreateQueryFromSyntaxTree/RecreateQueryFromSyntaxTree.js'
 );
 
 const formatQuery = (query, config = { maxLineLength: 80 }) =>
-  pipe(parseToAbstractSyntaxTree, (obj) => JSON.stringify(obj, null, 2))(query);
+  pipe(
+    parseToSyntaxTree,
+    formatSyntaxTree(config),
+    recreateQueryFromSyntaxTree
+  )(query);
 
 module.exports = {
   formatQuery,

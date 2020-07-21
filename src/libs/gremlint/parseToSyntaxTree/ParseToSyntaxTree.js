@@ -214,7 +214,7 @@ const getMethodTokenAndArgumentTokensFromMethodInvocation = (token) => {
 
 const tokenize = pipe(tokenizeOnTopLevelPunctuation);
 
-const parseToAbstractSyntaxTree = (query) => {
+const parseToSyntaxTree = (query) => {
   const tokens = tokenizeOnTopLevelPunctuation(query);
   if (tokens.length === 1) {
     const token = tokens[0];
@@ -225,8 +225,8 @@ const parseToAbstractSyntaxTree = (query) => {
       } = getMethodTokenAndArgumentTokensFromMethodInvocation(token);
       return {
         type: 'method',
-        method: parseToAbstractSyntaxTree(methodToken),
-        arguments: argumentTokens.map(parseToAbstractSyntaxTree),
+        method: parseToSyntaxTree(methodToken),
+        arguments: argumentTokens.map(parseToSyntaxTree),
       };
     }
     if (isString(token)) {
@@ -241,12 +241,13 @@ const parseToAbstractSyntaxTree = (query) => {
     };
   }
   return {
-    steps: tokens.map(parseToAbstractSyntaxTree),
+    type: 'traversal',
+    steps: tokens.map(parseToSyntaxTree),
   };
 };
 
 module.exports = {
-  parseToAbstractSyntaxTree,
+  parseToSyntaxTree,
 };
 
 /*
@@ -272,9 +273,9 @@ console.log(
 */
 
 console.log(
-  'parseToAbstractSyntaxTree: ',
+  'parseToSyntaxTree: ',
   JSON.stringify(
-    parseToAbstractSyntaxTree(`
+    parseToSyntaxTree(`
     g.V().
       filter(
         out().

@@ -257,6 +257,11 @@ const If = (getCondition, getThenChildNodes, getElseChildNodes = () => []) => {
 
       // Add the new children after the logic element
       logicElement.append(...thenChildNodes);
+      Array.from(logicElement.childNodes).forEach((childNode) => {
+        if (typeof childNode.update === 'function') {
+          childNode.update();
+        }
+      });
       return;
     }
     if (condition && !getCondition()) {
@@ -267,8 +272,18 @@ const If = (getCondition, getThenChildNodes, getElseChildNodes = () => []) => {
 
       // Add the new children
       logicElement.append(...elseChildNodes);
+      Array.from(logicElement.childNodes).forEach((childNode) => {
+        if (typeof childNode.update === 'function') {
+          childNode.update();
+        }
+      });
       return;
     }
+    Array.from(logicElement.childNodes).forEach((childNode) => {
+      if (typeof childNode.update === 'function') {
+        childNode.update();
+      }
+    });
   };
   return logicElement;
 };

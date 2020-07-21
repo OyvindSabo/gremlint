@@ -72,7 +72,7 @@ Use indents when the step in the new line is a modulator of a previous line.
 
 Use indents when the content in the new line is an argument of a previous step.
 
-If multiple anonymous traversals are passed as arguments to a function, each newline which is not the first of line of the step should be indented to make it more clear where the distinction between each argument goes. If this is the case, but the newline would already be indented because the step in the content in the new line is the argument of a previous step, there is no need to double-indent.
+If multiple anonymous traversals are passed as arguments to a function, each newline which is not the first step of the traversal should be indented to make it more clear where the distinction between each argument goes. If this is the case, but the newline would already be indented because the step in the content in the new line is the argument of a previous step, there is no need to double-indent.
 
 Don't be tempted to add extra indentation to vertically align a step with a step in a previous line.`,
     example: `// Bad - No newline should have the same indent as the line starting with the traversal source g

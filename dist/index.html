@@ -1544,160 +1544,6 @@ console.log(
   return module.exports;
 })();
 
-modules['src/libs/gremlint/formatSyntaxTree/FormatSyntaxTree.js'] = (() => {
-  const module = { exports: {} };
-  // For each step or argument adds a shouldBeNewlined property, as well as the line's indentation
-const formatSyntaxTree = (config = { maxLineLength: 80 }) => (syntaxTree) => {
-  return syntaxTree;
-};
-
-module.exports = { formatSyntaxTree };
-
-  return module.exports;
-})();
-
-modules['src/libs/gremlint/recreateQueryFromSyntaxTree/RecreateQueryFromSyntaxTree.js'] = (() => {
-  const module = { exports: {} };
-  const recreateQueryFromSyntaxTree = (syntaxTree) => {
-  if (syntaxTree.type === 'traversal') {
-    return syntaxTree.steps
-      .map((step, index, steps) => {
-        const nextStep = steps[index + 1];
-        if (nextStep === undefined) return recreateQueryFromSyntaxTree(step);
-        return (
-          recreateQueryFromSyntaxTree(step) +
-          (nextStep.shouldBeNewlined ? '.\n' : '.')
-        );
-      })
-      .join('');
-  }
-  if (syntaxTree.type === 'method') {
-    return (
-      recreateQueryFromSyntaxTree(syntaxTree.method) +
-      '(' +
-      syntaxTree.arguments.map((argument, index, arguments) => {
-        const nextArgument = arguments[index + 1];
-        if (nextArgument === undefined) {
-          return recreateQueryFromSyntaxTree(argument);
-        }
-        return (
-          recreateQueryFromSyntaxTree(argument) +
-          (nextArgument.shouldBeNewlined ? ',\n' : ',')
-        );
-      }) +
-      ')'
-    );
-  }
-  if (syntaxTree.type === 'string') {
-    return syntaxTree.string + (syntaxTree.shouldBeNewlined ? '\n' : '');
-  }
-  if (syntaxTree.type === 'word') {
-    return syntaxTree.word + (syntaxTree.shouldBeNewlined ? '\n' : '');
-  }
-  console.log('syntaxTree: ', syntaxTree);
-};
-
-module.exports = {
-  recreateQueryFromSyntaxTree,
-};
-
-  return module.exports;
-})();
-
-modules['src/libs/gremlint/Gremlint.js'] = (() => {
-  const module = { exports: {} };
-  const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
-const { parseToSyntaxTree } = include(
-  'src/libs/gremlint/parseToSyntaxTree/ParseToSyntaxTree.js'
-);
-const { formatSyntaxTree } = include(
-  'src/libs/gremlint/formatSyntaxTree/FormatSyntaxTree.js'
-);
-const { recreateQueryFromSyntaxTree } = include(
-  'src/libs/gremlint/recreateQueryFromSyntaxTree/RecreateQueryFromSyntaxTree.js'
-);
-
-const formatQuery = (query, config = { maxLineLength: 80 }) =>
-  pipe(
-    parseToSyntaxTree,
-    formatSyntaxTree(config),
-    recreateQueryFromSyntaxTree
-  )(query);
-
-module.exports = {
-  formatQuery,
-};
-
-  return module.exports;
-})();
-
-modules['src/store/Store.js'] = (() => {
-  const module = { exports: {} };
-  const Observable = include('src/libs/observable/Observable.js');
-const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
-
-const queryInput$ = new Observable('');
-const getQueryInput = () => queryInput$.value;
-const setQueryInput = (queryInput) => {
-  queryInput$.value = queryInput;
-};
-const addQueryInputChangeListener = (callback) => {
-  addEventListener(queryInput$.id, callback);
-};
-
-const queryOutput$ = new Observable('');
-const getQueryOutput = () => queryOutput$.value;
-const setQueryOutput = (queryOutput) => {
-  queryOutput$.value = queryOutput;
-};
-const addQueryOutputChangeListener = (callback) => {
-  addEventListener(queryOutput$.id, callback);
-};
-
-addQueryInputChangeListener(({ detail }) => {
-  setQueryOutput(formatQuery(detail));
-});
-
-module.exports = {
-  getQueryInput,
-  setQueryInput,
-  addQueryInputChangeListener,
-  getQueryOutput,
-  setQueryOutput,
-  addQueryOutputChangeListener,
-};
-
-  return module.exports;
-})();
-
-modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
-  const module = { exports: {} };
-  const QueryInput = include('src/components/queryInput/QueryInput.js');
-const Code = include('src/components/code/Code.js');
-const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { getQueryInput, setQueryInput, getQueryOutput } = include(
-  'src/store/Store.js'
-);
-
-const QueryFormatter = () => {
-  const element = compose('div', {}, [
-    QueryInput(() => ({
-      value: getQueryInput(),
-      oninput: ({ target }) => setQueryInput(target.value),
-    })),
-    If(
-      () => getQueryOutput(),
-      () => [Code(() => ({ innerText: getQueryOutput() }))]
-    ),
-  ]);
-  return element;
-};
-
-module.exports = QueryFormatter;
-
-  return module.exports;
-})();
-
 modules['src/components/title/Title.js'] = (() => {
   const module = { exports: {} };
   const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
@@ -1820,6 +1666,293 @@ const StyleGuide = () =>
   ]);
 
 module.exports = StyleGuide;
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/utils.js'] = (() => {
+  const module = { exports: {} };
+  const spaces = (numberOfSpaces) => Array(numberOfSpaces + 1).join(' ');
+
+module.exports = {
+  spaces,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQueryStringFromFormattedSyntaxTree.js'] = (() => {
+  const module = { exports: {} };
+  const { spaces } = include('src/libs/gremlint/utils.js');
+
+const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
+  if (syntaxTree.type === 'traversal') {
+    console.log('syntaxTree.stepGroups: ', syntaxTree.stepGroups);
+    return syntaxTree.stepGroups
+      .map((stepGroup) =>
+        stepGroup.steps
+          .map(recreateQueryStringFromFormattedSyntaxTree)
+          .join('.')
+      )
+      .join('.\n');
+  }
+  if (syntaxTree.type === 'method') {
+    return [
+      recreateQueryStringFromFormattedSyntaxTree(syntaxTree.method) + '(',
+      syntaxTree.argumentGroups
+        .map((arguments) =>
+          arguments.map(recreateQueryStringFromFormattedSyntaxTree).join(', ')
+        )
+        .join(syntaxTree.argumentGroups.length > 1 ? ',\n' : ', ') + ')',
+    ].join(syntaxTree.argumentGroups.length > 1 ? '\n' : '');
+  }
+  if (syntaxTree.type === 'string') {
+    return spaces(syntaxTree.indentation) + syntaxTree.string;
+  }
+  if (syntaxTree.type === 'word') {
+    return spaces(syntaxTree.indentation) + syntaxTree.word;
+  }
+};
+
+module.exports = {
+  recreateQueryStringFromFormattedSyntaxTree,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'] = (() => {
+  const module = { exports: {} };
+  const { spaces } = include('src/libs/gremlint/utils.js');
+
+const recreateQueryOnelinerFromSyntaxTree = (indentation = 0) => (
+  syntaxTree
+) => {
+  console.log('indentation: ', indentation);
+  switch (syntaxTree.type) {
+    case 'traversal':
+      return (
+        spaces(indentation) +
+        syntaxTree.steps.map(recreateQueryOnelinerFromSyntaxTree()).join('.')
+      );
+    case 'method':
+      return (
+        spaces(indentation) +
+        recreateQueryOnelinerFromSyntaxTree()(syntaxTree.method) +
+        '(' +
+        syntaxTree.arguments
+          .map(recreateQueryOnelinerFromSyntaxTree())
+          .join(', ') +
+        ')'
+      );
+    case 'string':
+      return spaces(indentation) + syntaxTree.string;
+    case 'word':
+      return spaces(indentation) + syntaxTree.word;
+  }
+};
+
+module.exports = {
+  recreateQueryOnelinerFromSyntaxTree,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/formatSyntaxTree/FormatSyntaxTree.js'] = (() => {
+  const module = { exports: {} };
+  const { recreateQueryOnelinerFromSyntaxTree } = include(
+  'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
+);
+
+const getStepGroups = (steps, indentation) => {
+  const { stepGroups } = steps.reduce(
+    ({ stepsInStepGroup, stepGroups }, step, index, steps) => {
+      return step.type === 'method' || index === steps.length - 1
+        ? {
+            stepsInStepGroup: [],
+            stepGroups: [
+              ...stepGroups,
+              // TODO: Here, the indentation should be incresed if the current step group is a modulator of the previous stepGroup. Anything is a modulator of a stepGroup which contains the word g. Other modulators, like as and by will have to be hard coded.
+              {
+                indentation,
+                steps: [...stepsInStepGroup, step],
+              },
+            ],
+          }
+        : {
+            stepsInStepGroup: [...stepsInStepGroup, step],
+            stepGroups,
+          };
+    },
+    { stepsInStepGroup: [], stepGroups: [] }
+  );
+  return stepGroups;
+};
+
+// Groups steps into stepGroups and argumentGroups respectively and adds an indentation property
+// TODO: Rewrite RecreateQueryStringFromFormattedSyntaxTree to support this
+const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
+  syntaxTree
+) => {
+  const recreatedQuery = recreateQueryOnelinerFromSyntaxTree(
+    config.indentation
+  )(syntaxTree);
+  if (syntaxTree.type === 'traversal') {
+    return recreatedQuery.length <= config.maxLineLength
+      ? {
+          type: 'traversal',
+          stepGroups: [
+            {
+              indentation: config.indentation,
+              steps: syntaxTree.steps.map((step) =>
+                formatSyntaxTree(config)(step)
+              ),
+            },
+          ],
+        }
+      : {
+          type: 'traversal',
+          stepGroups: getStepGroups(
+            syntaxTree.steps.map((step) => formatSyntaxTree(config)(step)),
+            config.indentation
+          ),
+        };
+  }
+
+  // TODO
+  if (syntaxTree.type === 'method') {
+    console.log('formatSyntaxTree config: ', config);
+    return recreatedQuery.length <= config.maxLineLength
+      ? {
+          type: 'method',
+          method: formatSyntaxTree(config)(syntaxTree.method),
+          argumentGroups: [
+            syntaxTree.arguments.map((step) => formatSyntaxTree(config)(step)),
+          ],
+        }
+      : {
+          type: 'method',
+          method: formatSyntaxTree(config)(syntaxTree.method),
+          argumentGroups: syntaxTree.arguments.map((step) => [
+            formatSyntaxTree({
+              ...config,
+              indentation: config.indentation + 2,
+            })(step),
+          ]),
+        };
+  }
+  if (syntaxTree.type === 'string') {
+    return {
+      type: 'string',
+      string: syntaxTree.string,
+      indentation: config.indentation,
+    };
+  }
+  if (syntaxTree.type === 'word') {
+    return {
+      type: 'word',
+      word: syntaxTree.word,
+      indentation: config.indentation,
+    };
+  }
+};
+
+module.exports = { formatSyntaxTree };
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/Gremlint.js'] = (() => {
+  const module = { exports: {} };
+  const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
+const { parseToSyntaxTree } = include(
+  'src/libs/gremlint/parseToSyntaxTree/ParseToSyntaxTree.js'
+);
+const { formatSyntaxTree } = include(
+  'src/libs/gremlint/formatSyntaxTree/FormatSyntaxTree.js'
+);
+const { recreateQueryStringFromFormattedSyntaxTree } = include(
+  'src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQueryStringFromFormattedSyntaxTree.js'
+);
+
+const formatQuery = (query, config = { indentation: 0, maxLineLength: 80 }) =>
+  pipe(
+    parseToSyntaxTree,
+    formatSyntaxTree(config),
+    recreateQueryStringFromFormattedSyntaxTree
+  )(query);
+
+module.exports = {
+  formatQuery,
+};
+
+  return module.exports;
+})();
+
+modules['src/store/Store.js'] = (() => {
+  const module = { exports: {} };
+  const Observable = include('src/libs/observable/Observable.js');
+const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
+
+const queryInput$ = new Observable('');
+const getQueryInput = () => queryInput$.value;
+const setQueryInput = (queryInput) => {
+  queryInput$.value = queryInput;
+};
+const addQueryInputChangeListener = (callback) => {
+  addEventListener(queryInput$.id, callback);
+};
+
+const queryOutput$ = new Observable('');
+const getQueryOutput = () => queryOutput$.value;
+const setQueryOutput = (queryOutput) => {
+  queryOutput$.value = queryOutput;
+};
+const addQueryOutputChangeListener = (callback) => {
+  addEventListener(queryOutput$.id, callback);
+};
+
+addQueryInputChangeListener(({ detail }) => {
+  setQueryOutput(formatQuery(detail));
+});
+
+module.exports = {
+  getQueryInput,
+  setQueryInput,
+  addQueryInputChangeListener,
+  getQueryOutput,
+  setQueryOutput,
+  addQueryOutputChangeListener,
+};
+
+  return module.exports;
+})();
+
+modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
+  const module = { exports: {} };
+  const QueryInput = include('src/components/queryInput/QueryInput.js');
+const Code = include('src/components/code/Code.js');
+const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { getQueryInput, setQueryInput, getQueryOutput } = include(
+  'src/store/Store.js'
+);
+
+const QueryFormatter = () => {
+  const element = compose('div', {}, [
+    QueryInput(() => ({
+      value: getQueryInput(),
+      oninput: ({ target }) => setQueryInput(target.value),
+    })),
+    If(
+      () => getQueryOutput(),
+      () => [Code(() => ({ innerText: getQueryOutput() }))]
+    ),
+  ]);
+  return element;
+};
+
+module.exports = QueryFormatter;
 
   return module.exports;
 })();

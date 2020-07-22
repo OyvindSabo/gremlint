@@ -5,15 +5,15 @@ const { parseToSyntaxTree } = include(
 const { formatSyntaxTree } = include(
   'src/libs/gremlint/formatSyntaxTree/FormatSyntaxTree.js'
 );
-const { recreateQueryFromSyntaxTree } = include(
-  'src/libs/gremlint/recreateQueryFromSyntaxTree/RecreateQueryFromSyntaxTree.js'
+const { recreateQueryStringFromFormattedSyntaxTree } = include(
+  'src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQueryStringFromFormattedSyntaxTree.js'
 );
 
-const formatQuery = (query, config = { maxLineLength: 80 }) =>
+const formatQuery = (query, config = { indentation: 0, maxLineLength: 80 }) =>
   pipe(
     parseToSyntaxTree,
     formatSyntaxTree(config),
-    recreateQueryFromSyntaxTree
+    recreateQueryStringFromFormattedSyntaxTree
   )(query);
 
 module.exports = {

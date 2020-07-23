@@ -249,39 +249,3 @@ const parseToSyntaxTree = (query) => {
 module.exports = {
   parseToSyntaxTree,
 };
-
-/*
-console.log(
-  'tokenizeOnTopLevelPunctuation: ',
-  tokenizeOnTopLevelPunctuation(`
-    g.V().
-      filter(
-        out().
-        hasLabel('Application').
-        has('name', 'Gremlint'))`)
-);
-
-console.log(
-  'tokenize: ',
-  tokenize(`
-    g.V().
-      filter(
-        out().
-        hasLabel('Application').
-        has('name', 'Gremlint'))`)
-);
-*/
-
-console.log(
-  'parseToSyntaxTree: ',
-  JSON.stringify(
-    parseToSyntaxTree(`
-    g.V().
-      filter(
-        out().
-        hasLabel('Application').
-        has('name', 'Gremlint'))`),
-    null,
-    2
-  )
-);

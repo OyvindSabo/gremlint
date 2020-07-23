@@ -1,4 +1,7 @@
 const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { InputTextColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
 
 const getQueryInputStyle = () => `
   height: calc(50vh - 60px);
@@ -12,6 +15,7 @@ const getQueryInputStyle = () => `
   resize: none;
   width: 100%;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
+  color: ${InputTextColor};
 `;
 
 const QueryInput = (getProps) => {

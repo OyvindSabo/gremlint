@@ -1,39 +1,78 @@
 const Observable = include('src/libs/observable/Observable.js');
 const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
-// Query input state
-const queryInput$ = new Observable('');
-const getQueryInput = () => queryInput$.value;
-const setQueryInput = (queryInput) => {
-  queryInput$.value = queryInput;
-};
-const addQueryInputChangeListener = (callback) => {
-  addEventListener(queryInput$.id, callback);
-};
-
-// Query output state
-const queryOutput$ = new Observable('');
-const getQueryOutput = () => queryOutput$.value;
-const setQueryOutput = (queryOutput) => {
-  queryOutput$.value = queryOutput;
-};
-const addQueryOutputChangeListener = (callback) => {
-  addEventListener(queryOutput$.id, callback);
+const atom = (initialValue) => {
+  const observable$ = new Observable(initialValue);
+  const get = () => observable$.value;
+  const set = (value) => {
+    observable$.value = value;
+  };
+  const addChangeListener = (callback) =>
+    addEventListener(observable$.id, callback);
+  return [get, set, addChangeListener];
 };
 
-// Show advanced options state
-const showAdvancedOptions$ = new Observable(false);
-const getShowAdvancedOptions = () => showAdvancedOptions$.value;
-const setShowAdvancedOptions = (showAdvancedOptions) => {
-  console.log('setting');
-  showAdvancedOptions$.value = showAdvancedOptions;
+const [getQueryInput, setQueryInput, addQueryInputChangeListener] = atom('');
+
+const [getQueryOutput, setQueryOutput, addQueryOutputChangeListener] = atom('');
+
+const [
+  getShowAdvancedOptions,
+  setShowAdvancedOptions,
+  addShowAdvancedOptionsChangeListener,
+] = atom(false);
+
+const [getIndentation, _setIndentation, addIndentationChangeListener] = atom(0);
+const setIndentation = (value) => {
+  const indentation = parseInt(value);
+  if (isNaN(indentation)) return;
+  if (indentation < 0) {
+    _setIndentation(0);
+    return;
+  }
+  _setIndentation(indentation);
 };
-const addShowAdvancedOptionsChangeListener = (callback) => {
-  addEventListener(showAdvancedOptions$.id, callback);
+
+const [
+  getMaxLineLength,
+  _setMaxLineLength,
+  addMaxLineLengthChangeListener,
+] = atom(80);
+const setMaxLineLength = (value) => {
+  const maxLineLength = parseInt(value);
+  if (isNaN(maxLineLength)) return;
+  if (maxLineLength < 0) {
+    _setMaxLineLength(0);
+    return;
+  }
+  _setMaxLineLength(maxLineLength);
 };
 
 addQueryInputChangeListener(({ detail }) => {
-  setQueryOutput(formatQuery(detail));
+  setQueryOutput(
+    formatQuery(detail, {
+      indentation: getIndentation(),
+      maxLineLength: getMaxLineLength(),
+    })
+  );
+});
+
+addIndentationChangeListener(() => {
+  setQueryOutput(
+    formatQuery(getQueryInput(), {
+      indentation: getIndentation(),
+      maxLineLength: getMaxLineLength(),
+    })
+  );
+});
+
+addMaxLineLengthChangeListener(() => {
+  setQueryOutput(
+    formatQuery(getQueryInput(), {
+      indentation: getIndentation(),
+      maxLineLength: getMaxLineLength(),
+    })
+  );
 });
 
 module.exports = {
@@ -48,4 +87,12 @@ module.exports = {
   getShowAdvancedOptions,
   setShowAdvancedOptions,
   addShowAdvancedOptionsChangeListener,
+
+  getIndentation,
+  setIndentation,
+  addIndentationChangeListener,
+
+  getMaxLineLength,
+  setMaxLineLength,
+  addMaxLineLengthChangeListener,
 };

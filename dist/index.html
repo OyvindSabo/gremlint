@@ -114,7 +114,7 @@ const compose = (elementType, getProps, children) => {
   element.update = () => {
     // We update the props only if they are provided as a function. Otherwise they are static.
     if (typeof getProps === 'function') {
-      if (element.setSelectionRange) {
+      if (element.setSelectionRange && !element.type === 'number') {
         const { selectionStart, selectionEnd } = element;
         Object.assign(element, getProps());
         element.setSelectionRange(selectionStart, selectionEnd);
@@ -702,6 +702,7 @@ module.exports = {
 modules['src/libs/simpleColorPalette/SimpleColorPalette.js'] = (() => {
   const module = { exports: {} };
   const TextColor = 'slategray';
+const InputTextColor = 'darkslategray';
 const HighlightedTextColor = 'darkslategray';
 const DisabledTextColor = 'lightgray';
 const HighlightColor = 'yellowgreen';
@@ -709,125 +710,12 @@ const White = 'white';
 
 module.exports = {
   TextColor,
+  InputTextColor,
   HighlightedTextColor,
   DisabledTextColor,
   HighlightColor,
   White,
 };
-
-  return module.exports;
-})();
-
-modules['src/components/navigationButton/NavigationButton.js'] = (() => {
-  const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { HighlightedTextColor, TextColor, HighlightColor } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
-
-const NavigationButton = (getProps) => {
-  const getIsSelected = () => getProps().isSelected;
-  const getHref = () => getProps().href;
-  const getLabel = () => getProps().label;
-
-  let isHovered = false;
-  const getIsHovered = () => isHovered;
-  const setIsHovered = (value) => {
-    isHovered = value;
-    element.update();
-  };
-
-  const getSpanStyle = () => `
-    display: inline-block;
-    padding: 10px;
-    box-sizing: border-box;
-    width: 140px;
-  `;
-
-  const getAStyle = () => `
-    text-decoration: none;
-    display: inline-block;
-    height: 20px;
-    line-height: 20px;
-    font-size: 15px;
-    color: ${
-      getIsSelected() || getIsHovered() ? HighlightedTextColor : TextColor
-    };
-    border-bottom: ${getIsSelected() ? `2px solid ${HighlightColor}` : 'none'};
-  `;
-
-  const element = compose('span', () => ({ style: getSpanStyle() }), [
-    compose(
-      'a',
-      () => ({
-        href: getHref(),
-        innerText: getLabel(),
-        style: getAStyle(),
-        onmouseenter: () => setIsHovered(true),
-        onmouseleave: () => setIsHovered(false),
-      }),
-      []
-    ),
-  ]);
-
-  return element;
-};
-
-module.exports = NavigationButton;
-
-  return module.exports;
-})();
-
-modules['src/components/navigator/Navigator.js'] = (() => {
-  const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
-const NavigationButton = include(
-  'src/components/navigationButton/NavigationButton.js'
-);
-
-const getQueryFormatterButtonProps = (getCurrentRoute) => () => ({
-  isSelected: getCurrentRoute() === '/',
-  label: 'Query formatter',
-  href: '#!/',
-});
-
-const getStyleGuideButtonProps = (getCurrentRoute) => () => ({
-  isSelected: getCurrentRoute() === '/style-guide',
-  label: 'Style guide',
-  href: '#!/style-guide',
-});
-
-const Navigator = (getProps) => {
-  const getCurrentRoute = () => getProps().currentRoute;
-  const element = compose('div', {}, [
-    compose(
-      'div',
-      {
-        style: `background: ${White};
-                box-shadow: ${White} 0 0 10px;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;`,
-      },
-      [
-        compose(
-          'div',
-          { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
-          [
-            NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
-            NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),
-          ]
-        ),
-      ]
-    ),
-    compose('div', { style: 'height:40px;' }, []),
-  ]);
-  return element;
-};
-
-module.exports = Navigator;
 
   return module.exports;
 })();
@@ -1162,6 +1050,9 @@ module.exports = { rules };
 modules['src/components/queryInput/QueryInput.js'] = (() => {
   const module = { exports: {} };
   const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { InputTextColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
 
 const getQueryInputStyle = () => `
   height: calc(50vh - 60px);
@@ -1175,6 +1066,7 @@ const getQueryInputStyle = () => `
   resize: none;
   width: 100%;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
+  color: ${InputTextColor};
 `;
 
 const QueryInput = (getProps) => {
@@ -1236,66 +1128,6 @@ const Code = (getProps) => {
 };
 
 module.exports = Code;
-
-  return module.exports;
-})();
-
-modules['src/components/textButton/TextButton.js'] = (() => {
-  const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { HighlightedTextColor, TextColor } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
-
-const TextButton = (getProps) => {
-  const getHref = () => getProps().href;
-  const getLabel = () => getProps().label;
-  const getOnClick = () => getProps().onclick;
-
-  let isHovered = false;
-  const getIsHovered = () => isHovered;
-  const setIsHovered = (value) => {
-    isHovered = value;
-    element.update();
-  };
-
-  const getSpanStyle = () => `
-    display: inline-block;
-    padding: 10px;
-    box-sizing: border-box;
-  `;
-
-  const getButtonStyle = () => `
-    text-decoration: none;
-    display: inline-block;
-    height: 20px;
-    line-height: 20px;
-    font-size: 15px;
-    color: ${getIsHovered() ? HighlightedTextColor : TextColor};
-    background: none;
-    border: none;
-    padding: 0;
-  `;
-
-  const element = compose('span', () => ({ style: getSpanStyle() }), [
-    compose(
-      'button',
-      () => ({
-        href: getHref(),
-        innerText: getLabel(),
-        style: getButtonStyle(),
-        onmouseenter: () => setIsHovered(true),
-        onmouseleave: () => setIsHovered(false),
-        onclick: getOnClick(),
-      }),
-      []
-    ),
-  ]);
-
-  return element;
-};
-
-module.exports = TextButton;
 
   return module.exports;
 })();
@@ -1568,6 +1400,229 @@ module.exports = {
   return module.exports;
 })();
 
+modules['src/libs/simpleStyle/SimpleStyle.js'] = (() => {
+  const module = { exports: {} };
+  const {
+  TextColor,
+  InputTextColor,
+  HighlightedTextColor,
+  DisabledTextColor,
+  HighlightColor,
+  White,
+} = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
+
+// A unit is 20px
+const getInlineContainerStyle = (widthUnits, heightUnits) => `
+  display: inline-block;
+  padding: 10px;
+  box-sizing: border-box;
+  height: ${heightUnits * 20}px;
+  width: ${widthUnits * 20}px;
+`;
+
+const getInputStyle = () => `
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.05);
+  outline: none;
+  font-size: 15px;
+  padding: 10px;
+  border: none;
+  box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
+  color: ${InputTextColor};
+`;
+
+// Used for links
+// inline-block is needed for the element to be able to have a height
+const getLinkStyle = (isHovered, isSelected) => `
+  text-decoration: none;
+  display: inline-block;
+  height: 20px;
+  line-height: 20px;
+  font-size: 15px;
+  color: ${isHovered || isSelected ? HighlightedTextColor : TextColor};
+  border-bottom: ${isSelected ? `2px solid ${HighlightColor}` : 'none'};
+`;
+
+// Used for buttons to make them look like text
+const getTextButtonStyle = (isHovered) => `
+  height: 20px;
+  line-height: 20px;
+  font-size: 15px;
+  color: ${isHovered ? HighlightedTextColor : TextColor};
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+`;
+
+// Used for spans and divs and what not
+const getTextStyle = () => `
+  height: 20px;
+  line-height: 20px;
+  font-size: 15px;
+  color: ${TextColor};
+`;
+
+module.exports = {
+  getInlineContainerStyle,
+  getInputStyle,
+  getLinkStyle,
+  getTextButtonStyle,
+  getTextStyle,
+};
+
+  return module.exports;
+})();
+
+modules['src/components/navigationButton/NavigationButton.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { getInlineContainerStyle, getLinkStyle } = include(
+  'src/libs/simpleStyle/SimpleStyle.js'
+);
+
+const NavigationButton = (getProps) => {
+  const getIsSelected = () => getProps().isSelected;
+  const getHref = () => getProps().href;
+  const getLabel = () => getProps().label;
+
+  let isHovered = false;
+  const getIsHovered = () => isHovered;
+  const setIsHovered = (value) => {
+    isHovered = value;
+    element.update();
+  };
+
+  const element = compose(
+    'span',
+    () => ({ style: getInlineContainerStyle(7, 2) }),
+    [
+      compose(
+        'a',
+        () => ({
+          href: getHref(),
+          innerText: getLabel(),
+          style: getLinkStyle(getIsHovered(), getIsSelected()),
+          onmouseenter: () => setIsHovered(true),
+          onmouseleave: () => setIsHovered(false),
+        }),
+        []
+      ),
+    ]
+  );
+
+  return element;
+};
+
+module.exports = NavigationButton;
+
+  return module.exports;
+})();
+
+modules['src/components/navigator/Navigator.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
+const NavigationButton = include(
+  'src/components/navigationButton/NavigationButton.js'
+);
+
+const getQueryFormatterButtonProps = (getCurrentRoute) => () => ({
+  isSelected: getCurrentRoute() === '/',
+  label: 'Query formatter',
+  href: '#!/',
+});
+
+const getStyleGuideButtonProps = (getCurrentRoute) => () => ({
+  isSelected: getCurrentRoute() === '/style-guide',
+  label: 'Style guide',
+  href: '#!/style-guide',
+});
+
+const Navigator = (getProps) => {
+  const getCurrentRoute = () => getProps().currentRoute;
+  const element = compose('div', {}, [
+    compose(
+      'div',
+      {
+        style: `background: ${White};
+                box-shadow: ${White} 0 0 10px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;`,
+      },
+      [
+        compose(
+          'div',
+          { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+          [
+            NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
+            NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),
+          ]
+        ),
+      ]
+    ),
+    compose('div', { style: 'height:40px;' }, []),
+  ]);
+  return element;
+};
+
+module.exports = Navigator;
+
+  return module.exports;
+})();
+
+modules['src/components/textButton/TextButton.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { HighlightedTextColor, TextColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+const { getTextButtonStyle } = include('src/libs/simpleStyle/SimpleStyle.js');
+
+const TextButton = (getProps) => {
+  const getHref = () => getProps().href;
+  const getLabel = () => getProps().label;
+  const getOnClick = () => getProps().onclick;
+
+  let isHovered = false;
+  const getIsHovered = () => isHovered;
+  const setIsHovered = (value) => {
+    isHovered = value;
+    element.update();
+  };
+
+  const getSpanStyle = () => `
+    display: inline-block;
+    padding: 10px;
+    box-sizing: border-box;
+  `;
+
+  const element = compose('span', () => ({ style: getSpanStyle() }), [
+    compose(
+      'button',
+      () => ({
+        href: getHref(),
+        innerText: getLabel(),
+        style: getTextButtonStyle(getIsHovered()),
+        onmouseenter: () => setIsHovered(true),
+        onmouseleave: () => setIsHovered(false),
+        onclick: getOnClick(),
+      }),
+      []
+    ),
+  ]);
+
+  return element;
+};
+
+module.exports = TextButton;
+
+  return module.exports;
+})();
+
 modules['src/components/title/Title.js'] = (() => {
   const module = { exports: {} };
   const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
@@ -1711,7 +1766,6 @@ modules['src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQu
 
 const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
   if (syntaxTree.type === 'traversal') {
-    console.log('syntaxTree.stepGroups: ', syntaxTree.stepGroups);
     return syntaxTree.stepGroups
       .map((stepGroup) =>
         stepGroup.steps
@@ -1950,10 +2004,6 @@ const { recreateQueryStringFromFormattedSyntaxTree } = include(
 );
 
 const formatQuery = (query, config = { indentation: 0, maxLineLength: 80 }) => {
-  console.log(
-    'formattedSyntaxTree',
-    pipe(parseToSyntaxTree, formatSyntaxTree(config))(query)
-  );
   return pipe(
     parseToSyntaxTree,
     formatSyntaxTree(config),
@@ -1973,39 +2023,78 @@ modules['src/store/Store.js'] = (() => {
   const Observable = include('src/libs/observable/Observable.js');
 const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
-// Query input state
-const queryInput$ = new Observable('');
-const getQueryInput = () => queryInput$.value;
-const setQueryInput = (queryInput) => {
-  queryInput$.value = queryInput;
-};
-const addQueryInputChangeListener = (callback) => {
-  addEventListener(queryInput$.id, callback);
-};
-
-// Query output state
-const queryOutput$ = new Observable('');
-const getQueryOutput = () => queryOutput$.value;
-const setQueryOutput = (queryOutput) => {
-  queryOutput$.value = queryOutput;
-};
-const addQueryOutputChangeListener = (callback) => {
-  addEventListener(queryOutput$.id, callback);
+const atom = (initialValue) => {
+  const observable$ = new Observable(initialValue);
+  const get = () => observable$.value;
+  const set = (value) => {
+    observable$.value = value;
+  };
+  const addChangeListener = (callback) =>
+    addEventListener(observable$.id, callback);
+  return [get, set, addChangeListener];
 };
 
-// Show advanced options state
-const showAdvancedOptions$ = new Observable(false);
-const getShowAdvancedOptions = () => showAdvancedOptions$.value;
-const setShowAdvancedOptions = (showAdvancedOptions) => {
-  console.log('setting');
-  showAdvancedOptions$.value = showAdvancedOptions;
+const [getQueryInput, setQueryInput, addQueryInputChangeListener] = atom('');
+
+const [getQueryOutput, setQueryOutput, addQueryOutputChangeListener] = atom('');
+
+const [
+  getShowAdvancedOptions,
+  setShowAdvancedOptions,
+  addShowAdvancedOptionsChangeListener,
+] = atom(false);
+
+const [getIndentation, _setIndentation, addIndentationChangeListener] = atom(0);
+const setIndentation = (value) => {
+  const indentation = parseInt(value);
+  if (isNaN(indentation)) return;
+  if (indentation < 0) {
+    _setIndentation(0);
+    return;
+  }
+  _setIndentation(indentation);
 };
-const addShowAdvancedOptionsChangeListener = (callback) => {
-  addEventListener(showAdvancedOptions$.id, callback);
+
+const [
+  getMaxLineLength,
+  _setMaxLineLength,
+  addMaxLineLengthChangeListener,
+] = atom(80);
+const setMaxLineLength = (value) => {
+  const maxLineLength = parseInt(value);
+  if (isNaN(maxLineLength)) return;
+  if (maxLineLength < 0) {
+    _setMaxLineLength(0);
+    return;
+  }
+  _setMaxLineLength(maxLineLength);
 };
 
 addQueryInputChangeListener(({ detail }) => {
-  setQueryOutput(formatQuery(detail));
+  setQueryOutput(
+    formatQuery(detail, {
+      indentation: getIndentation(),
+      maxLineLength: getMaxLineLength(),
+    })
+  );
+});
+
+addIndentationChangeListener(() => {
+  setQueryOutput(
+    formatQuery(getQueryInput(), {
+      indentation: getIndentation(),
+      maxLineLength: getMaxLineLength(),
+    })
+  );
+});
+
+addMaxLineLengthChangeListener(() => {
+  setQueryOutput(
+    formatQuery(getQueryInput(), {
+      indentation: getIndentation(),
+      maxLineLength: getMaxLineLength(),
+    })
+  );
 });
 
 module.exports = {
@@ -2020,7 +2109,81 @@ module.exports = {
   getShowAdvancedOptions,
   setShowAdvancedOptions,
   addShowAdvancedOptionsChangeListener,
+
+  getIndentation,
+  setIndentation,
+  addIndentationChangeListener,
+
+  getMaxLineLength,
+  setMaxLineLength,
+  addMaxLineLengthChangeListener,
 };
+
+  return module.exports;
+})();
+
+modules['src/views/queryFormatter/advancedOptions/AdvancedOptions.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const {
+  setQueryInput,
+  getIndentation,
+  setIndentation,
+  getMaxLineLength,
+  setMaxLineLength,
+} = include('src/store/Store.js');
+const { getInlineContainerStyle, getInputStyle, getTextStyle } = include(
+  'src/libs/simpleStyle/SimpleStyle.js'
+);
+
+const AdvancedOptions = () => {
+  const element = compose('div', {}, [
+    compose('div', { style: 'padding: 10px;' }, [
+      compose(
+        'span',
+        {
+          innerText: 'Indentation:',
+          style: getTextStyle() + getInlineContainerStyle(7, 2),
+        },
+        []
+      ),
+      compose(
+        'input',
+        () => ({
+          style: getInputStyle() + getInlineContainerStyle(7, 2),
+          type: 'number',
+          min: 0,
+          value: getIndentation(),
+          oninput: ({ target }) => setIndentation(target.value),
+        }),
+        []
+      ),
+    ]),
+    compose('div', { style: 'padding: 10px;' }, [
+      compose(
+        'span',
+        {
+          innerText: 'Max line length:',
+          style: getTextStyle() + getInlineContainerStyle(7, 2),
+        },
+        []
+      ),
+      compose(
+        'input',
+        {
+          style: getInputStyle() + getInlineContainerStyle(7, 2),
+          type: 'number',
+          value: getMaxLineLength(),
+          oninput: ({ target }) => setMaxLineLength(target.value),
+        },
+        []
+      ),
+    ]),
+  ]);
+  return element;
+};
+
+module.exports = AdvancedOptions;
 
   return module.exports;
 })();
@@ -2030,6 +2193,9 @@ modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
   const QueryInput = include('src/components/queryInput/QueryInput.js');
 const Code = include('src/components/code/Code.js');
 const TextButton = include('src/components/textButton/TextButton.js');
+const AdvancedOptions = include(
+  'src/views/queryFormatter/advancedOptions/AdvancedOptions.js'
+);
 const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
   getQueryInput,
@@ -2051,6 +2217,7 @@ const QueryFormatter = () => {
         : 'Show advanced options',
       onclick: () => setShowAdvancedOptions(!getShowAdvancedOptions()),
     })),
+    If(getShowAdvancedOptions, () => [AdvancedOptions()]),
     If(
       () => getQueryOutput(),
       () => [Code(() => ({ innerText: getQueryOutput() }))]
@@ -2111,9 +2278,9 @@ const app = App(() => ({}));
 Router.addHashChangeListener(app.update);
 Store.addQueryInputChangeListener(app.update);
 Store.addQueryOutputChangeListener(app.update);
-Store.addShowAdvancedOptionsChangeListener(() => {
-  console.log('updating'), app.update();
-});
+Store.addShowAdvancedOptionsChangeListener(app.update);
+Store.addIndentationChangeListener(app.update);
+Store.addMaxLineLengthChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

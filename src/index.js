@@ -7,9 +7,9 @@ const app = App(() => ({}));
 Router.addHashChangeListener(app.update);
 Store.addQueryInputChangeListener(app.update);
 Store.addQueryOutputChangeListener(app.update);
-Store.addShowAdvancedOptionsChangeListener(() => {
-  console.log('updating'), app.update();
-});
+Store.addShowAdvancedOptionsChangeListener(app.update);
+Store.addIndentationChangeListener(app.update);
+Store.addMaxLineLengthChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

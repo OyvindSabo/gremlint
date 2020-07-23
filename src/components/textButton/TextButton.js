@@ -2,6 +2,7 @@ const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { HighlightedTextColor, TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
+const { getTextButtonStyle } = include('src/libs/simpleStyle/SimpleStyle.js');
 
 const TextButton = (getProps) => {
   const getHref = () => getProps().href;
@@ -21,25 +22,13 @@ const TextButton = (getProps) => {
     box-sizing: border-box;
   `;
 
-  const getButtonStyle = () => `
-    text-decoration: none;
-    display: inline-block;
-    height: 20px;
-    line-height: 20px;
-    font-size: 15px;
-    color: ${getIsHovered() ? HighlightedTextColor : TextColor};
-    background: none;
-    border: none;
-    padding: 0;
-  `;
-
   const element = compose('span', () => ({ style: getSpanStyle() }), [
     compose(
       'button',
       () => ({
         href: getHref(),
         innerText: getLabel(),
-        style: getButtonStyle(),
+        style: getTextButtonStyle(getIsHovered()),
         onmouseenter: () => setIsHovered(true),
         onmouseleave: () => setIsHovered(false),
         onclick: getOnClick(),

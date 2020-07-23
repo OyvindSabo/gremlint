@@ -10,10 +10,6 @@ const { recreateQueryStringFromFormattedSyntaxTree } = include(
 );
 
 const formatQuery = (query, config = { indentation: 0, maxLineLength: 80 }) => {
-  console.log(
-    'formattedSyntaxTree',
-    pipe(parseToSyntaxTree, formatSyntaxTree(config))(query)
-  );
   return pipe(
     parseToSyntaxTree,
     formatSyntaxTree(config),

@@ -73,7 +73,7 @@ const compose = (elementType, getProps, children) => {
   element.update = () => {
     // We update the props only if they are provided as a function. Otherwise they are static.
     if (typeof getProps === 'function') {
-      if (element.setSelectionRange) {
+      if (element.setSelectionRange && !element.type === 'number') {
         const { selectionStart, selectionEnd } = element;
         Object.assign(element, getProps());
         element.setSelectionRange(selectionStart, selectionEnd);

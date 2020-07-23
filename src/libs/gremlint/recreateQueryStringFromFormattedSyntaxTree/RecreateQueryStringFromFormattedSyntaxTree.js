@@ -19,7 +19,7 @@ const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
           arguments.map(recreateQueryStringFromFormattedSyntaxTree).join(', ')
         )
         .join(syntaxTree.argumentGroups.length > 1 ? ',\n' : ', ') + ')',
-    ].join(syntaxTree.argumentGroups.length > 1 ? '\n' : '');
+    ].join(syntaxTree.argumentsShouldStartOnNewLine ? '\n' : '');
   }
   if (syntaxTree.type === 'string') {
     return spaces(syntaxTree.indentation) + syntaxTree.string;

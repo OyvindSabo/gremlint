@@ -57,16 +57,20 @@ const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
         };
   }
 
-  // TODO
   if (syntaxTree.type === 'method') {
-    console.log('formatSyntaxTree config: ', config);
     return recreatedQuery.length <= config.maxLineLength
       ? {
           type: 'method',
           method: formatSyntaxTree(config)(syntaxTree.method),
           argumentGroups: [
-            syntaxTree.arguments.map((step) => formatSyntaxTree(config)(step)),
+            syntaxTree.arguments.map((step) =>
+              formatSyntaxTree({
+                ...config,
+                indentation: 0,
+              })(step)
+            ),
           ],
+          argumentsShouldStartOnNewLine: false,
         }
       : {
           type: 'method',
@@ -77,6 +81,7 @@ const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
               indentation: config.indentation + 2,
             })(step),
           ]),
+          argumentsShouldStartOnNewLine: true,
         };
   }
   if (syntaxTree.type === 'string') {

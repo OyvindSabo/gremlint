@@ -1704,7 +1704,7 @@ const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
           arguments.map(recreateQueryStringFromFormattedSyntaxTree).join(', ')
         )
         .join(syntaxTree.argumentGroups.length > 1 ? ',\n' : ', ') + ')',
-    ].join(syntaxTree.argumentGroups.length > 1 ? '\n' : '');
+    ].join(syntaxTree.argumentsShouldStartOnNewLine ? '\n' : '');
   }
   if (syntaxTree.type === 'string') {
     return spaces(syntaxTree.indentation) + syntaxTree.string;
@@ -1728,7 +1728,6 @@ modules['src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnel
 const recreateQueryOnelinerFromSyntaxTree = (indentation = 0) => (
   syntaxTree
 ) => {
-  console.log('indentation: ', indentation);
   switch (syntaxTree.type) {
     case 'traversal':
       return (
@@ -1820,16 +1819,20 @@ const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
         };
   }
 
-  // TODO
   if (syntaxTree.type === 'method') {
-    console.log('formatSyntaxTree config: ', config);
     return recreatedQuery.length <= config.maxLineLength
       ? {
           type: 'method',
           method: formatSyntaxTree(config)(syntaxTree.method),
           argumentGroups: [
-            syntaxTree.arguments.map((step) => formatSyntaxTree(config)(step)),
+            syntaxTree.arguments.map((step) =>
+              formatSyntaxTree({
+                ...config,
+                indentation: 0,
+              })(step)
+            ),
           ],
+          argumentsShouldStartOnNewLine: false,
         }
       : {
           type: 'method',
@@ -1840,6 +1843,7 @@ const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
               indentation: config.indentation + 2,
             })(step),
           ]),
+          argumentsShouldStartOnNewLine: true,
         };
   }
   if (syntaxTree.type === 'string') {
@@ -1876,12 +1880,17 @@ const { recreateQueryStringFromFormattedSyntaxTree } = include(
   'src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQueryStringFromFormattedSyntaxTree.js'
 );
 
-const formatQuery = (query, config = { indentation: 0, maxLineLength: 80 }) =>
-  pipe(
+const formatQuery = (query, config = { indentation: 0, maxLineLength: 80 }) => {
+  console.log(
+    'formattedSyntaxTree',
+    pipe(parseToSyntaxTree, formatSyntaxTree(config))(query)
+  );
+  return pipe(
     parseToSyntaxTree,
     formatSyntaxTree(config),
     recreateQueryStringFromFormattedSyntaxTree
   )(query);
+};
 
 module.exports = {
   formatQuery,

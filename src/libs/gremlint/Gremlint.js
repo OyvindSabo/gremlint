@@ -9,12 +9,17 @@ const { recreateQueryStringFromFormattedSyntaxTree } = include(
   'src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQueryStringFromFormattedSyntaxTree.js'
 );
 
-const formatQuery = (query, config = { indentation: 0, maxLineLength: 80 }) =>
-  pipe(
+const formatQuery = (query, config = { indentation: 0, maxLineLength: 80 }) => {
+  console.log(
+    'formattedSyntaxTree',
+    pipe(parseToSyntaxTree, formatSyntaxTree(config))(query)
+  );
+  return pipe(
     parseToSyntaxTree,
     formatSyntaxTree(config),
     recreateQueryStringFromFormattedSyntaxTree
   )(query);
+};
 
 module.exports = {
   formatQuery,

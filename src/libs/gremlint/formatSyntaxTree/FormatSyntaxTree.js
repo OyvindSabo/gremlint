@@ -2,25 +2,54 @@ const { recreateQueryOnelinerFromSyntaxTree } = include(
   'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
 );
 
-const getStepGroups = (steps, indentation) => {
+const getStepGroups = (steps, config) => {
   const { stepGroups } = steps.reduce(
     ({ stepsInStepGroup, stepGroups }, step, index, steps) => {
-      return step.type === 'method' || index === steps.length - 1
-        ? {
+      // TODO: We need to make sure that indentation is zero for all steps which are not the first in the step group
+      // If it should be the last step in a line
+      if (step.type === 'method' || index === steps.length - 1) {
+        // If it is the first step, format it with indentation, otherwise, remove the indentation
+        if (!stepsInStepGroup.length) {
+          return {
             stepsInStepGroup: [],
             stepGroups: [
               ...stepGroups,
-              // TODO: Here, the indentation should be incresed if the current step group is a modulator of the previous stepGroup. Anything is a modulator of a stepGroup which contains the word g. Other modulators, like as and by will have to be hard coded.
+              // TODO: Here, the indentation should be increased if the current step group is a modulator of the previous stepGroup. Anything is a modulator of a stepGroup which contains the word g. Other modulators, like as and by will have to be hard coded.
               {
-                indentation,
-                steps: [...stepsInStepGroup, step],
+                steps: [formatSyntaxTree(config)(step)],
               },
             ],
-          }
-        : {
-            stepsInStepGroup: [...stepsInStepGroup, step],
+          };
+        }
+        return {
+          stepsInStepGroup: [],
+          stepGroups: [
+            ...stepGroups,
+            // TODO: Here, the indentation should be increased if the current step group is a modulator of the previous stepGroup. Anything is a modulator of a stepGroup which contains the word g. Other modulators, like as and by will have to be hard coded.
+            {
+              steps: [
+                ...stepsInStepGroup,
+                formatSyntaxTree({ ...config, indentation: 0 })(step),
+              ],
+            },
+          ],
+        };
+      } else {
+        // If it is the first step, format it with indentation, otherwise, remove the indentation
+        if (!stepsInStepGroup.length) {
+          return {
+            stepsInStepGroup: [formatSyntaxTree(config)(step)],
             stepGroups,
           };
+        }
+        return {
+          stepsInStepGroup: [
+            ...stepsInStepGroup,
+            formatSyntaxTree({ ...config, indentation: 0 })(step),
+          ],
+          stepGroups,
+        };
+      }
     },
     { stepsInStepGroup: [], stepGroups: [] }
   );
@@ -41,19 +70,22 @@ const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
           type: 'traversal',
           stepGroups: [
             {
-              indentation: config.indentation,
-              steps: syntaxTree.steps.map((step) =>
-                formatSyntaxTree(config)(step)
+              steps: syntaxTree.steps.map((step, index) =>
+                formatSyntaxTree(
+                  index === 0
+                    ? config
+                    : {
+                        ...config,
+                        indentation: 0,
+                      }
+                )(step)
               ),
             },
           ],
         }
       : {
           type: 'traversal',
-          stepGroups: getStepGroups(
-            syntaxTree.steps.map((step) => formatSyntaxTree(config)(step)),
-            config.indentation
-          ),
+          stepGroups: getStepGroups(syntaxTree.steps, config),
         };
   }
 

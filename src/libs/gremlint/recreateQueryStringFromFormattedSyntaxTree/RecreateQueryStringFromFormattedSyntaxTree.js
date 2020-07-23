@@ -18,7 +18,7 @@ const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
         .map((arguments) =>
           arguments.map(recreateQueryStringFromFormattedSyntaxTree).join(', ')
         )
-        .join(syntaxTree.argumentGroups.length > 1 ? ',\n' : ', ') + ')',
+        .join(',\n') + ')',
     ].join(syntaxTree.argumentsShouldStartOnNewLine ? '\n' : '');
   }
   if (syntaxTree.type === 'string') {

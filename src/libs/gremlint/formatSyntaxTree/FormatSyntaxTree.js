@@ -2,6 +2,22 @@ const { recreateQueryOnelinerFromSyntaxTree } = include(
   'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
 );
 
+const isTraversalSource = (step) => step.type === 'word' && step.word === 'g';
+
+const isModulator = (step) =>
+  step.type === 'method' &&
+  step.method.type === 'word' &&
+  step.method.word === 'by';
+
+const withIndentation = (config, indentation) => ({ ...config, indentation });
+
+const withZeroIndentation = (config) => withIndentation(config, 0);
+
+const withIncreasedIndentation = (config, indentationIncrease) => ({
+  ...config,
+  indentation: config.indentation + indentationIncrease,
+});
+
 const getStepGroups = (steps, config) => {
   const { stepGroups } = steps.reduce(
     ({ stepsInStepGroup, stepGroups }, step, index, steps) => {
@@ -16,7 +32,17 @@ const getStepGroups = (steps, config) => {
               ...stepGroups,
               // TODO: Here, the indentation should be increased if the current step group is a modulator of the previous stepGroup. Anything is a modulator of a stepGroup which contains the word g. Other modulators, like as and by will have to be hard coded.
               {
-                steps: [formatSyntaxTree(config)(step)],
+                steps: [
+                  formatSyntaxTree(
+                    withIncreasedIndentation(
+                      config,
+                      (stepGroups[0] &&
+                      isTraversalSource(stepGroups[0].steps[0])
+                        ? 2
+                        : 0) + (isModulator(step) ? 2 : 0)
+                    )
+                  )(step),
+                ],
               },
             ],
           };
@@ -29,7 +55,7 @@ const getStepGroups = (steps, config) => {
             {
               steps: [
                 ...stepsInStepGroup,
-                formatSyntaxTree({ ...config, indentation: 0 })(step),
+                formatSyntaxTree(withZeroIndentation(config))(step),
               ],
             },
           ],
@@ -45,7 +71,7 @@ const getStepGroups = (steps, config) => {
         return {
           stepsInStepGroup: [
             ...stepsInStepGroup,
-            formatSyntaxTree({ ...config, indentation: 0 })(step),
+            formatSyntaxTree(withZeroIndentation(config))(step),
           ],
           stepGroups,
         };
@@ -58,9 +84,7 @@ const getStepGroups = (steps, config) => {
 
 // Groups steps into stepGroups and argumentGroups respectively and adds an indentation property
 // TODO: Rewrite RecreateQueryStringFromFormattedSyntaxTree to support this
-const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
-  syntaxTree
-) => {
+const formatSyntaxTree = (config) => (syntaxTree) => {
   const recreatedQuery = recreateQueryOnelinerFromSyntaxTree(
     config.indentation
   )(syntaxTree);
@@ -72,12 +96,7 @@ const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
             {
               steps: syntaxTree.steps.map((step, index) =>
                 formatSyntaxTree(
-                  index === 0
-                    ? config
-                    : {
-                        ...config,
-                        indentation: 0,
-                      }
+                  index === 0 ? config : withZeroIndentation(config)
                 )(step)
               ),
             },
@@ -96,10 +115,7 @@ const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
           method: formatSyntaxTree(config)(syntaxTree.method),
           argumentGroups: [
             syntaxTree.arguments.map((step) =>
-              formatSyntaxTree({
-                ...config,
-                indentation: 0,
-              })(step)
+              formatSyntaxTree(withZeroIndentation(config))(step)
             ),
           ],
           argumentsShouldStartOnNewLine: false,
@@ -108,10 +124,7 @@ const formatSyntaxTree = (config = { indentation: 0, maxLineLength: 80 }) => (
           type: 'method',
           method: formatSyntaxTree(config)(syntaxTree.method),
           argumentGroups: syntaxTree.arguments.map((step) => [
-            formatSyntaxTree({
-              ...config,
-              indentation: config.indentation + 2,
-            })(step),
+            formatSyntaxTree(withIncreasedIndentation(config, 2))(step),
           ]),
           argumentsShouldStartOnNewLine: true,
         };

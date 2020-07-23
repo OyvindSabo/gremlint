@@ -1,5 +1,5 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { TextColor } = include(
+const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { DisabledTextColor, TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
 
@@ -18,8 +18,9 @@ const getCodeStyle = () => `
 
 const Code = (getProps) => {
   const getInnerText = () => getProps().innerText;
+  const getMaxLineLength = () => getProps().maxLineLength;
   const element = compose('div', { style: 'padding: 10px;' }, [
-    compose('div', { style: getCodeStyle() }, [
+    compose('div', { style: getCodeStyle() + 'position: relative;' }, [
       compose(
         'span',
         () => ({
@@ -27,6 +28,18 @@ const Code = (getProps) => {
           innerText: getInnerText(),
         }),
         []
+      ),
+      If(
+        () => getMaxLineLength() !== undefined,
+        () => [
+          compose(
+            'div',
+            () => ({
+              style: `top: 0; left: 0; width: calc(10px + ${getMaxLineLength()}ch); border-right: 1px solid ${DisabledTextColor}; position: absolute; height: 100%;`,
+            }),
+            []
+          ),
+        ]
       ),
     ]),
   ]);

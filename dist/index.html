@@ -1092,8 +1092,8 @@ module.exports = QueryInput;
 
 modules['src/components/code/Code.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { TextColor } = include(
+  const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { DisabledTextColor, TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
 
@@ -1112,8 +1112,9 @@ const getCodeStyle = () => `
 
 const Code = (getProps) => {
   const getInnerText = () => getProps().innerText;
+  const getMaxLineLength = () => getProps().maxLineLength;
   const element = compose('div', { style: 'padding: 10px;' }, [
-    compose('div', { style: getCodeStyle() }, [
+    compose('div', { style: getCodeStyle() + 'position: relative;' }, [
       compose(
         'span',
         () => ({
@@ -1121,6 +1122,18 @@ const Code = (getProps) => {
           innerText: getInnerText(),
         }),
         []
+      ),
+      If(
+        () => getMaxLineLength() !== undefined,
+        () => [
+          compose(
+            'div',
+            () => ({
+              style: `top: 0; left: 0; width: calc(10px + ${getMaxLineLength()}ch); border-right: 1px solid ${DisabledTextColor}; position: absolute; height: 100%;`,
+            }),
+            []
+          ),
+        ]
       ),
     ]),
   ]);
@@ -2052,6 +2065,11 @@ const setIndentation = (value) => {
     _setIndentation(0);
     return;
   }
+  const maxLineLength = getMaxLineLength();
+  if (indentation > maxLineLength) {
+    _setIndentation(maxLineLength);
+    return;
+  }
   _setIndentation(indentation);
 };
 
@@ -2065,6 +2083,10 @@ const setMaxLineLength = (value) => {
   if (isNaN(maxLineLength)) return;
   if (maxLineLength < 0) {
     _setMaxLineLength(0);
+    return;
+  }
+  if (maxLineLength > 85) {
+    _setMaxLineLength(85);
     return;
   }
   _setMaxLineLength(maxLineLength);
@@ -2126,7 +2148,6 @@ modules['src/views/queryFormatter/advancedOptions/AdvancedOptions.js'] = (() => 
   const module = { exports: {} };
   const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
-  setQueryInput,
   getIndentation,
   setIndentation,
   getMaxLineLength,
@@ -2153,6 +2174,7 @@ const AdvancedOptions = () => {
           style: getInputStyle() + getInlineContainerStyle(7, 2),
           type: 'number',
           min: 0,
+          max: getMaxLineLength(),
           value: getIndentation(),
           oninput: ({ target }) => setIndentation(target.value),
         }),
@@ -2173,6 +2195,8 @@ const AdvancedOptions = () => {
         {
           style: getInputStyle() + getInlineContainerStyle(7, 2),
           type: 'number',
+          min: 0,
+          max: 85,
           value: getMaxLineLength(),
           oninput: ({ target }) => setMaxLineLength(target.value),
         },
@@ -2203,6 +2227,7 @@ const {
   getQueryOutput,
   getShowAdvancedOptions,
   setShowAdvancedOptions,
+  getMaxLineLength,
 } = include('src/store/Store.js');
 
 const QueryFormatter = () => {
@@ -2220,7 +2245,12 @@ const QueryFormatter = () => {
     If(getShowAdvancedOptions, () => [AdvancedOptions()]),
     If(
       () => getQueryOutput(),
-      () => [Code(() => ({ innerText: getQueryOutput() }))]
+      () => [
+        Code(() => ({
+          innerText: getQueryOutput(),
+          maxLineLength: getMaxLineLength(),
+        })),
+      ]
     ),
   ]);
   return element;

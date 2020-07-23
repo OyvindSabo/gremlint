@@ -30,6 +30,11 @@ const setIndentation = (value) => {
     _setIndentation(0);
     return;
   }
+  const maxLineLength = getMaxLineLength();
+  if (indentation > maxLineLength) {
+    _setIndentation(maxLineLength);
+    return;
+  }
   _setIndentation(indentation);
 };
 
@@ -43,6 +48,10 @@ const setMaxLineLength = (value) => {
   if (isNaN(maxLineLength)) return;
   if (maxLineLength < 0) {
     _setMaxLineLength(0);
+    return;
+  }
+  if (maxLineLength > 85) {
+    _setMaxLineLength(85);
     return;
   }
   _setMaxLineLength(maxLineLength);

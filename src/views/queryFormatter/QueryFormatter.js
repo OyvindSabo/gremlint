@@ -11,6 +11,7 @@ const {
   getQueryOutput,
   getShowAdvancedOptions,
   setShowAdvancedOptions,
+  getMaxLineLength,
 } = include('src/store/Store.js');
 
 const QueryFormatter = () => {
@@ -28,7 +29,12 @@ const QueryFormatter = () => {
     If(getShowAdvancedOptions, () => [AdvancedOptions()]),
     If(
       () => getQueryOutput(),
-      () => [Code(() => ({ innerText: getQueryOutput() }))]
+      () => [
+        Code(() => ({
+          innerText: getQueryOutput(),
+          maxLineLength: getMaxLineLength(),
+        })),
+      ]
     ),
   ]);
   return element;

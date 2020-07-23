@@ -1,6 +1,5 @@
 const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
-  setQueryInput,
   getIndentation,
   setIndentation,
   getMaxLineLength,
@@ -27,6 +26,7 @@ const AdvancedOptions = () => {
           style: getInputStyle() + getInlineContainerStyle(7, 2),
           type: 'number',
           min: 0,
+          max: getMaxLineLength(),
           value: getIndentation(),
           oninput: ({ target }) => setIndentation(target.value),
         }),
@@ -47,6 +47,8 @@ const AdvancedOptions = () => {
         {
           style: getInputStyle() + getInlineContainerStyle(7, 2),
           type: 'number',
+          min: 0,
+          max: 85,
           value: getMaxLineLength(),
           oninput: ({ target }) => setMaxLineLength(target.value),
         },

@@ -4,7 +4,7 @@ const { InputTextColor } = include(
 );
 
 const getQueryInputStyle = () => `
-  height: calc(50vh - 60px);
+  height: auto;
   border-radius: 5px;
   font-family: "Courier New", Courier, monospace;
   background: rgba(0, 0, 0, 0.05);
@@ -28,6 +28,7 @@ const QueryInput = (getProps) => {
         oninput: getOnInput(),
         style: getQueryInputStyle(),
         value: getValue(),
+        rows: 20,
       }),
       []
     ),

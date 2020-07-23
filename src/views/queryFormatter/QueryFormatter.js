@@ -26,7 +26,15 @@ const QueryFormatter = () => {
         : 'Show advanced options',
       onclick: () => setShowAdvancedOptions(!getShowAdvancedOptions()),
     })),
-    If(getShowAdvancedOptions, () => [AdvancedOptions()]),
+    compose(
+      'div',
+      () => ({
+        style: `max-height: ${
+          getShowAdvancedOptions() ? '120px' : '0'
+        }; box-shadow: inset white 0 0 10px 0; overflow: hidden; transition: 0.5s;`,
+      }),
+      [AdvancedOptions()]
+    ),
     If(
       () => getQueryOutput(),
       () => [

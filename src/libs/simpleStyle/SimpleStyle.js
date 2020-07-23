@@ -8,8 +8,10 @@ const {
 } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 
 // A unit is 20px
+// vertical-align: bottom prevents half a pixel from getting added to the height
 const getInlineContainerStyle = (widthUnits, heightUnits) => `
   display: inline-block;
+  vertical-align: bottom;
   padding: 10px;
   box-sizing: border-box;
   height: ${heightUnits * 20}px;

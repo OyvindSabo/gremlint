@@ -1240,6 +1240,66 @@ module.exports = Code;
   return module.exports;
 })();
 
+modules['src/components/textButton/TextButton.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { HighlightedTextColor, TextColor } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+
+const TextButton = (getProps) => {
+  const getHref = () => getProps().href;
+  const getLabel = () => getProps().label;
+  const getOnClick = () => getProps().onclick;
+
+  let isHovered = false;
+  const getIsHovered = () => isHovered;
+  const setIsHovered = (value) => {
+    isHovered = value;
+    element.update();
+  };
+
+  const getSpanStyle = () => `
+    display: inline-block;
+    padding: 10px;
+    box-sizing: border-box;
+  `;
+
+  const getButtonStyle = () => `
+    text-decoration: none;
+    display: inline-block;
+    height: 20px;
+    line-height: 20px;
+    font-size: 15px;
+    color: ${getIsHovered() ? HighlightedTextColor : TextColor};
+    background: none;
+    border: none;
+    padding: 0;
+  `;
+
+  const element = compose('span', () => ({ style: getSpanStyle() }), [
+    compose(
+      'button',
+      () => ({
+        href: getHref(),
+        innerText: getLabel(),
+        style: getButtonStyle(),
+        onmouseenter: () => setIsHovered(true),
+        onmouseleave: () => setIsHovered(false),
+        onclick: getOnClick(),
+      }),
+      []
+    ),
+  ]);
+
+  return element;
+};
+
+module.exports = TextButton;
+
+  return module.exports;
+})();
+
 modules['src/libs/simpleFP/SimpleFP.js'] = (() => {
   const module = { exports: {} };
   const last = (array) => array.slice(-1)[0];
@@ -1913,6 +1973,7 @@ modules['src/store/Store.js'] = (() => {
   const Observable = include('src/libs/observable/Observable.js');
 const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
+// Query input state
 const queryInput$ = new Observable('');
 const getQueryInput = () => queryInput$.value;
 const setQueryInput = (queryInput) => {
@@ -1922,6 +1983,7 @@ const addQueryInputChangeListener = (callback) => {
   addEventListener(queryInput$.id, callback);
 };
 
+// Query output state
 const queryOutput$ = new Observable('');
 const getQueryOutput = () => queryOutput$.value;
 const setQueryOutput = (queryOutput) => {
@@ -1929,6 +1991,17 @@ const setQueryOutput = (queryOutput) => {
 };
 const addQueryOutputChangeListener = (callback) => {
   addEventListener(queryOutput$.id, callback);
+};
+
+// Show advanced options state
+const showAdvancedOptions$ = new Observable(false);
+const getShowAdvancedOptions = () => showAdvancedOptions$.value;
+const setShowAdvancedOptions = (showAdvancedOptions) => {
+  console.log('setting');
+  showAdvancedOptions$.value = showAdvancedOptions;
+};
+const addShowAdvancedOptionsChangeListener = (callback) => {
+  addEventListener(showAdvancedOptions$.id, callback);
 };
 
 addQueryInputChangeListener(({ detail }) => {
@@ -1939,9 +2012,14 @@ module.exports = {
   getQueryInput,
   setQueryInput,
   addQueryInputChangeListener,
+
   getQueryOutput,
   setQueryOutput,
   addQueryOutputChangeListener,
+
+  getShowAdvancedOptions,
+  setShowAdvancedOptions,
+  addShowAdvancedOptionsChangeListener,
 };
 
   return module.exports;
@@ -1951,16 +2029,27 @@ modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
   const module = { exports: {} };
   const QueryInput = include('src/components/queryInput/QueryInput.js');
 const Code = include('src/components/code/Code.js');
+const TextButton = include('src/components/textButton/TextButton.js');
 const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { getQueryInput, setQueryInput, getQueryOutput } = include(
-  'src/store/Store.js'
-);
+const {
+  getQueryInput,
+  setQueryInput,
+  getQueryOutput,
+  getShowAdvancedOptions,
+  setShowAdvancedOptions,
+} = include('src/store/Store.js');
 
 const QueryFormatter = () => {
   const element = compose('div', {}, [
     QueryInput(() => ({
       value: getQueryInput(),
       oninput: ({ target }) => setQueryInput(target.value),
+    })),
+    TextButton(() => ({
+      label: getShowAdvancedOptions()
+        ? 'Hide advanced options'
+        : 'Show advanced options',
+      onclick: () => setShowAdvancedOptions(!getShowAdvancedOptions()),
     })),
     If(
       () => getQueryOutput(),
@@ -2022,6 +2111,9 @@ const app = App(() => ({}));
 Router.addHashChangeListener(app.update);
 Store.addQueryInputChangeListener(app.update);
 Store.addQueryOutputChangeListener(app.update);
+Store.addShowAdvancedOptionsChangeListener(() => {
+  console.log('updating'), app.update();
+});
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

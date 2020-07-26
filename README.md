@@ -1,8 +1,8 @@
-![Gremlint logo 1920x360.png](https://cdn.steemitimages.com/DQmVTNMgZkxa2wxJVVLr4yihneNkB9amcYyoH4fVdXdZ3vm/Gremlint%20logo%201920x360.png)
+![Lowpoly Gremlin with Text 1080x1080](https://user-images.githubusercontent.com/25663729/88488156-c0300e00-cf8b-11ea-86b5-e9436e09ea3d.png)
 
 ### What is Gremlint?
 
-Gremlint is a code formatter which parses Gremlin queries and rewrites them to adhere to certain styling rules.
+Gremlint is a code formatter which parses Gremlin queries and rewrites them to adhere to certain styling rules. It does so by parsing the query to an abstract syntax tree, and reprinting it from scratch.
 
 ### But why?
 
@@ -13,7 +13,7 @@ Gremlint is a code formatter which parses Gremlin queries and rewrites them to a
 ### How do I use it?
 
 The easiest way to use Gremlint is via the official website (https://gremlint.com). Since Gremlint is just a standalone HTML document, you can easily download it and run it locally if you wish (you can find it in `dist/index.html`).
-![Gremlint.png](https://cdn.steemitimages.com/DQmWnS7cztfduGmCWWMyjfGmMzmdAtmR2w3rmBggfdVAenE/Gremlint.png)
+![Gremlint V2 Screenshot](https://user-images.githubusercontent.com/25663729/88488518-f078ac00-cf8d-11ea-9e1c-01edec285751.png)
 
 ## For developers
 

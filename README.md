@@ -1,4 +1,4 @@
-![Lowpoly Gremlin with Text 1080x1080](https://user-images.githubusercontent.com/25663729/88488156-c0300e00-cf8b-11ea-86b5-e9436e09ea3d.png)
+![Gremlint Github Header 1920x1024](https://user-images.githubusercontent.com/25663729/88488788-d5a73700-cf8f-11ea-9adb-03d62c77c1b7.png)
 
 ### What is Gremlint?
 

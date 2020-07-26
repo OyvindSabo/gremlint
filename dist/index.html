@@ -720,6 +720,90 @@ module.exports = {
   return module.exports;
 })();
 
+modules['src/components/loadingAnimation/LoadingAnimation.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
+
+const LoadingAnimation = (getProps) => {
+  let loadingCompletion = 0;
+  const getLoadingCompletion = () => loadingCompletion;
+  console.log(getProps);
+  const getOnLoadingComplete = () => getProps().onLoadingComplete;
+
+  const element = compose(
+    'div',
+    () => ({
+      style: `display: ${getLoadingCompletion() === 100 ? 'none' : 'initial'};
+              position: fixed;
+              background: ${White};
+              top: 0;
+              right: 0;
+              bottom: 0;
+              left: 0;
+              z-index: 2;
+              `,
+    }),
+    [
+      compose(
+        'div',
+        () => ({
+          style: `height: 100%; width: 100%; position: absolute; top: 25vmin;`,
+        }),
+        [
+          compose(
+            'img',
+            () => ({
+              src:
+                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-512x512-1.png',
+              style: `height: 50vmin; width: 50vmin; display: block; margin: auto;`,
+            }),
+            []
+          ),
+        ]
+      ),
+      compose(
+        'div',
+        () => ({
+          style: `overflow: hidden;
+                  height: ${(100 - loadingCompletion) / 2}vmin;
+                  width: 100%; position: absolute;
+                  top: 25vmin;`,
+        }),
+        [
+          compose(
+            'img',
+            () => ({
+              src:
+                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-Greyscale-512x512-1.png',
+              style: `height: 50vmin; width: 50vmin; display: block; margin: auto;`,
+            }),
+            []
+          ),
+        ]
+      ),
+    ]
+  );
+  const load = () => {
+    setTimeout(() => {
+      if (loadingCompletion < 100) {
+        loadingCompletion++;
+        element.update();
+        load();
+      } else {
+        getOnLoadingComplete()();
+      }
+    }, 10);
+  };
+  load();
+  return element;
+};
+
+module.exports = LoadingAnimation;
+
+  return module.exports;
+})();
+
 modules['src/views/styleGuide/rules/Rules.js'] = (() => {
   const module = { exports: {} };
   const rules = [
@@ -1567,7 +1651,8 @@ const Navigator = (getProps) => {
                 position: fixed;
                 top: 0;
                 left: 0;
-                right: 0;`,
+                right: 0;
+                z-index: 1;`,
       },
       [
         compose(
@@ -2277,30 +2362,44 @@ modules['src/app/App.js'] = (() => {
   const Navigator = include('src/components/navigator/Navigator.js');
 const StyleGuide = include('src/views/styleGuide/StyleGuide.js');
 const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
+const LoadingAnimation = include(
+  'src/components/loadingAnimation/LoadingAnimation.js'
+);
 const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getCurrentRoute } = include('src/router/Router.js');
 
 const App = () => {
-  const element = compose('div', {}, [
-    Navigator(() => ({ currentRoute: getCurrentRoute() })),
+  let loadingComplete = false;
+  const onLoadingComplete = () => {
+    loadingComplete = true;
+    element.update();
+  };
+  const element = If(
+    () => loadingComplete,
+    () => [
+      compose('div', {}, [
+        Navigator(() => ({ currentRoute: getCurrentRoute() })),
+        compose('div', () => ({}), [
+          compose(
+            'div',
+            { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+            [
+              If(
+                () => getCurrentRoute() === '/',
+                () => [QueryFormatter(() => ({}))]
+              ),
+              If(
+                () => getCurrentRoute() === '/style-guide',
+                () => [StyleGuide(() => ({}))]
+              ),
+            ]
+          ),
+        ]),
+      ]),
+    ],
+    () => [LoadingAnimation(() => ({ onLoadingComplete }))]
+  );
 
-    compose('div', () => ({}), [
-      compose(
-        'div',
-        { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
-        [
-          If(
-            () => getCurrentRoute() === '/',
-            () => [QueryFormatter(() => ({}))]
-          ),
-          If(
-            () => getCurrentRoute() === '/style-guide',
-            () => [StyleGuide(() => ({}))]
-          ),
-        ]
-      ),
-    ]),
-  ]);
   return element;
 };
 

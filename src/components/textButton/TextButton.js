@@ -1,7 +1,4 @@
 const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { HighlightedTextColor, TextColor } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
 const { getTextButtonStyle } = include('src/libs/simpleStyle/SimpleStyle.js');
 
 const TextButton = (getProps) => {

@@ -35,7 +35,13 @@ const Code = (getProps) => {
           compose(
             'div',
             () => ({
-              style: `top: 0; left: 0; width: calc(10px + ${getMaxLineLength()}ch); border-right: 1px solid ${DisabledTextColor}; position: absolute; height: 100%;`,
+              style: `top: 0;
+                      left: 0;
+                      width: calc(10px + ${getMaxLineLength()}ch);
+                      border-right: 1px solid ${DisabledTextColor};
+                      position: absolute;
+                      height: 100%;
+                      pointer-events: none;`,
             }),
             []
           ),

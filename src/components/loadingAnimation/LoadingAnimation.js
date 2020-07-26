@@ -31,7 +31,7 @@ const LoadingAnimation = (getProps) => {
             'img',
             () => ({
               src:
-                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-512x512-1.png',
+                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-1080x1080-1.png',
               style: `height: 50vmin; width: 50vmin; display: block; margin: auto;`,
             }),
             []
@@ -51,7 +51,7 @@ const LoadingAnimation = (getProps) => {
             'img',
             () => ({
               src:
-                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-Greyscale-512x512-1.png',
+                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-Grayscale-1080x1080-1.png',
               style: `height: 50vmin; width: 50vmin; display: block; margin: auto;`,
             }),
             []

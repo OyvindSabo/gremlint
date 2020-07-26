@@ -16,14 +16,14 @@ const AdvancedOptions = () => {
         'span',
         {
           innerText: 'Indentation:',
-          style: getTextStyle() + getInlineContainerStyle(7, 2),
+          style: getTextStyle() + getInlineContainerStyle(8, 2),
         },
         []
       ),
       compose(
         'input',
         () => ({
-          style: getInputStyle() + getInlineContainerStyle(7, 2),
+          style: getInputStyle() + getInlineContainerStyle(8, 2),
           type: 'number',
           min: 0,
           max: getMaxLineLength(),
@@ -38,14 +38,14 @@ const AdvancedOptions = () => {
         'span',
         {
           innerText: 'Max line length:',
-          style: getTextStyle() + getInlineContainerStyle(7, 2),
+          style: getTextStyle() + getInlineContainerStyle(8, 2),
         },
         []
       ),
       compose(
         'input',
         {
-          style: getInputStyle() + getInlineContainerStyle(7, 2),
+          style: getInputStyle() + getInlineContainerStyle(8, 2),
           type: 'number',
           min: 0,
           max: 85,

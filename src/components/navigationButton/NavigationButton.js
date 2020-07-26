@@ -17,7 +17,7 @@ const NavigationButton = (getProps) => {
 
   const element = compose(
     'span',
-    () => ({ style: getInlineContainerStyle(7, 2) }),
+    () => ({ style: getInlineContainerStyle(8, 2) }),
     [
       compose(
         'a',

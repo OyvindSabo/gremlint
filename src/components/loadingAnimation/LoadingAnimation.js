@@ -3,15 +3,26 @@ const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 
 const LoadingAnimation = (getProps) => {
   let loadingCompletion = 0;
-  const getLoadingCompletion = () => loadingCompletion;
-  console.log(getProps);
+  let coloredImageHasLoaded = false;
+  let grayscaleImageHasLoaded = false;
   const getOnLoadingComplete = () => getProps().onLoadingComplete;
+  const setColoredImageHasLoaded = () => {
+    if (!coloredImageHasLoaded) {
+      coloredImageHasLoaded = true;
+      element.update();
+    }
+  };
+  const setGrayscaleImageHasLoaded = () => {
+    if (!grayscaleImageHasLoaded) {
+      grayscaleImageHasLoaded = true;
+      element.update();
+    }
+  };
 
   const element = compose(
     'div',
     () => ({
-      style: `display: ${getLoadingCompletion() === 100 ? 'none' : 'initial'};
-              position: fixed;
+      style: `position: fixed;
               background: ${White};
               top: 0;
               right: 0;
@@ -24,15 +35,28 @@ const LoadingAnimation = (getProps) => {
       compose(
         'div',
         () => ({
-          style: `height: 100%; width: 100%; position: absolute; top: 25vmin;`,
+          style: `height: 100%; width: 100%; position: absolute; bottom: 25vmin;`,
         }),
         [
           compose(
             'img',
             () => ({
               src:
-                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-1080x1080-1.png',
-              style: `height: 50vmin; width: 50vmin; display: block; margin: auto;`,
+                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-Grayscale-1080x1080-1.png',
+              style: `opacity: ${
+                grayscaleImageHasLoaded && loadingCompletion !== 100 ? 1 : 0
+              };
+                      transition: 0.25s;
+                      height: 50vmin;
+                      width: 50vmin;
+                      display: block;
+                      margin: auto;
+                      position: absolute;
+                      bottom: 0;
+                      left: 50%;
+                      transform:
+                      translate(-50%, 0);`,
+              onload: setGrayscaleImageHasLoaded,
             }),
             []
           ),
@@ -42,17 +66,27 @@ const LoadingAnimation = (getProps) => {
         'div',
         () => ({
           style: `overflow: hidden;
-                  height: ${(100 - loadingCompletion) / 2}vmin;
-                  width: 100%; position: absolute;
-                  top: 25vmin;`,
+          height: ${loadingCompletion / 2}vmin;
+          width: 100%; position: absolute;
+          bottom: 25vmin;`,
         }),
         [
           compose(
             'img',
             () => ({
               src:
-                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-Grayscale-1080x1080-1.png',
-              style: `height: 50vmin; width: 50vmin; display: block; margin: auto;`,
+                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-1080x1080-1.png',
+              style: `opacity: ${loadingCompletion !== 100 ? 1 : 0};
+                      transition: 0.25s;
+                      height: 50vmin;
+                      width: 50vmin;
+                      display: block;
+                      margin: auto;
+                      position: absolute;
+                      bottom: 0;
+                      left: 50%;
+                      transform: translate(-50%, 0);`,
+              onload: setColoredImageHasLoaded,
             }),
             []
           ),
@@ -61,15 +95,21 @@ const LoadingAnimation = (getProps) => {
     ]
   );
   const load = () => {
-    setTimeout(() => {
-      if (loadingCompletion < 100) {
-        loadingCompletion++;
-        element.update();
-        load();
-      } else {
-        getOnLoadingComplete()();
-      }
-    }, 10);
+    setTimeout(
+      () => {
+        if (loadingCompletion < 100) {
+          if (coloredImageHasLoaded && grayscaleImageHasLoaded) {
+            loadingCompletion++;
+            element.update();
+          }
+          load();
+        } else {
+          element.update();
+          setTimeout(getOnLoadingComplete(), 250);
+        }
+      },
+      loadingCompletion === 0 ? 250 : 25
+    );
   };
   load();
   return element;

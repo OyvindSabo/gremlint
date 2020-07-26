@@ -108,7 +108,7 @@ const LoadingAnimation = (getProps) => {
           setTimeout(getOnLoadingComplete(), 250);
         }
       },
-      loadingCompletion === 0 ? 250 : 25
+      loadingCompletion === 0 ? 250 : 10
     );
   };
   load();

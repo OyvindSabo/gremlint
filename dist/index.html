@@ -479,6 +479,35 @@ module.exports = {
   return module.exports;
 })();
 
+modules['src/components/fadeIn/FadeIn.js'] = (() => {
+  const module = { exports: {} };
+  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+
+const FadeIn = (getProps, children) => {
+  let opacity = 0;
+
+  const element = compose(
+    'div',
+    () => ({
+      style: `opacity: ${opacity};
+              transition: 0.25s;`,
+    }),
+    children
+  );
+
+  setTimeout(() => {
+    opacity = 1;
+    element.update();
+  });
+
+  return element;
+};
+
+module.exports = FadeIn;
+
+  return module.exports;
+})();
+
 modules['src/libs/simpleRouter/SimpleRouter.js'] = (() => {
   const module = { exports: {} };
   function SimpleRouter(routes) {
@@ -832,7 +861,7 @@ const LoadingAnimation = (getProps) => {
           setTimeout(getOnLoadingComplete(), 250);
         }
       },
-      loadingCompletion === 0 ? 250 : 25
+      loadingCompletion === 0 ? 250 : 10
     );
   };
   load();
@@ -2405,6 +2434,7 @@ const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
 const LoadingAnimation = include(
   'src/components/loadingAnimation/LoadingAnimation.js'
 );
+const FadeIn = include('src/components/fadeIn/FadeIn.js');
 const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getCurrentRoute } = include('src/router/Router.js');
 
@@ -2417,23 +2447,25 @@ const App = () => {
   const element = If(
     () => loadingComplete,
     () => [
-      compose('div', {}, [
-        Navigator(() => ({ currentRoute: getCurrentRoute() })),
-        compose('div', () => ({}), [
-          compose(
-            'div',
-            { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
-            [
-              If(
-                () => getCurrentRoute() === '/',
-                () => [QueryFormatter(() => ({}))]
-              ),
-              If(
-                () => getCurrentRoute() === '/style-guide',
-                () => [StyleGuide(() => ({}))]
-              ),
-            ]
-          ),
+      FadeIn(() => ({}), [
+        compose('div', {}, [
+          Navigator(() => ({ currentRoute: getCurrentRoute() })),
+          compose('div', () => ({}), [
+            compose(
+              'div',
+              { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+              [
+                If(
+                  () => getCurrentRoute() === '/',
+                  () => [QueryFormatter(() => ({}))]
+                ),
+                If(
+                  () => getCurrentRoute() === '/style-guide',
+                  () => [StyleGuide(() => ({}))]
+                ),
+              ]
+            ),
+          ]),
         ]),
       ]),
     ],

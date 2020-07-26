@@ -4,6 +4,7 @@ const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
 const LoadingAnimation = include(
   'src/components/loadingAnimation/LoadingAnimation.js'
 );
+const FadeIn = include('src/components/fadeIn/FadeIn.js');
 const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getCurrentRoute } = include('src/router/Router.js');
 
@@ -16,23 +17,25 @@ const App = () => {
   const element = If(
     () => loadingComplete,
     () => [
-      compose('div', {}, [
-        Navigator(() => ({ currentRoute: getCurrentRoute() })),
-        compose('div', () => ({}), [
-          compose(
-            'div',
-            { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
-            [
-              If(
-                () => getCurrentRoute() === '/',
-                () => [QueryFormatter(() => ({}))]
-              ),
-              If(
-                () => getCurrentRoute() === '/style-guide',
-                () => [StyleGuide(() => ({}))]
-              ),
-            ]
-          ),
+      FadeIn(() => ({}), [
+        compose('div', {}, [
+          Navigator(() => ({ currentRoute: getCurrentRoute() })),
+          compose('div', () => ({}), [
+            compose(
+              'div',
+              { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+              [
+                If(
+                  () => getCurrentRoute() === '/',
+                  () => [QueryFormatter(() => ({}))]
+                ),
+                If(
+                  () => getCurrentRoute() === '/style-guide',
+                  () => [StyleGuide(() => ({}))]
+                ),
+              ]
+            ),
+          ]),
         ]),
       ]),
     ],

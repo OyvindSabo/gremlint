@@ -42,7 +42,7 @@ const LoadingAnimation = (getProps) => {
             'img',
             () => ({
               src:
-                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-Grayscale-1080x1080-1.png',
+                'https://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-Grayscale-1080x1080-1.png',
               style: `opacity: ${
                 grayscaleImageHasLoaded && loadingCompletion !== 100 ? 1 : 0
               };
@@ -75,7 +75,7 @@ const LoadingAnimation = (getProps) => {
             'img',
             () => ({
               src:
-                'http://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-1080x1080-1.png',
+                'https://gremlint.com/wp-content/uploads/2020/07/Lowpoly-Gremlin-with-Text-1080x1080-1.png',
               style: `opacity: ${loadingCompletion !== 100 ? 1 : 0};
                       transition: 0.25s;
                       height: 50vmin;

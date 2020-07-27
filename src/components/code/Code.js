@@ -14,6 +14,7 @@ const getCodeStyle = () => `
   resize: none;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
   white-space: pre-wrap;
+  overflow: auto;
 `;
 
 const Code = (getProps) => {

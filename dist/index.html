@@ -981,18 +981,19 @@ const { InputTextColor } = include(
 );
 
 const getQueryInputStyle = () => `
-  height: auto;
+  height: calc(100vh / 4);
   border-radius: 5px;
   font-family: "Courier New", Courier, monospace;
   background: rgba(0, 0, 0, 0.05);
   outline: none;
-  font-size: 15px;
+  font-size: 16px;
   padding: 10px;
   border: none;
   resize: none;
   width: 100%;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
   color: ${InputTextColor};
+  box-sizing: border-box;
 `;
 
 const QueryInput = (getProps) => {
@@ -1035,6 +1036,7 @@ const getCodeStyle = () => `
   resize: none;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
   white-space: pre-wrap;
+  overflow: auto;
 `;
 
 const Code = (getProps) => {
@@ -1372,7 +1374,7 @@ const getInputStyle = () => `
   border-radius: 5px;
   background: rgba(0, 0, 0, 0.05);
   outline: none;
-  font-size: 15px;
+  font-size: 16px;
   padding: 10px;
   border: none;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
@@ -1505,7 +1507,10 @@ const Navigator = (getProps) => {
       [
         html(
           'div',
-          { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+          {
+            style:
+              'width: min(800px, 100vw); margin-left: calc(50vw - min(400px, 50vw));',
+          },
           [
             NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
             NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),
@@ -2113,16 +2118,12 @@ const [
   getMaxLineLength,
   _setMaxLineLength,
   addMaxLineLengthChangeListener,
-] = atom(80);
+] = atom(72);
 const setMaxLineLength = (value) => {
   const maxLineLength = parseInt(value);
   if (isNaN(maxLineLength)) return;
   if (maxLineLength < 0) {
     _setMaxLineLength(0);
-    return;
-  }
-  if (maxLineLength > 85) {
-    _setMaxLineLength(85);
     return;
   }
   _setMaxLineLength(maxLineLength);
@@ -2232,7 +2233,6 @@ const AdvancedOptions = () => {
           style: getInputStyle() + getInlineContainerStyle(8, 2),
           type: 'number',
           min: 0,
-          max: 85,
           value: getMaxLineLength(),
           oninput: ({ target }) => setMaxLineLength(target.value),
         },
@@ -2329,10 +2329,13 @@ const App = () => {
       FadeIn(() => ({}), [
         html('div', {}, [
           Navigator(() => ({ currentRoute: getCurrentRoute() })),
-          html('div', () => ({}), [
+          html('div', {}, [
             html(
               'div',
-              { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+              {
+                style:
+                  'width: min(800px, 100vw); margin-left: calc(50vw - min(400px, 50vw));',
+              },
               [
                 If(
                   () => getCurrentRoute() === '/',

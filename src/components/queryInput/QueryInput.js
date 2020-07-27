@@ -4,18 +4,19 @@ const { InputTextColor } = include(
 );
 
 const getQueryInputStyle = () => `
-  height: auto;
+  height: calc(100vh / 4);
   border-radius: 5px;
   font-family: "Courier New", Courier, monospace;
   background: rgba(0, 0, 0, 0.05);
   outline: none;
-  font-size: 15px;
+  font-size: 16px;
   padding: 10px;
   border: none;
   resize: none;
   width: 100%;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
   color: ${InputTextColor};
+  box-sizing: border-box;
 `;
 
 const QueryInput = (getProps) => {

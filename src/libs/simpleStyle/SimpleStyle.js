@@ -22,7 +22,7 @@ const getInputStyle = () => `
   border-radius: 5px;
   background: rgba(0, 0, 0, 0.05);
   outline: none;
-  font-size: 15px;
+  font-size: 16px;
   padding: 10px;
   border: none;
   box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;

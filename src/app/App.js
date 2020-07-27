@@ -20,10 +20,13 @@ const App = () => {
       FadeIn(() => ({}), [
         html('div', {}, [
           Navigator(() => ({ currentRoute: getCurrentRoute() })),
-          html('div', () => ({}), [
+          html('div', {}, [
             html(
               'div',
-              { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+              {
+                style:
+                  'width: min(800px, 100vw); margin-left: calc(50vw - min(400px, 50vw));',
+              },
               [
                 If(
                   () => getCurrentRoute() === '/',

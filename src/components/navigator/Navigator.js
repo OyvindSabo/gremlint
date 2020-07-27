@@ -33,7 +33,10 @@ const Navigator = (getProps) => {
       [
         html(
           'div',
-          { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
+          {
+            style:
+              'width: min(800px, 100vw); margin-left: calc(50vw - min(400px, 50vw));',
+          },
           [
             NavigationButton(getQueryFormatterButtonProps(getCurrentRoute)),
             NavigationButton(getStyleGuideButtonProps(getCurrentRoute)),

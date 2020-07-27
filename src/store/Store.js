@@ -42,16 +42,12 @@ const [
   getMaxLineLength,
   _setMaxLineLength,
   addMaxLineLengthChangeListener,
-] = atom(80);
+] = atom(72);
 const setMaxLineLength = (value) => {
   const maxLineLength = parseInt(value);
   if (isNaN(maxLineLength)) return;
   if (maxLineLength < 0) {
     _setMaxLineLength(0);
-    return;
-  }
-  if (maxLineLength > 85) {
-    _setMaxLineLength(85);
     return;
   }
   _setMaxLineLength(maxLineLength);

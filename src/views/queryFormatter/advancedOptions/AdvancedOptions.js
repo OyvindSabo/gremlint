@@ -48,7 +48,6 @@ const AdvancedOptions = () => {
           style: getInputStyle() + getInlineContainerStyle(8, 2),
           type: 'number',
           min: 0,
-          max: 85,
           value: getMaxLineLength(),
           oninput: ({ target }) => setMaxLineLength(target.value),
         },

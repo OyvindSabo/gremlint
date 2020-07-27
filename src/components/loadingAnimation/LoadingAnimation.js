@@ -35,7 +35,7 @@ const LoadingAnimation = (getProps) => {
       html(
         'div',
         () => ({
-          style: `height: 100%; width: 100%; position: absolute; bottom: 25vmin;`,
+          style: `height: 100%; width: 100%; position: absolute; bottom: calc(50vh - 25vmin);`,
         }),
         [
           html(
@@ -68,7 +68,7 @@ const LoadingAnimation = (getProps) => {
           style: `overflow: hidden;
           height: ${loadingCompletion / 2}vmin;
           width: 100%; position: absolute;
-          bottom: 25vmin;`,
+          bottom: calc(50vh - 25vmin);`,
         }),
         [
           html(

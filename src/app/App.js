@@ -5,7 +5,7 @@ const LoadingAnimation = include(
   'src/components/loadingAnimation/LoadingAnimation.js'
 );
 const FadeIn = include('src/components/fadeIn/FadeIn.js');
-const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getCurrentRoute } = include('src/router/Router.js');
 
 const App = () => {
@@ -18,10 +18,10 @@ const App = () => {
     () => loadingComplete,
     () => [
       FadeIn(() => ({}), [
-        compose('div', {}, [
+        html('div', {}, [
           Navigator(() => ({ currentRoute: getCurrentRoute() })),
-          compose('div', () => ({}), [
-            compose(
+          html('div', () => ({}), [
+            html(
               'div',
               { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
               [

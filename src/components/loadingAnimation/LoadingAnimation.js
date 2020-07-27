@@ -1,4 +1,4 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 
 const LoadingAnimation = (getProps) => {
@@ -19,7 +19,7 @@ const LoadingAnimation = (getProps) => {
     }
   };
 
-  const element = compose(
+  const element = html(
     'div',
     () => ({
       style: `position: fixed;
@@ -32,13 +32,13 @@ const LoadingAnimation = (getProps) => {
               `,
     }),
     [
-      compose(
+      html(
         'div',
         () => ({
           style: `height: 100%; width: 100%; position: absolute; bottom: 25vmin;`,
         }),
         [
-          compose(
+          html(
             'img',
             () => ({
               src:
@@ -62,7 +62,7 @@ const LoadingAnimation = (getProps) => {
           ),
         ]
       ),
-      compose(
+      html(
         'div',
         () => ({
           style: `overflow: hidden;
@@ -71,7 +71,7 @@ const LoadingAnimation = (getProps) => {
           bottom: 25vmin;`,
         }),
         [
-          compose(
+          html(
             'img',
             () => ({
               src:

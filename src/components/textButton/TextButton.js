@@ -1,4 +1,4 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getTextButtonStyle } = include('src/libs/simpleStyle/SimpleStyle.js');
 
 const TextButton = (getProps) => {
@@ -19,8 +19,8 @@ const TextButton = (getProps) => {
     box-sizing: border-box;
   `;
 
-  const element = compose('span', () => ({ style: getSpanStyle() }), [
-    compose(
+  const element = html('span', () => ({ style: getSpanStyle() }), [
+    html(
       'button',
       () => ({
         href: getHref(),

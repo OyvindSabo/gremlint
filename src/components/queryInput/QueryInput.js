@@ -1,4 +1,4 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { InputTextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
@@ -21,8 +21,8 @@ const getQueryInputStyle = () => `
 const QueryInput = (getProps) => {
   const getOnInput = () => getProps().oninput;
   const getValue = () => getProps().value;
-  return compose('div', { style: 'padding: 10px;' }, [
-    compose(
+  return html('div', { style: 'padding: 10px;' }, [
+    html(
       'textarea',
       () => ({
         oninput: getOnInput(),

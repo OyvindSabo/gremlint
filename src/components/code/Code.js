@@ -1,4 +1,4 @@
-const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { DisabledTextColor, TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
@@ -19,9 +19,9 @@ const getCodeStyle = () => `
 const Code = (getProps) => {
   const getInnerText = () => getProps().innerText;
   const getMaxLineLength = () => getProps().maxLineLength;
-  const element = compose('div', { style: 'padding: 10px;' }, [
-    compose('div', { style: getCodeStyle() + 'position: relative;' }, [
-      compose(
+  const element = html('div', { style: 'padding: 10px;' }, [
+    html('div', { style: getCodeStyle() + 'position: relative;' }, [
+      html(
         'span',
         () => ({
           style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
@@ -32,7 +32,7 @@ const Code = (getProps) => {
       If(
         () => getMaxLineLength() !== undefined,
         () => [
-          compose(
+          html(
             'div',
             () => ({
               style: `top: 0;

@@ -1,9 +1,9 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 
 const FadeIn = (getProps, children) => {
   let opacity = 0;
 
-  const element = compose(
+  const element = html(
     'div',
     () => ({
       style: `opacity: ${opacity};

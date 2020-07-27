@@ -53,7 +53,7 @@ modules['src/libs/simpleHTML/SimpleHTML.js'] = (() => {
   return flat;
 };
 
-const compose = (elementType, getProps, children) => {
+const html = (elementType, getProps, children) => {
   const element = document.createElement(elementType);
 
   // Assign props
@@ -244,7 +244,7 @@ const If = (getCondition, getThenChildNodes, getElseChildNodes = () => []) => {
 };
 
 module.exports = {
-  compose,
+  html,
   Each,
   If,
 };
@@ -254,12 +254,12 @@ module.exports = {
 
 modules['src/components/fadeIn/FadeIn.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 
 const FadeIn = (getProps, children) => {
   let opacity = 0;
 
-  const element = compose(
+  const element = html(
     'div',
     () => ({
       style: `opacity: ${opacity};
@@ -524,7 +524,7 @@ module.exports = {
 
 modules['src/components/loadingAnimation/LoadingAnimation.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 
 const LoadingAnimation = (getProps) => {
@@ -545,7 +545,7 @@ const LoadingAnimation = (getProps) => {
     }
   };
 
-  const element = compose(
+  const element = html(
     'div',
     () => ({
       style: `position: fixed;
@@ -558,13 +558,13 @@ const LoadingAnimation = (getProps) => {
               `,
     }),
     [
-      compose(
+      html(
         'div',
         () => ({
           style: `height: 100%; width: 100%; position: absolute; bottom: 25vmin;`,
         }),
         [
-          compose(
+          html(
             'img',
             () => ({
               src:
@@ -588,7 +588,7 @@ const LoadingAnimation = (getProps) => {
           ),
         ]
       ),
-      compose(
+      html(
         'div',
         () => ({
           style: `overflow: hidden;
@@ -597,7 +597,7 @@ const LoadingAnimation = (getProps) => {
           bottom: 25vmin;`,
         }),
         [
-          compose(
+          html(
             'img',
             () => ({
               src:
@@ -975,7 +975,7 @@ module.exports = { rules };
 
 modules['src/components/queryInput/QueryInput.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { InputTextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
@@ -998,8 +998,8 @@ const getQueryInputStyle = () => `
 const QueryInput = (getProps) => {
   const getOnInput = () => getProps().oninput;
   const getValue = () => getProps().value;
-  return compose('div', { style: 'padding: 10px;' }, [
-    compose(
+  return html('div', { style: 'padding: 10px;' }, [
+    html(
       'textarea',
       () => ({
         oninput: getOnInput(),
@@ -1019,7 +1019,7 @@ module.exports = QueryInput;
 
 modules['src/components/code/Code.js'] = (() => {
   const module = { exports: {} };
-  const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { DisabledTextColor, TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
@@ -1040,9 +1040,9 @@ const getCodeStyle = () => `
 const Code = (getProps) => {
   const getInnerText = () => getProps().innerText;
   const getMaxLineLength = () => getProps().maxLineLength;
-  const element = compose('div', { style: 'padding: 10px;' }, [
-    compose('div', { style: getCodeStyle() + 'position: relative;' }, [
-      compose(
+  const element = html('div', { style: 'padding: 10px;' }, [
+    html('div', { style: getCodeStyle() + 'position: relative;' }, [
+      html(
         'span',
         () => ({
           style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
@@ -1053,7 +1053,7 @@ const Code = (getProps) => {
       If(
         () => getMaxLineLength() !== undefined,
         () => [
-          compose(
+          html(
             'div',
             () => ({
               style: `top: 0;
@@ -1425,7 +1425,7 @@ module.exports = {
 
 modules['src/components/navigationButton/NavigationButton.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getInlineContainerStyle, getLinkStyle } = include(
   'src/libs/simpleStyle/SimpleStyle.js'
 );
@@ -1442,11 +1442,11 @@ const NavigationButton = (getProps) => {
     element.update();
   };
 
-  const element = compose(
+  const element = html(
     'span',
     () => ({ style: getInlineContainerStyle(8, 2) }),
     [
-      compose(
+      html(
         'a',
         () => ({
           href: getHref(),
@@ -1470,7 +1470,7 @@ module.exports = NavigationButton;
 
 modules['src/components/navigator/Navigator.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 const NavigationButton = include(
   'src/components/navigationButton/NavigationButton.js'
@@ -1490,8 +1490,8 @@ const getStyleGuideButtonProps = (getCurrentRoute) => () => ({
 
 const Navigator = (getProps) => {
   const getCurrentRoute = () => getProps().currentRoute;
-  const element = compose('div', {}, [
-    compose(
+  const element = html('div', {}, [
+    html(
       'div',
       {
         style: `background: ${White};
@@ -1503,7 +1503,7 @@ const Navigator = (getProps) => {
                 z-index: 1;`,
       },
       [
-        compose(
+        html(
           'div',
           { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
           [
@@ -1513,7 +1513,7 @@ const Navigator = (getProps) => {
         ),
       ]
     ),
-    compose('div', { style: 'height:40px;' }, []),
+    html('div', { style: 'height:40px;' }, []),
   ]);
   return element;
 };
@@ -1525,7 +1525,7 @@ module.exports = Navigator;
 
 modules['src/components/textButton/TextButton.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getTextButtonStyle } = include('src/libs/simpleStyle/SimpleStyle.js');
 
 const TextButton = (getProps) => {
@@ -1546,8 +1546,8 @@ const TextButton = (getProps) => {
     box-sizing: border-box;
   `;
 
-  const element = compose('span', () => ({ style: getSpanStyle() }), [
-    compose(
+  const element = html('span', () => ({ style: getSpanStyle() }), [
+    html(
       'button',
       () => ({
         href: getHref(),
@@ -1571,18 +1571,18 @@ module.exports = TextButton;
 
 modules['src/components/title/Title.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
 
 const Title = (getProps) => {
   const getInnerText = () => getProps().innerText;
-  const element = compose(
+  const element = html(
     'div',
     { style: getInnerText() ? 'padding: 10px;' : '' },
     [
-      compose(
+      html(
         'span',
         {
           style: `color: ${TextColor}; line-height: 30px; font-size: 25px;`,
@@ -1602,18 +1602,18 @@ module.exports = Title;
 
 modules['src/components/paragraph/Paragraph.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
 
 const Paragraph = (getProps) => {
   const getInnerText = () => getProps().innerText;
-  const element = compose(
+  const element = html(
     'div',
     () => ({ style: getInnerText() ? 'padding: 10px;' : '' }),
     [
-      compose(
+      html(
         'span',
         {
           style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,
@@ -1633,9 +1633,9 @@ module.exports = Paragraph;
 
 modules['src/components/spacer/Spacer.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 
-const Spacer = () => compose('div', { style: 'height: 20px' }, []);
+const Spacer = () => html('div', { style: 'height: 20px' }, []);
 
 module.exports = Spacer;
 
@@ -1648,14 +1648,14 @@ modules['src/components/styleGuideRule/StyleGuideRule.js'] = (() => {
 const Paragraph = include('src/components/paragraph/Paragraph.js');
 const Code = include('src/components/code/Code.js');
 const Spacer = include('src/components/spacer/Spacer.js');
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 
 const StyleGuideRule = (getProps) => {
   const getTitle = () => getProps().title;
   const getExplanation = () => getProps().explanation;
   const getExample = () => getProps().example;
 
-  return compose('div', {}, [
+  return html('div', {}, [
     Title(() => ({ innerText: getTitle() })),
     Paragraph(() => ({ innerText: getExplanation() })),
     Code(() => ({ innerText: getExample() })),
@@ -1673,11 +1673,11 @@ modules['src/views/styleGuide/StyleGuide.js'] = (() => {
   const StyleGuideRule = include(
   'src/components/styleGuideRule/StyleGuideRule.js'
 );
-const { compose, Each } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html, Each } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { rules } = include('src/views/styleGuide/rules/Rules.js');
 
 const StyleGuide = () =>
-  compose('div', {}, [
+  html('div', {}, [
     Each(
       () => rules,
       (getCurrentValue) => [
@@ -2081,7 +2081,7 @@ module.exports = {
 
 modules['src/views/queryFormatter/advancedOptions/AdvancedOptions.js'] = (() => {
   const module = { exports: {} };
-  const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
   getIndentation,
   setIndentation,
@@ -2093,9 +2093,9 @@ const { getInlineContainerStyle, getInputStyle, getTextStyle } = include(
 );
 
 const AdvancedOptions = () => {
-  const element = compose('div', {}, [
-    compose('div', { style: 'padding: 10px;' }, [
-      compose(
+  const element = html('div', {}, [
+    html('div', { style: 'padding: 10px;' }, [
+      html(
         'span',
         {
           innerText: 'Indentation:',
@@ -2103,7 +2103,7 @@ const AdvancedOptions = () => {
         },
         []
       ),
-      compose(
+      html(
         'input',
         () => ({
           style: getInputStyle() + getInlineContainerStyle(8, 2),
@@ -2116,8 +2116,8 @@ const AdvancedOptions = () => {
         []
       ),
     ]),
-    compose('div', { style: 'padding: 10px;' }, [
-      compose(
+    html('div', { style: 'padding: 10px;' }, [
+      html(
         'span',
         {
           innerText: 'Max line length:',
@@ -2125,7 +2125,7 @@ const AdvancedOptions = () => {
         },
         []
       ),
-      compose(
+      html(
         'input',
         {
           style: getInputStyle() + getInlineContainerStyle(8, 2),
@@ -2155,7 +2155,7 @@ const TextButton = include('src/components/textButton/TextButton.js');
 const AdvancedOptions = include(
   'src/views/queryFormatter/advancedOptions/AdvancedOptions.js'
 );
-const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
   getQueryInput,
   setQueryInput,
@@ -2166,7 +2166,7 @@ const {
 } = include('src/store/Store.js');
 
 const QueryFormatter = () => {
-  const element = compose('div', {}, [
+  const element = html('div', {}, [
     QueryInput(() => ({
       value: getQueryInput(),
       oninput: ({ target }) => setQueryInput(target.value),
@@ -2177,7 +2177,7 @@ const QueryFormatter = () => {
         : 'Show advanced options',
       onclick: () => setShowAdvancedOptions(!getShowAdvancedOptions()),
     })),
-    compose(
+    html(
       'div',
       () => ({
         style: `max-height: ${
@@ -2213,7 +2213,7 @@ const LoadingAnimation = include(
   'src/components/loadingAnimation/LoadingAnimation.js'
 );
 const FadeIn = include('src/components/fadeIn/FadeIn.js');
-const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getCurrentRoute } = include('src/router/Router.js');
 
 const App = () => {
@@ -2226,10 +2226,10 @@ const App = () => {
     () => loadingComplete,
     () => [
       FadeIn(() => ({}), [
-        compose('div', {}, [
+        html('div', {}, [
           Navigator(() => ({ currentRoute: getCurrentRoute() })),
-          compose('div', () => ({}), [
-            compose(
+          html('div', () => ({}), [
+            html(
               'div',
               { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
               [

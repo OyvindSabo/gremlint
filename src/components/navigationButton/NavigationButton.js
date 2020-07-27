@@ -1,4 +1,4 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getInlineContainerStyle, getLinkStyle } = include(
   'src/libs/simpleStyle/SimpleStyle.js'
 );
@@ -15,11 +15,11 @@ const NavigationButton = (getProps) => {
     element.update();
   };
 
-  const element = compose(
+  const element = html(
     'span',
     () => ({ style: getInlineContainerStyle(8, 2) }),
     [
-      compose(
+      html(
         'a',
         () => ({
           href: getHref(),

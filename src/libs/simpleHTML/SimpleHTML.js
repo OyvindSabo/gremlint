@@ -12,7 +12,7 @@ const flatten = (items) => {
   return flat;
 };
 
-const compose = (elementType, getProps, children) => {
+const html = (elementType, getProps, children) => {
   const element = document.createElement(elementType);
 
   // Assign props
@@ -203,7 +203,7 @@ const If = (getCondition, getThenChildNodes, getElseChildNodes = () => []) => {
 };
 
 module.exports = {
-  compose,
+  html,
   Each,
   If,
 };

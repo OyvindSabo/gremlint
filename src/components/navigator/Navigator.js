@@ -1,4 +1,4 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 const NavigationButton = include(
   'src/components/navigationButton/NavigationButton.js'
@@ -18,8 +18,8 @@ const getStyleGuideButtonProps = (getCurrentRoute) => () => ({
 
 const Navigator = (getProps) => {
   const getCurrentRoute = () => getProps().currentRoute;
-  const element = compose('div', {}, [
-    compose(
+  const element = html('div', {}, [
+    html(
       'div',
       {
         style: `background: ${White};
@@ -31,7 +31,7 @@ const Navigator = (getProps) => {
                 z-index: 1;`,
       },
       [
-        compose(
+        html(
           'div',
           { style: 'width: 800px; margin-left: calc(50vw - 400px);' },
           [
@@ -41,7 +41,7 @@ const Navigator = (getProps) => {
         ),
       ]
     ),
-    compose('div', { style: 'height:40px;' }, []),
+    html('div', { style: 'height:40px;' }, []),
   ]);
   return element;
 };

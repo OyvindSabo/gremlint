@@ -1,4 +1,4 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
   getIndentation,
   setIndentation,
@@ -10,9 +10,9 @@ const { getInlineContainerStyle, getInputStyle, getTextStyle } = include(
 );
 
 const AdvancedOptions = () => {
-  const element = compose('div', {}, [
-    compose('div', { style: 'padding: 10px;' }, [
-      compose(
+  const element = html('div', {}, [
+    html('div', { style: 'padding: 10px;' }, [
+      html(
         'span',
         {
           innerText: 'Indentation:',
@@ -20,7 +20,7 @@ const AdvancedOptions = () => {
         },
         []
       ),
-      compose(
+      html(
         'input',
         () => ({
           style: getInputStyle() + getInlineContainerStyle(8, 2),
@@ -33,8 +33,8 @@ const AdvancedOptions = () => {
         []
       ),
     ]),
-    compose('div', { style: 'padding: 10px;' }, [
-      compose(
+    html('div', { style: 'padding: 10px;' }, [
+      html(
         'span',
         {
           innerText: 'Max line length:',
@@ -42,7 +42,7 @@ const AdvancedOptions = () => {
         },
         []
       ),
-      compose(
+      html(
         'input',
         {
           style: getInputStyle() + getInlineContainerStyle(8, 2),

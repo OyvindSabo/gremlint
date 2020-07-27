@@ -1,15 +1,15 @@
-const { compose } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
 
 const Paragraph = (getProps) => {
   const getInnerText = () => getProps().innerText;
-  const element = compose(
+  const element = html(
     'div',
     () => ({ style: getInnerText() ? 'padding: 10px;' : '' }),
     [
-      compose(
+      html(
         'span',
         {
           style: `color: ${TextColor}; line-height: 20px; font-size: 15px;`,

@@ -4,7 +4,7 @@ const TextButton = include('src/components/textButton/TextButton.js');
 const AdvancedOptions = include(
   'src/views/queryFormatter/advancedOptions/AdvancedOptions.js'
 );
-const { compose, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
   getQueryInput,
   setQueryInput,
@@ -15,7 +15,7 @@ const {
 } = include('src/store/Store.js');
 
 const QueryFormatter = () => {
-  const element = compose('div', {}, [
+  const element = html('div', {}, [
     QueryInput(() => ({
       value: getQueryInput(),
       oninput: ({ target }) => setQueryInput(target.value),
@@ -26,7 +26,7 @@ const QueryFormatter = () => {
         : 'Show advanced options',
       onclick: () => setShowAdvancedOptions(!getShowAdvancedOptions()),
     })),
-    compose(
+    html(
       'div',
       () => ({
         style: `max-height: ${

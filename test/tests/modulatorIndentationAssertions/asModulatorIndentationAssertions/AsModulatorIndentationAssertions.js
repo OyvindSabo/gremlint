@@ -7,18 +7,15 @@ const AsModulatorIndentationAssertions = [
   // assitional spaces
   assertEquals(
     `g.V().
-    as('a').
-  out().
-    as('b').
-  out().
-    as('c').
-  select(
-    'a',
-    'b',
-    'c')`,
+  has('name', within('marko', 'vadas', 'josh')).
+    as('person').
+  V().
+  has('name', within('lop', 'ripple')).
+  addE('uses').
+    from('person')`,
     formatQuery(
-      "g.V().as('a').out().as('b').out().as('c').select('a','b','c')",
-      { indentation: 0, maxLineLength: 12 }
+      "g.V().has('name', within('marko', 'vadas', 'josh')).as('person').V().has('name', within('lop', 'ripple')).addE('uses').from('person')",
+      { indentation: 0, maxLineLength: 50 }
     )
   ),
 ];

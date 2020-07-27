@@ -7,7 +7,9 @@ const isTraversalSource = (step) => step.type === 'word' && step.word === 'g';
 const isModulator = (step) =>
   step.type === 'method' &&
   step.method.type === 'word' &&
-  step.method.word === 'by';
+  ['by', 'as', 'option', 'from', 'to', 'read', 'write'].includes(
+    step.method.word
+  );
 
 const withIndentation = (config, indentation) => ({ ...config, indentation });
 

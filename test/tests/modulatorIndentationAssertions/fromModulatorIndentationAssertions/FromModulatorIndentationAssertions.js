@@ -6,16 +6,22 @@ const FromModulatorIndentationAssertions = [
   // additional spaces, but consecutive steps should not be indented with two
   // assitional spaces
   assertEquals(
-    `g.V(1).as('a').
-  out('created').
-  in('created').
-  where(neq('a')).
-  addE('co-developer').
-    from('a').
-  property('year', 2009)`,
+    `g.V().
+  has(
+    'person',
+    'name',
+    'vadas').
+    as('e').
+  in('knows').
+    as('m').
+  out('knows').
+  where(neq('e')).
+  path().
+    from('m').
+    by('name')`,
     formatQuery(
-      "g.V(1).as('a').out('created').in('created').where(neq('a')).addE('co-developer').from('a').property('year',2009)",
-      { indentation: 0, maxLineLength: 80 }
+      "g.V().has('person','name','vadas').as('e').in('knows').as('m').out('knows').where(neq('e')).path().from('m').by('name')",
+      { indentation: 0, maxLineLength: 20 }
     )
   ),
 ];

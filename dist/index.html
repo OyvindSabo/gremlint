@@ -2250,11 +2250,18 @@ const setMaxLineLength = (value) => {
   _setMaxLineLength(maxLineLength);
 };
 
+const [
+  getShouldPlaceDotsAfterNewlines,
+  setShouldPlaceDotsAfterNewlines,
+  addShouldPlaceDotsAfterNewlinesChangeListener,
+] = atom(false);
+
 addQueryInputChangeListener(({ detail }) => {
   setQueryOutput(
     formatQuery(detail, {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
+      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
     })
   );
 });
@@ -2264,6 +2271,7 @@ addIndentationChangeListener(() => {
     formatQuery(getQueryInput(), {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
+      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
     })
   );
 });
@@ -2273,6 +2281,7 @@ addMaxLineLengthChangeListener(() => {
     formatQuery(getQueryInput(), {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
+      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
     })
   );
 });
@@ -2297,6 +2306,10 @@ module.exports = {
   getMaxLineLength,
   setMaxLineLength,
   addMaxLineLengthChangeListener,
+
+  getShouldPlaceDotsAfterNewlines,
+  setShouldPlaceDotsAfterNewlines,
+  addShouldPlaceDotsAfterNewlinesChangeListener,
 };
 
   return module.exports;
@@ -2490,12 +2503,14 @@ const Store = include('src/store/Store.js');
 const Router = include('src/router/Router.js');
 
 const app = App(() => ({}));
+
 Router.addHashChangeListener(app.update);
 Store.addQueryInputChangeListener(app.update);
 Store.addQueryOutputChangeListener(app.update);
 Store.addShowAdvancedOptionsChangeListener(app.update);
 Store.addIndentationChangeListener(app.update);
 Store.addMaxLineLengthChangeListener(app.update);
+Store.addShouldPlaceDotsAfterNewlinesChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

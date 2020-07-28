@@ -53,11 +53,18 @@ const setMaxLineLength = (value) => {
   _setMaxLineLength(maxLineLength);
 };
 
+const [
+  getShouldPlaceDotsAfterNewlines,
+  setShouldPlaceDotsAfterNewlines,
+  addShouldPlaceDotsAfterNewlinesChangeListener,
+] = atom(false);
+
 addQueryInputChangeListener(({ detail }) => {
   setQueryOutput(
     formatQuery(detail, {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
+      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
     })
   );
 });
@@ -67,6 +74,7 @@ addIndentationChangeListener(() => {
     formatQuery(getQueryInput(), {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
+      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
     })
   );
 });
@@ -76,6 +84,7 @@ addMaxLineLengthChangeListener(() => {
     formatQuery(getQueryInput(), {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
+      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
     })
   );
 });
@@ -100,4 +109,8 @@ module.exports = {
   getMaxLineLength,
   setMaxLineLength,
   addMaxLineLengthChangeListener,
+
+  getShouldPlaceDotsAfterNewlines,
+  setShouldPlaceDotsAfterNewlines,
+  addShouldPlaceDotsAfterNewlinesChangeListener,
 };

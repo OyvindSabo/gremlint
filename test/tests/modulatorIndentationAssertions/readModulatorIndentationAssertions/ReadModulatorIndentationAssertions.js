@@ -12,6 +12,7 @@ const ReadModulatorIndentationAssertions = [
     formatQuery('g.io(someInputFile).read().iterate()', {
       indentation: 0,
       maxLineLength: 20,
+      shouldPlaceDotsAfterNewlines: false,
     })
   ),
 ];

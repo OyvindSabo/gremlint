@@ -15,7 +15,7 @@ const ToModulatorIndentationAssertions = [
   iterate()`,
     formatQuery(
       "g.V(v1).addE('knows').to(v2).property('weight',0.75).iterate()",
-      { indentation: 0, maxLineLength: 20 }
+      { indentation: 0, maxLineLength: 20, shouldPlaceDotsAfterNewlines: false }
     )
   ),
 ];

@@ -8,23 +8,33 @@ const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
           .map(recreateQueryStringFromFormattedSyntaxTree)
           .join('.')
       )
-      .join('.\n');
+      .join('\n');
   }
   if (syntaxTree.type === 'method') {
-    return [
-      recreateQueryStringFromFormattedSyntaxTree(syntaxTree.method) + '(',
-      syntaxTree.argumentGroups
-        .map((arguments) =>
-          arguments.map(recreateQueryStringFromFormattedSyntaxTree).join(', ')
-        )
-        .join(',\n') + ')',
-    ].join(syntaxTree.argumentsShouldStartOnNewLine ? '\n' : '');
+    return (
+      (syntaxTree.shouldStartWithDot ? '.' : '') +
+      [
+        recreateQueryStringFromFormattedSyntaxTree(syntaxTree.method) + '(',
+        syntaxTree.argumentGroups
+          .map((arguments) =>
+            arguments.map(recreateQueryStringFromFormattedSyntaxTree).join(', ')
+          )
+          .join(',\n') +
+          ')' +
+          (syntaxTree.shouldEndWithDot ? '.' : ''),
+      ].join(syntaxTree.argumentsShouldStartOnNewLine ? '\n' : '')
+    );
   }
   if (syntaxTree.type === 'string') {
     return spaces(syntaxTree.indentation) + syntaxTree.string;
   }
   if (syntaxTree.type === 'word') {
-    return spaces(syntaxTree.indentation) + syntaxTree.word;
+    return (
+      spaces(syntaxTree.indentation) +
+      (syntaxTree.shouldStartWithDot ? '.' : '') +
+      syntaxTree.word +
+      (syntaxTree.shouldEndWithDot ? '.' : '')
+    );
   }
 };
 

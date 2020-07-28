@@ -7,6 +7,7 @@ const ByModulatorWrappingAssertions = [
     formatQuery('g.V().group().by().by(bothE().count())', {
       indentation: 0,
       maxLineLength: 38,
+      shouldPlaceDotsAfterNewlines: false,
     })
   ),
   assertEquals(
@@ -17,6 +18,7 @@ const ByModulatorWrappingAssertions = [
     formatQuery('g.V().group().by().by(bothE().count())', {
       indentation: 0,
       maxLineLength: 37,
+      shouldPlaceDotsAfterNewlines: false,
     })
   ),
 
@@ -31,7 +33,7 @@ const ByModulatorWrappingAssertions = [
     select(values).count(local).is(gt(1)))`,
     formatQuery(
       "g.V().hasLabel('person').group().by(values('name', 'age').fold()).unfold().filter(select(values).count(local).is(gt(1)))",
-      { indentation: 0, maxLineLength: 43 }
+      { indentation: 0, maxLineLength: 43, shouldPlaceDotsAfterNewlines: false }
     )
   ),
 ];

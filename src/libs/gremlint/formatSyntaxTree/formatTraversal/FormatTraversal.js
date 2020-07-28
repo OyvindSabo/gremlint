@@ -1,10 +1,11 @@
+const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
 const { recreateQueryOnelinerFromSyntaxTree } = include(
   'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
 );
 const { getStepGroups } = include(
   'src/libs/gremlint/formatSyntaxTree/formatTraversal/getStepGroups/GetStepGroups.js'
 );
-const { withZeroIndentation } = include(
+const { withDotInfo, withZeroIndentation } = include(
   'src/libs/gremlint/formatSyntaxTree/utils.js'
 );
 

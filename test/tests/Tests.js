@@ -9,6 +9,9 @@ const ModulatorIndentationAssertions = include(
 const ModulatorWrappingAssertions = include(
   'test/tests/modulatorWrappingAssertions/ModulatorWrappingAssertions.js'
 );
+const DotsAfterNewlinesAssertions = include(
+  'test/tests/dotsAfterNewlinesAssertions/DotsAfterNewlinesAssertions.js'
+);
 
 runTests(
   test(
@@ -24,6 +27,11 @@ runTests(
   test(
     "Modulators should not be line-wrapped if they can fit on the line of the step they're modulating",
     ...ModulatorWrappingAssertions
+  ),
+
+  test(
+    'If dots are configured to be placed after newlines, make sure they are correctly placed, and not missing, nor duplicated',
+    ...DotsAfterNewlinesAssertions
   ),
 
   test(

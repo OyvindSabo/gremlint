@@ -12,6 +12,7 @@ const WriteModulatorIndentationAssertions = [
     formatQuery('g.io(someOutputFile).write().iterate()', {
       indentation: 0,
       maxLineLength: 25,
+      shouldPlaceDotsAfterNewlines: false,
     })
   ),
 ];

@@ -15,7 +15,7 @@ const OptionModulatorIndentationAssertions = [
     option('peter', label())`,
     formatQuery(
       "g.V().hasLabel('person').choose(values('name')).option('marko', values('age')).option('josh', values('name')).option('vadas', elementMap()).option('peter', label())",
-      { indentation: 0, maxLineLength: 80 }
+      { indentation: 0, maxLineLength: 80, shouldPlaceDotsAfterNewlines: false }
     )
   ),
 ];

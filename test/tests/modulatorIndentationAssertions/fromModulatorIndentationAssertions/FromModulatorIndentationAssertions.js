@@ -4,7 +4,8 @@ const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 const FromModulatorIndentationAssertions = [
   // If modulators have to be wrapped, they should be indented with two
   // additional spaces, but consecutive steps should not be indented with two
-  // assitional spaces
+  // additional spaces.
+  // Check that from-steps are indented as modulators.
   assertEquals(
     `g.V().
   has(

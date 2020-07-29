@@ -18,6 +18,9 @@ const formatMethod = (formatSyntaxTree) => (config) => (syntaxTree) => {
     return {
       type: 'method',
       method: formatSyntaxTree(withNoEndDotInfo(config))(syntaxTree.method),
+      // The arguments property is here so that the resulted syntax tree can
+      // still be understood by recreateQueryOnelinerFromSyntaxTree
+      arguments: syntaxTree.arguments,
       argumentGroups: [
         syntaxTree.arguments.map(
           formatSyntaxTree(pipe(withZeroIndentation, withZeroDotInfo)(config))

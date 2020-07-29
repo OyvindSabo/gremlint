@@ -5,14 +5,61 @@ const { withZeroIndentation, withIncreasedIndentation, withDotInfo } = include(
 const { isTraversalSource, isModulator } = include(
   'src/libs/gremlint/formatSyntaxTree/formatTraversal/getStepGroups/utils.js'
 );
+const { recreateQueryOnelinerFromSyntaxTree } = include(
+  'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
+);
 
 const getStepGroups = (formatSyntaxTree, steps, config) => {
   const { stepGroups } = steps.reduce(
     ({ stepsInStepGroup, stepGroups }, step, index, steps) => {
       const isFirstStepInStepGroup = !stepsInStepGroup.length;
 
+      const isLastStep = index === steps.length - 1;
+      const nextStepIsModulator = !isLastStep && isModulator(steps[index + 1]);
+      const stepsWithSubsequentModulators = steps.slice(index + 1).reduce(
+        (aggregator, step) => {
+          const { stepsInStepGroup, hasReachedFinalModulator } = aggregator;
+          if (hasReachedFinalModulator) return aggregator;
+          if (isModulator(step)) {
+            return {
+              ...aggregator,
+              stepsInStepGroup: [...stepsInStepGroup, step],
+            };
+          }
+          return { ...aggregator, hasReachedFinalModulator: true };
+        },
+        {
+          stepsInStepGroup: [...stepsInStepGroup, step],
+          hasReachedFinalModulator: false,
+        }
+      ).stepsInStepGroup;
+
+      const stepGroupIndentationIncrease = (() => {
+        const traversalSourceIndentationIncrease =
+          stepGroups[0] && isTraversalSource(stepGroups[0].steps[0]) ? 2 : 0;
+        const modulatorIndentationIncrease = isModulator(
+          [...stepsInStepGroup, step][0]
+        )
+          ? 2
+          : 0;
+        const indentationIncrease =
+          traversalSourceIndentationIncrease + modulatorIndentationIncrease;
+        return indentationIncrease;
+      })();
+
+      const recreatedQueryWithSubsequentModulators = recreateQueryOnelinerFromSyntaxTree(
+        config.indentation + stepGroupIndentationIncrease
+      )({ type: 'traversal', steps: stepsWithSubsequentModulators });
+
+      const lineIsTooLongWithSubsequentModulators =
+        recreatedQueryWithSubsequentModulators.length > config.maxLineLength;
+
+      // If the first step in a group is a modulator, then it must also be the last step in the group
       const shouldBeLastStepInStepGroup =
-        step.type === 'method' || index === steps.length - 1;
+        isLastStep ||
+        (isFirstStepInStepGroup && isModulator(step)) ||
+        (step.type === 'method' &&
+          !(nextStepIsModulator && !lineIsTooLongWithSubsequentModulators));
 
       // If it should be the last step in a line
       // We don't want to newline after words which are not methods. For

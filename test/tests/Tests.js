@@ -12,6 +12,9 @@ const ModulatorWrappingAssertions = include(
 const DotsAfterNewlinesAssertions = include(
   'test/tests/dotsAfterNewlinesAssertions/DotsAfterNewlinesAssertions.js'
 );
+const NonMethodIndentationAssertions = include(
+  'test/tests/nonMethodIndentationAssertions/NonMethodIndentationAssertions.js'
+);
 
 runTests(
   test(
@@ -32,6 +35,11 @@ runTests(
   test(
     'If dots are configured to be placed after newlines, make sure they are correctly placed, and not missing, nor duplicated',
     ...DotsAfterNewlinesAssertions
+  ),
+
+  test(
+    'Non-methods in a traversal should be indented correctly, even if this might never occur in a valid query',
+    ...NonMethodIndentationAssertions
   ),
 
   test(

@@ -11,10 +11,13 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
     ({ stepsInStepGroup, stepGroups }, step, index, steps) => {
       const isFirstStepInStepGroup = !stepsInStepGroup.length;
 
+      const shouldBeLastStepInStepGroup =
+        step.type === 'method' || index === steps.length - 1;
+
       // If it should be the last step in a line
       // We don't want to newline after words which are not methods. For
       // instance, g.V() should be one one line, as should __.as
-      if (step.type === 'method' || index === steps.length - 1) {
+      if (shouldBeLastStepInStepGroup) {
         const isFirstStepGroup = stepGroups.length === 0;
         const isLastStepGroup = index === steps.length - 1;
 
@@ -91,6 +94,9 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
       // If it is the first step in a group and also not the last one, format it
       // with indentation, otherwise, remove the indentation
       if (isFirstStepInStepGroup) {
+        const indentationIncrease =
+          stepGroups[0] && isTraversalSource(stepGroups[0].steps[0]) ? 2 : 0;
+
         const isFirstStepGroup = stepGroups.length === 0;
 
         // It is the first step in a group and should start with a dot if it is
@@ -105,7 +111,10 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
         return {
           stepsInStepGroup: [
             formatSyntaxTree(
-              withDotInfo({ shouldStartWithDot, shouldEndWithDot })(config)
+              pipe(
+                withIncreasedIndentation(indentationIncrease),
+                withDotInfo({ shouldStartWithDot, shouldEndWithDot })
+              )(config)
             )(step),
           ],
           stepGroups,

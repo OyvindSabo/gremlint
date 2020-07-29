@@ -46,8 +46,10 @@ const [
 const setMaxLineLength = (value) => {
   const maxLineLength = parseInt(value);
   if (isNaN(maxLineLength)) return;
-  if (maxLineLength < 0) {
-    _setMaxLineLength(0);
+
+  const indentation = getIndentation();
+  if (maxLineLength < indentation) {
+    _setMaxLineLength(indentation);
     return;
   }
   _setMaxLineLength(maxLineLength);

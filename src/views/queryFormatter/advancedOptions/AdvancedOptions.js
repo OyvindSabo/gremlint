@@ -38,7 +38,7 @@ const AdvancedOptions = () => {
         () => ({
           style: getInputStyle() + getInlineContainerStyle(16, 2),
           type: 'number',
-          min: 0,
+          min: getIndentation(),
           value: getMaxLineLength(),
           oninput: ({ target }) => setMaxLineLength(target.value),
         }),

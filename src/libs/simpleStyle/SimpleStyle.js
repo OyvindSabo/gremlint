@@ -41,6 +41,11 @@ const getLinkStyle = (isHovered, isSelected) => `
   border-bottom: ${isSelected ? `2px solid ${HighlightColor}` : 'none'};
 `;
 
+const getRadioInputStyle = () => `
+  height: 16px;
+  width: 16px;
+`;
+
 // Used for buttons to make them look like text
 const getTextButtonStyle = (isHovered) => `
   height: 20px;
@@ -66,6 +71,7 @@ module.exports = {
   getInlineContainerStyle,
   getInputStyle,
   getLinkStyle,
+  getRadioInputStyle,
   getTextButtonStyle,
   getTextStyle,
 };

@@ -54,9 +54,9 @@ const setMaxLineLength = (value) => {
 };
 
 const [
-  getShouldPlaceDotsAfterNewlines,
-  setShouldPlaceDotsAfterNewlines,
-  addShouldPlaceDotsAfterNewlinesChangeListener,
+  getShouldPlaceDotsAfterLineBreaks,
+  setShouldPlaceDotsAfterLineBreaks,
+  addShouldPlaceDotsAfterLineBreaksChangeListener,
 ] = atom(false);
 
 addQueryInputChangeListener(({ detail }) => {
@@ -64,7 +64,7 @@ addQueryInputChangeListener(({ detail }) => {
     formatQuery(detail, {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
+      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
     })
   );
 });
@@ -74,7 +74,7 @@ addIndentationChangeListener(() => {
     formatQuery(getQueryInput(), {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
+      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
     })
   );
 });
@@ -84,7 +84,17 @@ addMaxLineLengthChangeListener(() => {
     formatQuery(getQueryInput(), {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
+      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
+    })
+  );
+});
+
+addShouldPlaceDotsAfterLineBreaksChangeListener(() => {
+  setQueryOutput(
+    formatQuery(getQueryInput(), {
+      indentation: getIndentation(),
+      maxLineLength: getMaxLineLength(),
+      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
     })
   );
 });
@@ -110,7 +120,7 @@ module.exports = {
   setMaxLineLength,
   addMaxLineLengthChangeListener,
 
-  getShouldPlaceDotsAfterNewlines,
-  setShouldPlaceDotsAfterNewlines,
-  addShouldPlaceDotsAfterNewlinesChangeListener,
+  getShouldPlaceDotsAfterLineBreaks,
+  setShouldPlaceDotsAfterLineBreaks,
+  addShouldPlaceDotsAfterLineBreaksChangeListener,
 };

@@ -1393,6 +1393,11 @@ const getLinkStyle = (isHovered, isSelected) => `
   border-bottom: ${isSelected ? `2px solid ${HighlightColor}` : 'none'};
 `;
 
+const getRadioInputStyle = () => `
+  height: 16px;
+  width: 16px;
+`;
+
 // Used for buttons to make them look like text
 const getTextButtonStyle = (isHovered) => `
   height: 20px;
@@ -1418,6 +1423,7 @@ module.exports = {
   getInlineContainerStyle,
   getInputStyle,
   getLinkStyle,
+  getRadioInputStyle,
   getTextButtonStyle,
   getTextStyle,
 };
@@ -2251,9 +2257,9 @@ const setMaxLineLength = (value) => {
 };
 
 const [
-  getShouldPlaceDotsAfterNewlines,
-  setShouldPlaceDotsAfterNewlines,
-  addShouldPlaceDotsAfterNewlinesChangeListener,
+  getShouldPlaceDotsAfterLineBreaks,
+  setShouldPlaceDotsAfterLineBreaks,
+  addShouldPlaceDotsAfterLineBreaksChangeListener,
 ] = atom(false);
 
 addQueryInputChangeListener(({ detail }) => {
@@ -2261,7 +2267,7 @@ addQueryInputChangeListener(({ detail }) => {
     formatQuery(detail, {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
+      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
     })
   );
 });
@@ -2271,7 +2277,7 @@ addIndentationChangeListener(() => {
     formatQuery(getQueryInput(), {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
+      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
     })
   );
 });
@@ -2281,7 +2287,17 @@ addMaxLineLengthChangeListener(() => {
     formatQuery(getQueryInput(), {
       indentation: getIndentation(),
       maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewLines: getShouldPlaceDotsAfterNewlines(),
+      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
+    })
+  );
+});
+
+addShouldPlaceDotsAfterLineBreaksChangeListener(() => {
+  setQueryOutput(
+    formatQuery(getQueryInput(), {
+      indentation: getIndentation(),
+      maxLineLength: getMaxLineLength(),
+      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
     })
   );
 });
@@ -2307,9 +2323,9 @@ module.exports = {
   setMaxLineLength,
   addMaxLineLengthChangeListener,
 
-  getShouldPlaceDotsAfterNewlines,
-  setShouldPlaceDotsAfterNewlines,
-  addShouldPlaceDotsAfterNewlinesChangeListener,
+  getShouldPlaceDotsAfterLineBreaks,
+  setShouldPlaceDotsAfterLineBreaks,
+  addShouldPlaceDotsAfterLineBreaksChangeListener,
 };
 
   return module.exports;
@@ -2323,55 +2339,112 @@ const {
   setIndentation,
   getMaxLineLength,
   setMaxLineLength,
+  getShouldPlaceDotsAfterLineBreaks,
+  setShouldPlaceDotsAfterLineBreaks,
 } = include('src/store/Store.js');
-const { getInlineContainerStyle, getInputStyle, getTextStyle } = include(
-  'src/libs/simpleStyle/SimpleStyle.js'
-);
+const {
+  getInlineContainerStyle,
+  getInputStyle,
+  getRadioInputStyle,
+  getTextStyle,
+} = include('src/libs/simpleStyle/SimpleStyle.js');
 
 const AdvancedOptions = () => {
   const element = html('div', {}, [
-    html('div', { style: 'padding: 10px;' }, [
-      html(
-        'span',
-        {
-          innerText: 'Indentation:',
-          style: getTextStyle() + getInlineContainerStyle(8, 2),
-        },
-        []
-      ),
-      html(
-        'input',
-        () => ({
-          style: getInputStyle() + getInlineContainerStyle(8, 2),
-          type: 'number',
-          min: 0,
-          max: getMaxLineLength(),
-          value: getIndentation(),
-          oninput: ({ target }) => setIndentation(target.value),
-        }),
-        []
-      ),
-    ]),
-    html('div', { style: 'padding: 10px;' }, [
-      html(
-        'span',
-        {
-          innerText: 'Max line length:',
-          style: getTextStyle() + getInlineContainerStyle(8, 2),
-        },
-        []
-      ),
-      html(
-        'input',
-        () => ({
-          style: getInputStyle() + getInlineContainerStyle(8, 2),
-          type: 'number',
-          min: 0,
-          value: getMaxLineLength(),
-          oninput: ({ target }) => setMaxLineLength(target.value),
-        }),
-        []
-      ),
+    html('form', {}, [
+      html('div', { style: 'padding: 10px' }, [
+        html(
+          'span',
+          {
+            innerText: 'Indentation:',
+            style: getTextStyle() + getInlineContainerStyle(8, 2),
+          },
+          []
+        ),
+        html(
+          'input',
+          () => ({
+            style: getInputStyle() + getInlineContainerStyle(8, 2),
+            type: 'number',
+            min: 0,
+            max: getMaxLineLength(),
+            value: getIndentation(),
+            oninput: ({ target }) => setIndentation(target.value),
+          }),
+          []
+        ),
+      ]),
+      html('div', { style: 'padding: 10px; display;' }, [
+        html(
+          'span',
+          {
+            innerText: 'Max line length:',
+            style: getTextStyle() + getInlineContainerStyle(8, 2),
+          },
+          []
+        ),
+        html(
+          'input',
+          () => ({
+            style: getInputStyle() + getInlineContainerStyle(8, 2),
+            type: 'number',
+            min: 0,
+            value: getMaxLineLength(),
+            oninput: ({ target }) => setMaxLineLength(target.value),
+          }),
+          []
+        ),
+      ]),
+      html('div', { style: 'padding: 10px;' }, [
+        html('span', { style: getInlineContainerStyle(2, 2) }, [
+          html(
+            'input',
+            () => ({
+              style: getRadioInputStyle(),
+              type: 'radio',
+              value: 'false',
+              name: 'shouldPlaceDotsAfterLineBreaks',
+              onclick: () => setShouldPlaceDotsAfterLineBreaks(false),
+              checked: !getShouldPlaceDotsAfterLineBreaks(),
+            }),
+            []
+          ),
+        ]),
+        html(
+          'span',
+          {
+            innerText: 'Place dots before line breaks',
+            style: getTextStyle() + getInlineContainerStyle(14, 2),
+            onclick: () => setShouldPlaceDotsAfterLineBreaks(false),
+          },
+          []
+        ),
+      ]),
+      html('div', { style: 'padding: 10px' }, [
+        html('span', { style: getInlineContainerStyle(2, 2) }, [
+          html(
+            'input',
+            () => ({
+              style: getRadioInputStyle(),
+              type: 'radio',
+              value: 'true',
+              name: 'shouldPlaceDotsAfterLineBreaks',
+              onclick: () => setShouldPlaceDotsAfterLineBreaks(true),
+              checked: getShouldPlaceDotsAfterLineBreaks(),
+            }),
+            []
+          ),
+        ]),
+        html(
+          'span',
+          {
+            innerText: 'Place dots after line breaks',
+            style: getTextStyle() + getInlineContainerStyle(14, 2),
+            onclick: () => setShouldPlaceDotsAfterLineBreaks(true),
+          },
+          []
+        ),
+      ]),
     ]),
   ]);
   return element;
@@ -2416,7 +2489,7 @@ const QueryFormatter = () => {
       'div',
       () => ({
         style: `max-height: ${
-          getShowAdvancedOptions() ? '120px' : '0'
+          getShowAdvancedOptions() ? '240px' : '0'
         }; box-shadow: inset white 0 0 10px 0; overflow: hidden; transition: 0.5s;`,
       }),
       [AdvancedOptions()]
@@ -2510,7 +2583,7 @@ Store.addQueryOutputChangeListener(app.update);
 Store.addShowAdvancedOptionsChangeListener(app.update);
 Store.addIndentationChangeListener(app.update);
 Store.addMaxLineLengthChangeListener(app.update);
-Store.addShouldPlaceDotsAfterNewlinesChangeListener(app.update);
+Store.addShouldPlaceDotsAfterLineBreaksChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

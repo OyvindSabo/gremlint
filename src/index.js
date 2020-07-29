@@ -11,7 +11,7 @@ Store.addQueryOutputChangeListener(app.update);
 Store.addShowAdvancedOptionsChangeListener(app.update);
 Store.addIndentationChangeListener(app.update);
 Store.addMaxLineLengthChangeListener(app.update);
-Store.addShouldPlaceDotsAfterNewlinesChangeListener(app.update);
+Store.addShouldPlaceDotsAfterLineBreaksChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

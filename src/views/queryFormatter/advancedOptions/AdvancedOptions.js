@@ -119,7 +119,7 @@ const AdvancedOptions = () => {
                           color: ${HighlightedTextColor};
                           text-align: center;
                           border: 1px solid ${BorderColor};
-                          transition: 0.25s;`,
+                          transition: 0.5s;`,
 
                 innerText: getShouldPlaceDotsAfterLineBreaks()
                   ? 'After line break'

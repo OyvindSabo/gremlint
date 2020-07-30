@@ -1794,6 +1794,123 @@ module.exports = {
   return module.exports;
 })();
 
+modules['src/components/toggle/styles.js'] = (() => {
+  const module = { exports: {} };
+  const { BorderColor, HighlightedTextColor, TextColor, White } = include(
+  'src/libs/simpleColorPalette/SimpleColorPalette.js'
+);
+
+const getToggleContainerStyle = (width, height) => `
+  display: inline-block;
+  height: ${height};
+  width: ${width};
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
+  position: relative;
+`;
+
+const getOptionStyle = (width, height) => `
+  cursor: pointer;
+  display: inline-block;
+  height: ${height};
+  width: calc(${width} / 2);
+  box-sizing: border-box;
+  padding: 10px;
+  line-height: 20px;
+  font-size: 16px;
+  color: ${TextColor};
+  text-align: center;
+`;
+
+const getSelectedOptionStyle = (checked) => `
+  background: ${White};
+  cursor: pointer;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: ${checked ? '160px' : '0'};
+  height: 40px;
+  width: 160px;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 10px;
+  line-height: 20px;
+  font-size: 16px;
+  color: ${HighlightedTextColor};
+  text-align: center;
+  border: 1px solid ${BorderColor};
+  transition: 0.5s;
+`;
+
+module.exports = {
+  getToggleContainerStyle,
+  getOptionStyle,
+  getSelectedOptionStyle,
+};
+
+  return module.exports;
+})();
+
+modules['src/components/toggle/Toggle.js'] = (() => {
+  const module = { exports: {} };
+  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+const {
+  getToggleContainerStyle,
+  getOptionStyle,
+  getSelectedOptionStyle,
+} = include('src/components/toggle/styles.js');
+
+const Toggle = (getProps) => {
+  const getWidth = () => getProps().width || '320px';
+  const getHeight = () => getProps().height || '40px;';
+  const getIsChecked = () => getProps().checked || false;
+  const getLabels = () =>
+    getProps().labels || { checked: 'Checked', unchecked: 'Unchecked' };
+  const getOnChange = () => getProps().onchange;
+
+  const element = html(
+    'span',
+    () => ({ style: getToggleContainerStyle(getWidth(), getHeight()) }),
+    [
+      html(
+        'span',
+        () => ({
+          style: getOptionStyle(getWidth(), getHeight()),
+          innerText: getLabels().unchecked,
+          onclick: () => getOnChange()(false),
+        }),
+        []
+      ),
+      html(
+        'span',
+        () => ({
+          style: getOptionStyle(getWidth(), getHeight()),
+          innerText: getLabels().checked,
+          onclick: () => getOnChange()(true),
+        }),
+        []
+      ),
+      html(
+        'span',
+        () => ({
+          style: getSelectedOptionStyle(getIsChecked()),
+          innerText: getIsChecked()
+            ? getLabels().checked
+            : getLabels().unchecked,
+        }),
+        []
+      ),
+    ]
+  );
+  return element;
+};
+
+module.exports = Toggle;
+
+  return module.exports;
+})();
+
 modules['src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'] = (() => {
   const module = { exports: {} };
   const { spaces } = include('src/libs/gremlint/utils.js');
@@ -2390,7 +2507,8 @@ module.exports = {
 
 modules['src/views/queryFormatter/advancedOptions/AdvancedOptions.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  const Toggle = include('src/components/toggle/Toggle.js');
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
   getIndentation,
   setIndentation,
@@ -2438,90 +2556,17 @@ const AdvancedOptions = () => {
       ),
     ]),
     html('div', { style: 'padding: 10px;' }, [
-      html('span', { style: 'display: inline-block' }, [
-        html('div', { innerText: 'Dot placement', style: getTextStyle() }, []),
-        html(
-          'span',
-          {
-            style: `display: inline-block;
-                      height: 40px;
-                      width: 320px;
-                      border-radius: 5px;
-                      background: rgba(0, 0, 0, 0.05);
-                      box-shadow: inset rgba(0, 0, 0, 0.5) 0 0 10px -5px;
-                      position: relative;`,
-          },
-          [
-            html(
-              'span',
-              () => ({
-                style: `cursor: pointer;
-                          display: inline-block;
-                          height: 40px;
-                          width: 160px;
-                          box-sizing: border-box;
-                          padding: 10px;
-                          line-height: 20px;
-                          font-size: 16px;
-                          color: ${TextColor};
-                          text-align: center;`,
-
-                innerText: 'Before line break',
-                onclick: () => setShouldPlaceDotsAfterLineBreaks(false),
-              }),
-              []
-            ),
-            html(
-              'span',
-              {
-                style: `cursor: pointer;
-                          display: inline-block;
-                          height: 40px;
-                          width: 160px;
-                          box-sizing: border-box;
-                          padding: 10px;
-                          line-height: 20px;
-                          font-size: 16px;
-                          color: ${TextColor};
-                          text-align: center;`,
-
-                innerText: 'After line break',
-                onclick: () => setShouldPlaceDotsAfterLineBreaks(true),
-              },
-              []
-            ),
-            html(
-              'span',
-              () => ({
-                style: `background: ${White};
-                          cursor: pointer;
-                          display: inline-block;
-                          position: absolute;
-                          top: 0;
-                          left: ${
-                            getShouldPlaceDotsAfterLineBreaks() ? '160px' : '0'
-                          };
-                          height: 40px;
-                          width: 160px;
-                          border-radius: 5px;
-                          box-sizing: border-box;
-                          padding: 10px;
-                          line-height: 20px;
-                          font-size: 16px;
-                          color: ${HighlightedTextColor};
-                          text-align: center;
-                          border: 1px solid ${BorderColor};
-                          transition: 0.5s;`,
-
-                innerText: getShouldPlaceDotsAfterLineBreaks()
-                  ? 'After line break'
-                  : 'Before line break',
-              }),
-              []
-            ),
-          ]
-        ),
-      ]),
+      html('div', { innerText: 'Dot placement', style: getTextStyle() }, []),
+      Toggle(() => ({
+        height: '40px',
+        width: '320px',
+        checked: getShouldPlaceDotsAfterLineBreaks(),
+        labels: {
+          checked: 'After line break',
+          unchecked: 'Before line break',
+        },
+        onchange: (checked) => setShouldPlaceDotsAfterLineBreaks(checked),
+      })),
     ]),
   ]);
   return element;

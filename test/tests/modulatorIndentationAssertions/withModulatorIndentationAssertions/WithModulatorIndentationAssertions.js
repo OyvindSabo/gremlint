@@ -9,12 +9,12 @@ const WithModulatorIndentationAssertions = [
   assertEquals(
     `g.V().
   connectedComponent().
-    with_(ConnectedComponent.propertyName, 'component').
+    with(ConnectedComponent.propertyName, 'component').
   project('name', 'component').
     by('name').
     by('component')`,
     formatQuery(
-      "g.V().connectedComponent().with_(ConnectedComponent.propertyName, 'component').project('name','component').by('name').by('component')",
+      "g.V().connectedComponent().with(ConnectedComponent.propertyName, 'component').project('name','component').by('name').by('component')",
       { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -22,13 +22,13 @@ const WithModulatorIndentationAssertions = [
     `g.V().
   hasLabel('person').
   connectedComponent().
-    with_(ConnectedComponent.propertyName, 'component').
-    with_(ConnectedComponent.edges, outE('knows')).
+    with(ConnectedComponent.propertyName, 'component').
+    with(ConnectedComponent.edges, outE('knows')).
   project('name', 'component').
     by('name').
     by('component')`,
     formatQuery(
-      "g.V().hasLabel('person').connectedComponent().with_(ConnectedComponent.propertyName, 'component').with_(ConnectedComponent.edges, outE('knows')).project('name','component').by('name').by('component')",
+      "g.V().hasLabel('person').connectedComponent().with(ConnectedComponent.propertyName, 'component').with(ConnectedComponent.edges, outE('knows')).project('name','component').by('name').by('component')",
       { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -39,11 +39,11 @@ const WithModulatorIndentationAssertions = [
   fold().
   order(Scope.local).
   index().
-    with_(WithOptions.indexer, WithOptions.list).
+    with(WithOptions.indexer, WithOptions.list).
   unfold().
   order().by(__.tail(Scope.local, 1))`,
     formatQuery(
-      "g.V().hasLabel('software').values('name').fold().order(Scope.local).index().with_(WithOptions.indexer, WithOptions.list).unfold().order().by(__.tail(Scope.local, 1))",
+      "g.V().hasLabel('software').values('name').fold().order(Scope.local).index().with(WithOptions.indexer, WithOptions.list).unfold().order().by(__.tail(Scope.local, 1))",
       { indentation: 0, maxLineLength: 50, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -54,29 +54,29 @@ const WithModulatorIndentationAssertions = [
   fold().
   order(Scope.local).
   index().
-    with_(WithOptions.indexer, WithOptions.map)`,
+    with(WithOptions.indexer, WithOptions.map)`,
     formatQuery(
-      "g.V().hasLabel('person').values('name').fold().order(Scope.local).index().with_(WithOptions.indexer, WithOptions.map)",
+      "g.V().hasLabel('person').values('name').fold().order(Scope.local).index().with(WithOptions.indexer, WithOptions.map)",
       { indentation: 0, maxLineLength: 50, shouldPlaceDotsAfterNewlines: false }
     )
   ),
   assertEquals(
     `g.io(someInputFile).
-    with_(IO.reader, IO.graphson).
+    with(IO.reader, IO.graphson).
     read().
   iterate()`,
     formatQuery(
-      'g.io(someInputFile).with_(IO.reader, IO.graphson).read().iterate()',
+      'g.io(someInputFile).with(IO.reader, IO.graphson).read().iterate()',
       { indentation: 0, maxLineLength: 35, shouldPlaceDotsAfterNewlines: false }
     )
   ),
   assertEquals(
     `g.io(someOutputFile).
-    with_(IO.writer, IO.graphml).
+    with(IO.writer, IO.graphml).
     write().
   iterate()`,
     formatQuery(
-      'g.io(someOutputFile).with_(IO.writer,IO.graphml).write().iterate()',
+      'g.io(someOutputFile).with(IO.writer,IO.graphml).write().iterate()',
       { indentation: 0, maxLineLength: 35, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -84,12 +84,12 @@ const WithModulatorIndentationAssertions = [
     `g.V().
   hasLabel('person').
   pageRank().
-    with_(PageRank.edges, __.outE('knows')).
-    with_(PageRank.propertyName, 'friendRank').
+    with(PageRank.edges, __.outE('knows')).
+    with(PageRank.propertyName, 'friendRank').
   order().by('friendRank', desc).
   elementMap('name', 'friendRank')`,
     formatQuery(
-      "g.V().hasLabel('person').pageRank().with_(PageRank.edges, __.outE('knows')).with_(PageRank.propertyName, 'friendRank').order().by('friendRank',desc).elementMap('name','friendRank')",
+      "g.V().hasLabel('person').pageRank().with(PageRank.edges, __.outE('knows')).with(PageRank.propertyName, 'friendRank').order().by('friendRank',desc).elementMap('name','friendRank')",
       { indentation: 0, maxLineLength: 50, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -97,39 +97,29 @@ const WithModulatorIndentationAssertions = [
     `g.V().
   hasLabel('person').
   peerPressure().
-    with_(PeerPressure.propertyName, 'cluster').
+    with(PeerPressure.propertyName, 'cluster').
   group().by('cluster').by('name')`,
     formatQuery(
-      "g.V().hasLabel('person').peerPressure().with_(PeerPressure.propertyName, 'cluster').group().by('cluster').by('name')",
+      "g.V().hasLabel('person').peerPressure().with(PeerPressure.propertyName, 'cluster').group().by('cluster').by('name')",
       { indentation: 0, maxLineLength: 50, shouldPlaceDotsAfterNewlines: false }
     )
   ),
   assertEquals(
     `g.V().
   shortestPath().
-    with_(ShortestPath.target, __.has('name', 'peter'))`,
+    with(ShortestPath.target, __.has('name', 'peter'))`,
     formatQuery(
-      "g.V().shortestPath().with_(ShortestPath.target, __.has('name','peter'))",
+      "g.V().shortestPath().with(ShortestPath.target, __.has('name','peter'))",
       { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterNewlines: false }
     )
   ),
   assertEquals(
     `g.V().
   shortestPath().
-    with_(ShortestPath.edges, Direction.IN).
-    with_(ShortestPath.target, __.has('name', 'josh'))`,
+    with(ShortestPath.edges, Direction.IN).
+    with(ShortestPath.target, __.has('name', 'josh'))`,
     formatQuery(
-      "g.V().shortestPath().with_(ShortestPath.edges, Direction.IN).with_(ShortestPath.target, __.has('name','josh'))",
-      { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterNewlines: false }
-    )
-  ),
-  assertEquals(
-    `g.V().
-  has('person', 'name', 'marko').
-  shortestPath().
-    with_(ShortestPath.target, __.has('name', 'josh'))`,
-    formatQuery(
-      "g.V().has('person','name','marko').shortestPath().with_(ShortestPath.target,__.has('name','josh'))",
+      "g.V().shortestPath().with(ShortestPath.edges, Direction.IN).with(ShortestPath.target, __.has('name','josh'))",
       { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -137,10 +127,9 @@ const WithModulatorIndentationAssertions = [
     `g.V().
   has('person', 'name', 'marko').
   shortestPath().
-    with_(ShortestPath.target, __.has('name', 'josh')).
-    with_(ShortestPath.distance, 'weight')`,
+    with(ShortestPath.target, __.has('name', 'josh'))`,
     formatQuery(
-      "g.V().has('person','name','marko').shortestPath().with_(ShortestPath.target, __.has('name','josh')).with_(ShortestPath.distance, 'weight')",
+      "g.V().has('person','name','marko').shortestPath().with(ShortestPath.target,__.has('name','josh'))",
       { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -148,10 +137,21 @@ const WithModulatorIndentationAssertions = [
     `g.V().
   has('person', 'name', 'marko').
   shortestPath().
-    with_(ShortestPath.target, __.has('name', 'josh')).
-    with_(ShortestPath.includeEdges, true)`,
+    with(ShortestPath.target, __.has('name', 'josh')).
+    with(ShortestPath.distance, 'weight')`,
     formatQuery(
-      "g.V().has('person','name','marko').shortestPath().with_(ShortestPath.target, __.has('name','josh')).with_(ShortestPath.includeEdges, true)",
+      "g.V().has('person','name','marko').shortestPath().with(ShortestPath.target, __.has('name','josh')).with(ShortestPath.distance, 'weight')",
+      { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterNewlines: false }
+    )
+  ),
+  assertEquals(
+    `g.V().
+  has('person', 'name', 'marko').
+  shortestPath().
+    with(ShortestPath.target, __.has('name', 'josh')).
+    with(ShortestPath.includeEdges, true)`,
+    formatQuery(
+      "g.V().has('person','name','marko').shortestPath().with(ShortestPath.target, __.has('name','josh')).with(ShortestPath.includeEdges, true)",
       { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -160,14 +160,14 @@ const WithModulatorIndentationAssertions = [
   g.withComputer().
     V().
     shortestPath().
-      with_(ShortestPath.distance, 'weight').
-      with_(ShortestPath.includeEdges, true).
-      with_(ShortestPath.maxDistance, 1).
+      with(ShortestPath.distance, 'weight').
+      with(ShortestPath.includeEdges, true).
+      with(ShortestPath.maxDistance, 1).
     toList().
     toArray()).
   map(unfold().values('name', 'weight').fold())`,
     formatQuery(
-      "g.inject(g.withComputer().V().shortestPath().with_(ShortestPath.distance, 'weight').with_(ShortestPath.includeEdges, true).with_(ShortestPath.maxDistance, 1).toList().toArray()).map(unfold().values('name','weight').fold())",
+      "g.inject(g.withComputer().V().shortestPath().with(ShortestPath.distance, 'weight').with(ShortestPath.includeEdges, true).with(ShortestPath.maxDistance, 1).toList().toArray()).map(unfold().values('name','weight').fold())",
       { indentation: 0, maxLineLength: 50, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -175,9 +175,9 @@ const WithModulatorIndentationAssertions = [
     `g.V().
   hasLabel('person').
   valueMap().
-    with_(WithOptions.tokens)`,
+    with(WithOptions.tokens)`,
     formatQuery(
-      "g.V().hasLabel('person').valueMap().with_(WithOptions.tokens)",
+      "g.V().hasLabel('person').valueMap().with(WithOptions.tokens)",
       { indentation: 0, maxLineLength: 35, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -185,11 +185,11 @@ const WithModulatorIndentationAssertions = [
     `g.V().
   hasLabel('person').
   valueMap('name').
-    with_(
+    with(
       WithOptions.tokens,
       WithOptions.labels)`,
     formatQuery(
-      "g.V().hasLabel('person').valueMap('name').with_(WithOptions.tokens,WithOptions.labels)",
+      "g.V().hasLabel('person').valueMap('name').with(WithOptions.tokens,WithOptions.labels)",
       { indentation: 0, maxLineLength: 35, shouldPlaceDotsAfterNewlines: false }
     )
   ),
@@ -198,11 +198,11 @@ const WithModulatorIndentationAssertions = [
   hasLabel('person').
   properties('location').
   valueMap().
-    with_(
+    with(
       WithOptions.tokens,
       WithOptions.values)`,
     formatQuery(
-      "g.V().hasLabel('person').properties('location').valueMap().with_(WithOptions.tokens, WithOptions.values)",
+      "g.V().hasLabel('person').properties('location').valueMap().with(WithOptions.tokens, WithOptions.values)",
       { indentation: 0, maxLineLength: 35, shouldPlaceDotsAfterNewlines: false }
     )
   ),

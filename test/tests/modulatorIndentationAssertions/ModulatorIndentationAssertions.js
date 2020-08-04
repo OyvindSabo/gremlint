@@ -10,6 +10,9 @@ const AsModulatorIndentationAssertions = include(
 const As_ModulatorIndentationAssertions = include(
   'test/tests/modulatorIndentationAssertions/as_ModulatorIndentationAssertions/As_ModulatorIndentationAssertions.js'
 );
+const EmitModulatorIndentationAssertions = include(
+  'test/tests/modulatorIndentationAssertions/emitModulatorIndentationAssertions/EmitModulatorIndentationAssertions.js'
+);
 const FromModulatorIndentationAssertions = include(
   'test/tests/modulatorIndentationAssertions/fromModulatorIndentationAssertions/FromModulatorIndentationAssertions.js'
 );
@@ -21,6 +24,12 @@ const ToModulatorIndentationAssertions = include(
 );
 const ReadModulatorIndentationAssertions = include(
   'test/tests/modulatorIndentationAssertions/readModulatorIndentationAssertions/ReadModulatorIndentationAssertions.js'
+);
+const TimesModulatorIndentationAssertions = include(
+  'test/tests/modulatorIndentationAssertions/timesModulatorIndentationAssertions/TimesModulatorIndentationAssertions.js'
+);
+const WithModulatorIndentationAssertions = include(
+  'test/tests/modulatorIndentationAssertions/withModulatorIndentationAssertions/WithModulatorIndentationAssertions.js'
 );
 const With_ModulatorIndentationAssertions = include(
   'test/tests/modulatorIndentationAssertions/with_ModulatorIndentationAssertions/With_ModulatorIndentationAssertions.js'
@@ -34,10 +43,13 @@ const ModulatorIndentationAssertions = [
   ...OptionModulatorIndentationAssertions,
   ...AsModulatorIndentationAssertions,
   ...As_ModulatorIndentationAssertions,
+  ...EmitModulatorIndentationAssertions,
   ...FromModulatorIndentationAssertions,
   ...From_ModulatorIndentationAssertions,
   ...ToModulatorIndentationAssertions,
   ...ReadModulatorIndentationAssertions,
+  ...TimesModulatorIndentationAssertions,
+  ...WithModulatorIndentationAssertions,
   ...With_ModulatorIndentationAssertions,
   ...WriteModulatorIndentationAssertions,
 ];

@@ -8,9 +8,7 @@ const {
   getShouldPlaceDotsAfterLineBreaks,
   setShouldPlaceDotsAfterLineBreaks,
 } = include('src/store/Store.js');
-const { BorderColor, HighlightedTextColor, TextColor, White } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
+
 const { getInlineContainerStyle, getInputStyle, getTextStyle } = include(
   'src/libs/simpleStyle/SimpleStyle.js'
 );

@@ -7,6 +7,10 @@ const build = () => {
   let importQueue = ['src/index.js'];
 
   let output = `
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta name="google-site-verification" content="8rkkiQkZaBwVUAUBxSY6Nj_EBHqCGPEYnEJmlyXuLnw" />
 <script>
 const modules = {}
 const include = path => modules[path];
@@ -20,7 +24,7 @@ const include = path => modules[path];
       content: fileContent,
       dependencies: paths,
     };
-    paths.forEach(path => {
+    paths.forEach((path) => {
       if (!importedFilePaths[path]) {
         importQueue.push(path);
       }
@@ -44,7 +48,7 @@ modules['${path}'] = (() => {
 `;
   });
 
-  output += '</script>';
+  output += '</script></head><body></body></html>';
 
   writeContentToFile(output, 'dist/index.html');
 };

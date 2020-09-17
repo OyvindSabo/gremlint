@@ -9,7 +9,26 @@ const include = path => modules[path];
 
 modules['src/libs/observable/Observable.js'] = (() => {
   const module = { exports: {} };
-  class Observable {
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+class Observable {
   constructor(value) {
     // Maybe this can cause an id collision of two observables created almost at the same time
     this._id = `${Math.random()}${+new Date()}`;
@@ -43,7 +62,26 @@ module.exports = Observable;
 
 modules['src/libs/simpleHTML/SimpleHTML.js'] = (() => {
   const module = { exports: {} };
-  const flatten = (items) => {
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const flatten = (items) => {
   const flat = [];
 
   items.forEach((item) => {
@@ -258,7 +296,26 @@ module.exports = {
 
 modules['src/components/fadeIn/FadeIn.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 
 const FadeIn = (getProps, children) => {
   let opacity = 0;
@@ -287,7 +344,26 @@ module.exports = FadeIn;
 
 modules['src/libs/simpleRouter/SimpleRouter.js'] = (() => {
   const module = { exports: {} };
-  function SimpleRouter(routes) {
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+function SimpleRouter(routes) {
   /**
    * @param {string} routes
    */
@@ -485,7 +561,26 @@ module.exports = SimpleRouter;
 
 modules['src/router/Router.js'] = (() => {
   const module = { exports: {} };
-  const SimpleRouter = include('src/libs/simpleRouter/SimpleRouter.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const SimpleRouter = include('src/libs/simpleRouter/SimpleRouter.js');
 
 const router = new SimpleRouter({
   '/': 'Gremlint - Query formatter',
@@ -507,7 +602,26 @@ module.exports = {
 
 modules['src/libs/simpleColorPalette/SimpleColorPalette.js'] = (() => {
   const module = { exports: {} };
-  const BorderColor = 'lightgray';
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const BorderColor = 'lightgray';
 const TextColor = 'slategray';
 const InputTextColor = 'darkslategray';
 const HighlightedTextColor = 'darkslategray';
@@ -530,7 +644,26 @@ module.exports = {
 
 modules['src/components/loadingAnimation/LoadingAnimation.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 
 const LoadingAnimation = (getProps) => {
@@ -654,7 +787,26 @@ module.exports = LoadingAnimation;
 
 modules['src/views/styleGuide/rules/Rules.js'] = (() => {
   const module = { exports: {} };
-  const rules = [
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const rules = [
   {
     title: 'Break long queries into multiple lines',
     explanation: `What is considered too long depends on your application.
@@ -981,7 +1133,26 @@ module.exports = { rules };
 
 modules['src/components/queryInput/QueryInput.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { InputTextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
@@ -1026,7 +1197,26 @@ module.exports = QueryInput;
 
 modules['src/components/code/Code.js'] = (() => {
   const module = { exports: {} };
-  const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { DisabledTextColor, TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
@@ -1088,7 +1278,26 @@ module.exports = Code;
 
 modules['src/libs/simpleFP/SimpleFP.js'] = (() => {
   const module = { exports: {} };
-  const last = (array) => array.slice(-1)[0];
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const last = (array) => array.slice(-1)[0];
 
 const pipe = (...fns) => (value) => fns.reduce((value, fn) => fn(value), value);
 
@@ -1099,7 +1308,26 @@ module.exports = { last, pipe };
 
 modules['src/libs/gremlint/parseToSyntaxTree/ParseToSyntaxTree.js'] = (() => {
   const module = { exports: {} };
-  const { last, pipe } = include('src/libs/simpleFP/SimpleFP.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { last, pipe } = include('src/libs/simpleFP/SimpleFP.js');
 
 const tokenizeOnTopLevelPunctuation = (query) => {
   word = '';
@@ -1356,13 +1584,30 @@ module.exports = {
 
 modules['src/libs/simpleStyle/SimpleStyle.js'] = (() => {
   const module = { exports: {} };
-  const {
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const {
   TextColor,
   InputTextColor,
   HighlightedTextColor,
-  DisabledTextColor,
   HighlightColor,
-  White,
 } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 
 // A unit is 20px
@@ -1433,7 +1678,26 @@ module.exports = {
 
 modules['src/components/navigationButton/NavigationButton.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getInlineContainerStyle, getLinkStyle } = include(
   'src/libs/simpleStyle/SimpleStyle.js'
 );
@@ -1478,7 +1742,26 @@ module.exports = NavigationButton;
 
 modules['src/components/navigator/Navigator.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
 const NavigationButton = include(
   'src/components/navigationButton/NavigationButton.js'
@@ -1536,7 +1819,26 @@ module.exports = Navigator;
 
 modules['src/components/textButton/TextButton.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { getTextButtonStyle } = include('src/libs/simpleStyle/SimpleStyle.js');
 
 const TextButton = (getProps) => {
@@ -1582,7 +1884,26 @@ module.exports = TextButton;
 
 modules['src/components/title/Title.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
@@ -1613,7 +1934,26 @@ module.exports = Title;
 
 modules['src/components/paragraph/Paragraph.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const { TextColor } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
@@ -1644,7 +1984,26 @@ module.exports = Paragraph;
 
 modules['src/components/spacer/Spacer.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 
 const Spacer = () => html('div', { style: 'height: 20px' }, []);
 
@@ -1655,7 +2014,26 @@ module.exports = Spacer;
 
 modules['src/components/styleGuideRule/StyleGuideRule.js'] = (() => {
   const module = { exports: {} };
-  const Title = include('src/components/title/Title.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const Title = include('src/components/title/Title.js');
 const Paragraph = include('src/components/paragraph/Paragraph.js');
 const Code = include('src/components/code/Code.js');
 const Spacer = include('src/components/spacer/Spacer.js');
@@ -1681,7 +2059,26 @@ module.exports = StyleGuideRule;
 
 modules['src/views/styleGuide/StyleGuide.js'] = (() => {
   const module = { exports: {} };
-  const StyleGuideRule = include(
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const StyleGuideRule = include(
   'src/components/styleGuideRule/StyleGuideRule.js'
 );
 const { html, Each } = include('src/libs/simpleHTML/SimpleHTML.js');
@@ -1708,7 +2105,26 @@ module.exports = StyleGuide;
 
 modules['src/libs/gremlint/formatSyntaxTree/formatString/FormatString.js'] = (() => {
   const module = { exports: {} };
-  const formatString = (config) => (syntaxTree) => {
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const formatString = (config) => (syntaxTree) => {
   return {
     type: 'string',
     string: syntaxTree.string,
@@ -1723,7 +2139,26 @@ module.exports = { formatString };
 
 modules['src/libs/gremlint/formatSyntaxTree/formatWord/FormatWord.js'] = (() => {
   const module = { exports: {} };
-  const formatWord = (config) => (syntaxTree) => {
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const formatWord = (config) => (syntaxTree) => {
   return {
     type: 'word',
     word: syntaxTree.word,
@@ -1740,7 +2175,26 @@ module.exports = { formatWord };
 
 modules['src/libs/gremlint/utils.js'] = (() => {
   const module = { exports: {} };
-  const spaces = (numberOfSpaces) => Array(numberOfSpaces + 1).join(' ');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const spaces = (numberOfSpaces) => Array(numberOfSpaces + 1).join(' ');
 
 module.exports = {
   spaces,
@@ -1751,7 +2205,26 @@ module.exports = {
 
 modules['src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQueryStringFromFormattedSyntaxTree.js'] = (() => {
   const module = { exports: {} };
-  const { spaces } = include('src/libs/gremlint/utils.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { spaces } = include('src/libs/gremlint/utils.js');
 
 const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
   if (syntaxTree.type === 'traversal') {
@@ -1800,7 +2273,26 @@ module.exports = {
 
 modules['src/components/toggle/styles.js'] = (() => {
   const module = { exports: {} };
-  const { BorderColor, HighlightedTextColor, TextColor, White } = include(
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { BorderColor, HighlightedTextColor, TextColor, White } = include(
   'src/libs/simpleColorPalette/SimpleColorPalette.js'
 );
 
@@ -1858,7 +2350,26 @@ module.exports = {
 
 modules['src/components/toggle/Toggle.js'] = (() => {
   const module = { exports: {} };
-  const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
   getToggleContainerStyle,
   getOptionStyle,
@@ -1917,7 +2428,26 @@ module.exports = Toggle;
 
 modules['src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'] = (() => {
   const module = { exports: {} };
-  const { spaces } = include('src/libs/gremlint/utils.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { spaces } = include('src/libs/gremlint/utils.js');
 
 const recreateQueryOnelinerFromSyntaxTree = (indentation = 0) => (
   syntaxTree
@@ -1954,7 +2484,26 @@ module.exports = {
 
 modules['src/libs/gremlint/formatSyntaxTree/utils.js'] = (() => {
   const module = { exports: {} };
-  const withIndentation = (indentation) => (config) => ({
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const withIndentation = (indentation) => (config) => ({
   ...config,
   indentation,
 });
@@ -1995,7 +2544,26 @@ module.exports = {
 
 modules['src/libs/gremlint/formatSyntaxTree/formatMethod/FormatMethod.js'] = (() => {
   const module = { exports: {} };
-  const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
 const { recreateQueryOnelinerFromSyntaxTree } = include(
   'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
 );
@@ -2051,7 +2619,26 @@ module.exports = { formatMethod };
 
 modules['src/libs/gremlint/formatSyntaxTree/formatTraversal/getStepGroups/utils.js'] = (() => {
   const module = { exports: {} };
-  const isTraversalSource = (step) => step.type === 'word' && step.word === 'g';
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const isTraversalSource = (step) => step.type === 'word' && step.word === 'g';
 
 const isModulator = (step) =>
   step.type === 'method' &&
@@ -2080,7 +2667,26 @@ module.exports = { isTraversalSource, isModulator };
 
 modules['src/libs/gremlint/formatSyntaxTree/formatTraversal/getStepGroups/GetStepGroups.js'] = (() => {
   const module = { exports: {} };
-  const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
 const { withZeroIndentation, withIncreasedIndentation, withDotInfo } = include(
   'src/libs/gremlint/formatSyntaxTree/utils.js'
 );
@@ -2279,14 +2885,32 @@ module.exports = { getStepGroups };
 
 modules['src/libs/gremlint/formatSyntaxTree/formatTraversal/FormatTraversal.js'] = (() => {
   const module = { exports: {} };
-  const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 const { recreateQueryOnelinerFromSyntaxTree } = include(
   'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
 );
 const { getStepGroups } = include(
   'src/libs/gremlint/formatSyntaxTree/formatTraversal/getStepGroups/GetStepGroups.js'
 );
-const { withDotInfo, withZeroIndentation } = include(
+const { withZeroIndentation } = include(
   'src/libs/gremlint/formatSyntaxTree/utils.js'
 );
 
@@ -2322,7 +2946,26 @@ module.exports = { formatTraversal };
 
 modules['src/libs/gremlint/formatSyntaxTree/FormatSyntaxTree.js'] = (() => {
   const module = { exports: {} };
-  const { formatTraversal } = include(
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { formatTraversal } = include(
   'src/libs/gremlint/formatSyntaxTree/formatTraversal/FormatTraversal.js'
 );
 const { formatMethod } = include(
@@ -2355,7 +2998,26 @@ module.exports = { formatSyntaxTree };
 
 modules['src/libs/gremlint/Gremlint.js'] = (() => {
   const module = { exports: {} };
-  const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
 const { parseToSyntaxTree } = include(
   'src/libs/gremlint/parseToSyntaxTree/ParseToSyntaxTree.js'
 );
@@ -2390,7 +3052,26 @@ module.exports = {
 
 modules['src/store/Store.js'] = (() => {
   const module = { exports: {} };
-  const Observable = include('src/libs/observable/Observable.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const Observable = include('src/libs/observable/Observable.js');
 const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
 
 const atom = (initialValue) => {
@@ -2524,7 +3205,26 @@ module.exports = {
 
 modules['src/views/queryFormatter/advancedOptions/AdvancedOptions.js'] = (() => {
   const module = { exports: {} };
-  const Toggle = include('src/components/toggle/Toggle.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const Toggle = include('src/components/toggle/Toggle.js');
 const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
 const {
   getIndentation,
@@ -2594,7 +3294,26 @@ module.exports = AdvancedOptions;
 
 modules['src/views/queryFormatter/QueryFormatter.js'] = (() => {
   const module = { exports: {} };
-  const QueryInput = include('src/components/queryInput/QueryInput.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const QueryInput = include('src/components/queryInput/QueryInput.js');
 const Code = include('src/components/code/Code.js');
 const TextButton = include('src/components/textButton/TextButton.js');
 const AdvancedOptions = include(
@@ -2651,7 +3370,26 @@ module.exports = QueryFormatter;
 
 modules['src/app/App.js'] = (() => {
   const module = { exports: {} };
-  const Navigator = include('src/components/navigator/Navigator.js');
+  /**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+const Navigator = include('src/components/navigator/Navigator.js');
 const StyleGuide = include('src/views/styleGuide/StyleGuide.js');
 const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
 const LoadingAnimation = include(
@@ -2707,6 +3445,25 @@ module.exports = App;
 })();
 
 window.addEventListener('load', () => {
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 const Observable = include('src/libs/observable/Observable.js');
 const App = include('src/app/App.js');
 const Store = include('src/store/Store.js');

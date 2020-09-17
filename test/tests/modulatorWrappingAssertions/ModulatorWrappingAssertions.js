@@ -1,6 +1,4 @@
-const ByModulatorWrappingAssertions = include(
-  'test/tests/modulatorWrappingAssertions/byModulatorWrappingAssertions/ByModulatorWrappingAssertions.js'
-);
+const ByModulatorWrappingAssertions = require('./byModulatorWrappingAssertions/ByModulatorWrappingAssertions.js');
 
 const ModulatorWrappingAssertions = [...ByModulatorWrappingAssertions];
 

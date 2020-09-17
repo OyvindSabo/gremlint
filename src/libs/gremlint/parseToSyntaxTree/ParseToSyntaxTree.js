@@ -1,4 +1,4 @@
-const { last, pipe } = include('src/libs/simpleFP/SimpleFP.js');
+const { last, pipe } = require('../../../libs/simpleFP/SimpleFP.js');
 
 const tokenizeOnTopLevelPunctuation = (query) => {
   word = '';

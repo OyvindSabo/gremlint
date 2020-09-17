@@ -1,7 +1,6 @@
-const Observable = include('src/libs/observable/Observable.js');
-const App = include('src/app/App.js');
-const Store = include('src/store/Store.js');
-const Router = include('src/router/Router.js');
+const App = require('./app/App.js');
+const Store = require('./store/Store.js');
+const Router = require('./router/Router.js');
 
 const app = App(() => ({}));
 

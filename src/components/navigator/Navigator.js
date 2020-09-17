@@ -1,8 +1,8 @@
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
-const NavigationButton = include(
-  'src/components/navigationButton/NavigationButton.js'
-);
+const { html } = require('../../libs/simpleHTML/SimpleHTML.js');
+const {
+  White,
+} = require('../../libs/simpleColorPalette/SimpleColorPalette.js');
+const NavigationButton = require('../../components/navigationButton/NavigationButton.js');
 
 const getQueryFormatterButtonProps = (getCurrentRoute) => () => ({
   isSelected: getCurrentRoute() === '/',

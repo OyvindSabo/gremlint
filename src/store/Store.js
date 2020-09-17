@@ -1,5 +1,5 @@
-const Observable = include('src/libs/observable/Observable.js');
-const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
+const Observable = require('../libs/observable/Observable.js');
+const { formatQuery } = require('../libs/gremlint/Gremlint.js');
 
 const atom = (initialValue) => {
   const observable$ = new Observable(initialValue);

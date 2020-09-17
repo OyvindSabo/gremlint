@@ -1,10 +1,10 @@
 const { readContentFromFile, writeContentToFile } = require('./fileUtils');
-const { extractImportPaths } = require('./parseUtils');
+const { extractImportPaths, getNewAbsolutePath } = require('./parseUtils');
 const { getOrderedListOfFiles } = require('./sortUtils');
 
 const build = () => {
   let importedFilePaths = {};
-  let importQueue = ['src/index.js'];
+  let importQueue = ['./src/index.js'];
 
   let output = `
 <!DOCTYPE html>
@@ -13,27 +13,36 @@ const build = () => {
 <meta name="google-site-verification" content="8rkkiQkZaBwVUAUBxSY6Nj_EBHqCGPEYnEJmlyXuLnw" />
 <script>
 const modules = {}
-const include = path => modules[path];
+const require = path => modules[path];
 `;
 
   while (importQueue.length) {
-    const path = importQueue.shift();
-    const fileContent = readContentFromFile(path);
-    const paths = extractImportPaths(fileContent);
-    importedFilePaths[path] = {
-      content: fileContent,
-      dependencies: paths,
+    const absolutePath = importQueue.shift();
+    const fileContent = readContentFromFile(absolutePath);
+    const relativePaths = extractImportPaths(fileContent);
+    const absolutePaths = relativePaths.map((relativePath) =>
+      getNewAbsolutePath(absolutePath, relativePath)
+    );
+    const fileContentWithAbsolutePaths = relativePaths.reduce(
+      (currentContent, relativePath, i) => {
+        return currentContent.replace(relativePath, absolutePaths[i]);
+      },
+      fileContent
+    );
+    importedFilePaths[absolutePath] = {
+      content: fileContentWithAbsolutePaths,
+      dependencies: absolutePaths,
     };
-    paths.forEach((path) => {
-      if (!importedFilePaths[path]) {
-        importQueue.push(path);
+    absolutePaths.forEach((absolutePath) => {
+      if (!importedFilePaths[absolutePath]) {
+        importQueue.push(absolutePath);
       }
     });
   }
   const topologicallyOrderedFiles = getOrderedListOfFiles(importedFilePaths);
   topologicallyOrderedFiles.forEach(({ path, content }) => {
     output +=
-      path === 'src/index.js'
+      path === './src/index.js'
         ? `
 window.addEventListener('load', () => {
 ${content}
@@ -50,7 +59,7 @@ modules['${path}'] = (() => {
 
   output += '</script></head><body></body></html>';
 
-  writeContentToFile(output, 'dist/index.html');
+  writeContentToFile(output, './dist/index.html');
 };
 
 module.exports = { build };

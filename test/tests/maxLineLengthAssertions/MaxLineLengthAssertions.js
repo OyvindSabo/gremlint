@@ -1,5 +1,5 @@
-const { assertEquals } = include('test/test.js');
-const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
+const { assertEquals } = require('../../test.js');
+const { formatQuery } = require('../../../src/libs/gremlint/Gremlint.js');
 
 const MaxLineLengthAssertions = [
   // When the maximum line length is equal to the length of the query, no line

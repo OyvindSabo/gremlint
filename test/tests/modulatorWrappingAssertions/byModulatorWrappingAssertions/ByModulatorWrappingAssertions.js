@@ -1,5 +1,5 @@
-const { assertEquals } = include('test/test.js');
-const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
+const { assertEquals } = require('../../../test.js');
+const { formatQuery } = require('../../../../src/libs/gremlint/Gremlint.js');
 
 const ByModulatorWrappingAssertions = [
   // No weapping: All modulators should end up on the same line as the step they

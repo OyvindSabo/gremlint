@@ -1,5 +1,5 @@
-const { assertEquals } = include('test/test.js');
-const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
+const { assertEquals } = require('../../../test.js');
+const { formatQuery } = require('../../../../src/libs/gremlint/Gremlint.js');
 
 const From_ModulatorIndentationAssertions = [
   // If modulators have to be wrapped, they should be indented with two

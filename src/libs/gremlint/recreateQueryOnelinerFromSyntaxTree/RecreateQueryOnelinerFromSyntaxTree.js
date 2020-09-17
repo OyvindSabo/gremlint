@@ -1,4 +1,4 @@
-const { spaces } = include('src/libs/gremlint/utils.js');
+const { spaces } = require('../../../libs/gremlint/utils.js');
 
 const recreateQueryOnelinerFromSyntaxTree = (indentation = 0) => (
   syntaxTree

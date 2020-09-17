@@ -1,11 +1,10 @@
 const fs = require('fs');
 
-const readContentFromFile = filePath =>
-  fs.readFileSync(`./${filePath}`, 'utf8');
+const readContentFromFile = (filePath) => fs.readFileSync(filePath, 'utf8');
 
 const writeContentToFile = (content, filename) => {
   // create folder path if not exists
-  `./${filename}`
+  filename
     .split('/')
     .slice(0, -1)
     .reduce((last, folder) => {

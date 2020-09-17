@@ -1,7 +1,8 @@
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { getInlineContainerStyle, getLinkStyle } = include(
-  'src/libs/simpleStyle/SimpleStyle.js'
-);
+const { html } = require('../../libs/simpleHTML/SimpleHTML.js');
+const {
+  getInlineContainerStyle,
+  getLinkStyle,
+} = require('../../libs/simpleStyle/SimpleStyle.js');
 
 const NavigationButton = (getProps) => {
   const getIsSelected = () => getProps().isSelected;

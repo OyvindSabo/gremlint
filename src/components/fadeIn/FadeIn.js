@@ -1,4 +1,4 @@
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = require('../../libs/simpleHTML/SimpleHTML.js');
 
 const FadeIn = (getProps, children) => {
   let opacity = 0;

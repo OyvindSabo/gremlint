@@ -1,3 +1,3 @@
-const { run } = require('../run/run.js');
+const doRunTests = require('./tests/Tests.js');
 
-run('test/tests/Tests.js');
+doRunTests();

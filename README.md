@@ -33,12 +33,6 @@ The compiled HTML file will end up in `dist/index.html`.
 $ node watch
 ```
 
-### Run an individual file
-
-```
-$ node run src/someFile.js
-```
-
 ### Run tests
 
 ```

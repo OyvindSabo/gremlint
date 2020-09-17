@@ -1,4 +1,4 @@
-const SimpleRouter = include('src/libs/simpleRouter/SimpleRouter.js');
+const SimpleRouter = require('../libs/simpleRouter/SimpleRouter.js');
 
 const router = new SimpleRouter({
   '/': 'Gremlint - Query formatter',

@@ -1,7 +1,7 @@
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { InputTextColor } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
+const { html } = require('../../libs/simpleHTML/SimpleHTML.js');
+const {
+  InputTextColor,
+} = require('../../libs/simpleColorPalette/SimpleColorPalette.js');
 
 const getQueryInputStyle = () => `
   height: calc(100vh / 4);

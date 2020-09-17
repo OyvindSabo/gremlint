@@ -1,7 +1,7 @@
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { TextColor } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
+const { html } = require('../../libs/simpleHTML/SimpleHTML.js');
+const {
+  TextColor,
+} = require('../../libs/simpleColorPalette/SimpleColorPalette.js');
 
 const Paragraph = (getProps) => {
   const getInnerText = () => getProps().innerText;

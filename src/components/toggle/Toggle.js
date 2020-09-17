@@ -1,9 +1,9 @@
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+const { html } = require('../../libs/simpleHTML/SimpleHTML.js');
 const {
   getToggleContainerStyle,
   getOptionStyle,
   getSelectedOptionStyle,
-} = include('src/components/toggle/styles.js');
+} = require('../../components/toggle/styles.js');
 
 const Toggle = (getProps) => {
   const getWidth = () => getProps().width || '320px';

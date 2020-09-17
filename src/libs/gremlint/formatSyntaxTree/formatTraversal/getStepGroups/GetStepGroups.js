@@ -1,13 +1,13 @@
-const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
-const { withZeroIndentation, withIncreasedIndentation, withDotInfo } = include(
-  'src/libs/gremlint/formatSyntaxTree/utils.js'
-);
-const { isTraversalSource, isModulator } = include(
-  'src/libs/gremlint/formatSyntaxTree/formatTraversal/getStepGroups/utils.js'
-);
-const { recreateQueryOnelinerFromSyntaxTree } = include(
-  'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
-);
+const { pipe } = require('../../../../simpleFP/SimpleFP.js');
+const {
+  withZeroIndentation,
+  withIncreasedIndentation,
+  withDotInfo,
+} = require('../../utils.js');
+const { isTraversalSource, isModulator } = require('./utils.js');
+const {
+  recreateQueryOnelinerFromSyntaxTree,
+} = require('../../../recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js');
 
 const getStepGroups = (formatSyntaxTree, steps, config) => {
   const { stepGroups } = steps.reduce(

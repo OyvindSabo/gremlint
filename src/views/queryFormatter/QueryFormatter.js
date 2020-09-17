@@ -1,10 +1,8 @@
-const QueryInput = include('src/components/queryInput/QueryInput.js');
-const Code = include('src/components/code/Code.js');
-const TextButton = include('src/components/textButton/TextButton.js');
-const AdvancedOptions = include(
-  'src/views/queryFormatter/advancedOptions/AdvancedOptions.js'
-);
-const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
+const QueryInput = require('../../components/queryInput/QueryInput.js');
+const Code = require('../../components/code/Code.js');
+const TextButton = require('../../components/textButton/TextButton.js');
+const AdvancedOptions = require('../../views/queryFormatter/advancedOptions/AdvancedOptions.js');
+const { html, If } = require('../../libs/simpleHTML/SimpleHTML.js');
 const {
   getQueryInput,
   setQueryInput,
@@ -12,7 +10,7 @@ const {
   getShowAdvancedOptions,
   setShowAdvancedOptions,
   getMaxLineLength,
-} = include('src/store/Store.js');
+} = require('../../store/Store.js');
 
 const QueryFormatter = () => {
   const element = html('div', {}, [

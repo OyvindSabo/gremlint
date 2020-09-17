@@ -1,62 +1,53 @@
-const { runTests, test, assertEquals } = include('test/test.js');
-const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
-const MaxLineLengthAssertions = include(
-  'test/tests/maxLineLengthAssertions/MaxLineLengthAssertions.js'
-);
-const ModulatorIndentationAssertions = include(
-  'test/tests/modulatorIndentationAssertions/ModulatorIndentationAssertions.js'
-);
-const ModulatorWrappingAssertions = include(
-  'test/tests/modulatorWrappingAssertions/ModulatorWrappingAssertions.js'
-);
-const DotsAfterNewlinesAssertions = include(
-  'test/tests/dotsAfterNewlinesAssertions/DotsAfterNewlinesAssertions.js'
-);
-const NonMethodIndentationAssertions = include(
-  'test/tests/nonMethodIndentationAssertions/NonMethodIndentationAssertions.js'
-);
+const { runTests, test, assertEquals } = require('../test.js');
+const { formatQuery } = require('../../src/libs/gremlint/Gremlint.js');
+const MaxLineLengthAssertions = require('./maxLineLengthAssertions/MaxLineLengthAssertions.js');
+const ModulatorIndentationAssertions = require('./modulatorIndentationAssertions/ModulatorIndentationAssertions.js');
+const ModulatorWrappingAssertions = require('./modulatorWrappingAssertions/ModulatorWrappingAssertions.js');
+const DotsAfterNewlinesAssertions = require('./dotsAfterNewlinesAssertions/DotsAfterNewlinesAssertions.js');
+const NonMethodIndentationAssertions = require('./nonMethodIndentationAssertions/NonMethodIndentationAssertions.js');
 
-runTests(
-  test(
-    'No line in the query should exceed the maximum line length',
-    ...MaxLineLengthAssertions
-  ),
+const doRunTests = () => {
+  runTests(
+    test(
+      'No line in the query should exceed the maximum line length',
+      ...MaxLineLengthAssertions
+    ),
 
-  test(
-    'Wrapped modulators should be indented with two spaces',
-    ...ModulatorIndentationAssertions
-  ),
+    test(
+      'Wrapped modulators should be indented with two spaces',
+      ...ModulatorIndentationAssertions
+    ),
 
-  test(
-    "Modulators should not be line-wrapped if they can fit on the line of the step they're modulating",
-    ...ModulatorWrappingAssertions
-  ),
+    test(
+      "Modulators should not be line-wrapped if they can fit on the line of the step they're modulating",
+      ...ModulatorWrappingAssertions
+    ),
 
-  test(
-    'If dots are configured to be placed after newlines, make sure they are correctly placed, and not missing, nor duplicated',
-    ...DotsAfterNewlinesAssertions
-  ),
+    test(
+      'If dots are configured to be placed after newlines, make sure they are correctly placed, and not missing, nor duplicated',
+      ...DotsAfterNewlinesAssertions
+    ),
 
-  test(
-    'Non-methods in a traversal should be indented correctly, even if this might never occur in a valid query',
-    ...NonMethodIndentationAssertions
-  ),
+    test(
+      'Non-methods in a traversal should be indented correctly, even if this might never occur in a valid query',
+      ...NonMethodIndentationAssertions
+    ),
 
-  test(
-    'Add linebreak after punctuation, not before',
-    assertEquals(
-      `g.V().
+    test(
+      'Add linebreak after punctuation, not before',
+      assertEquals(
+        `g.V().
   has('name', 'marko').
   out('knows').
   has('age', gt(29)).
   values('name')`,
-      formatQuery(
-        "g.V().has('name', 'marko').out('knows').has('age', gt(29)).values('name')",
-        { indentation: 0, maxLineLength: 70 }
-      )
-    ),
-    assertEquals(
-      `g.V().
+        formatQuery(
+          "g.V().has('name', 'marko').out('knows').has('age', gt(29)).values('name')",
+          { indentation: 0, maxLineLength: 70 }
+        )
+      ),
+      assertEquals(
+        `g.V().
   hasLabel('person').
   group().
     by(values('name', 'age').fold()).
@@ -65,10 +56,13 @@ runTests(
     select(values).
     count(local).
     is(gt(1)))`,
-      formatQuery(
-        "g.V().hasLabel('person').group().by(values('name', 'age').fold()).unfold().filter(select(values).count(local).is(gt(1)))",
-        { indentation: 0, maxLineLength: 40 }
+        formatQuery(
+          "g.V().hasLabel('person').group().by(values('name', 'age').fold()).unfold().filter(select(values).count(local).is(gt(1)))",
+          { indentation: 0, maxLineLength: 40 }
+        )
       )
     )
-  )
-);
+  );
+};
+
+module.exports = doRunTests;

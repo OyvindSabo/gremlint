@@ -1,5 +1,5 @@
-const Toggle = include('src/components/toggle/Toggle.js');
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
+const Toggle = require('../../../components/toggle/Toggle.js');
+const { html } = require('../../../libs/simpleHTML/SimpleHTML.js');
 const {
   getIndentation,
   setIndentation,
@@ -7,11 +7,13 @@ const {
   setMaxLineLength,
   getShouldPlaceDotsAfterLineBreaks,
   setShouldPlaceDotsAfterLineBreaks,
-} = include('src/store/Store.js');
+} = require('../../../store/Store.js');
 
-const { getInlineContainerStyle, getInputStyle, getTextStyle } = include(
-  'src/libs/simpleStyle/SimpleStyle.js'
-);
+const {
+  getInlineContainerStyle,
+  getInputStyle,
+  getTextStyle,
+} = require('../../../libs/simpleStyle/SimpleStyle.js');
 
 const AdvancedOptions = () => {
   const element = html('div', {}, [

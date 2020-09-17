@@ -1,5 +1,7 @@
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { White } = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
+const { html } = require('../../libs/simpleHTML/SimpleHTML.js');
+const {
+  White,
+} = require('../../libs/simpleColorPalette/SimpleColorPalette.js');
 
 const LoadingAnimation = (getProps) => {
   let loadingCompletion = 0;

@@ -1,5 +1,5 @@
-const { assertEquals } = include('test/test.js');
-const { formatQuery } = include('src/libs/gremlint/Gremlint.js');
+const { assertEquals } = require('../../test.js');
+const { formatQuery } = require('../../../src/libs/gremlint/Gremlint.js');
 
 const NonMethodIndentationAssertions = [
   // Check that non-methods which are neither the first nor the last step in a

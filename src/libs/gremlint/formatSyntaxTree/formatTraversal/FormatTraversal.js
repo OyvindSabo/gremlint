@@ -1,13 +1,8 @@
-const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
-const { recreateQueryOnelinerFromSyntaxTree } = include(
-  'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
-);
-const { getStepGroups } = include(
-  'src/libs/gremlint/formatSyntaxTree/formatTraversal/getStepGroups/GetStepGroups.js'
-);
-const { withDotInfo, withZeroIndentation } = include(
-  'src/libs/gremlint/formatSyntaxTree/utils.js'
-);
+const {
+  recreateQueryOnelinerFromSyntaxTree,
+} = require('../../recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js');
+const { getStepGroups } = require('./getStepGroups/GetStepGroups.js');
+const { withZeroIndentation } = require('../utils.js');
 
 // Groups steps into step groups and adds an indentation property
 const formatTraversal = (formatSyntaxTree) => (config) => (syntaxTree) => {

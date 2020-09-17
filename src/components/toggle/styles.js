@@ -1,6 +1,9 @@
-const { BorderColor, HighlightedTextColor, TextColor, White } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
+const {
+  BorderColor,
+  HighlightedTextColor,
+  TextColor,
+  White,
+} = require('../../libs/simpleColorPalette/SimpleColorPalette.js');
 
 const getToggleContainerStyle = (width, height) => `
   display: inline-block;

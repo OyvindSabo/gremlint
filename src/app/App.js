@@ -1,12 +1,10 @@
-const Navigator = include('src/components/navigator/Navigator.js');
-const StyleGuide = include('src/views/styleGuide/StyleGuide.js');
-const QueryFormatter = include('src/views/queryFormatter/QueryFormatter.js');
-const LoadingAnimation = include(
-  'src/components/loadingAnimation/LoadingAnimation.js'
-);
-const FadeIn = include('src/components/fadeIn/FadeIn.js');
-const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { getCurrentRoute } = include('src/router/Router.js');
+const Navigator = require('../components/navigator/Navigator.js');
+const StyleGuide = require('../views/styleGuide/StyleGuide.js');
+const QueryFormatter = require('../views/queryFormatter/QueryFormatter.js');
+const LoadingAnimation = require('../components/loadingAnimation/LoadingAnimation.js');
+const FadeIn = require('../components/fadeIn/FadeIn.js');
+const { html, If } = require('../libs/simpleHTML/SimpleHTML.js');
+const { getCurrentRoute } = require('../router/Router.js');
 
 const App = () => {
   let loadingComplete = false;

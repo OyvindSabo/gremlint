@@ -1,13 +1,13 @@
-const { pipe } = include('src/libs/simpleFP/SimpleFP.js');
-const { recreateQueryOnelinerFromSyntaxTree } = include(
-  'src/libs/gremlint/recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js'
-);
+const { pipe } = require('../../../simpleFP/SimpleFP.js');
+const {
+  recreateQueryOnelinerFromSyntaxTree,
+} = require('../../recreateQueryOnelinerFromSyntaxTree/RecreateQueryOnelinerFromSyntaxTree.js');
 const {
   withIncreasedIndentation,
   withZeroIndentation,
   withZeroDotInfo,
   withNoEndDotInfo,
-} = include('src/libs/gremlint/formatSyntaxTree/utils.js');
+} = require('../utils.js');
 
 // Groups arguments into argument groups an adds an indentation property
 const formatMethod = (formatSyntaxTree) => (config) => (syntaxTree) => {

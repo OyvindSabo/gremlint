@@ -2,10 +2,8 @@ const {
   TextColor,
   InputTextColor,
   HighlightedTextColor,
-  DisabledTextColor,
   HighlightColor,
-  White,
-} = include('src/libs/simpleColorPalette/SimpleColorPalette.js');
+} = require('../../libs/simpleColorPalette/SimpleColorPalette.js');
 
 // A unit is 20px
 // vertical-align: bottom prevents half a pixel from getting added to the height

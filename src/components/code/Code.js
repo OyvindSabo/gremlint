@@ -1,7 +1,8 @@
-const { html, If } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { DisabledTextColor, TextColor } = include(
-  'src/libs/simpleColorPalette/SimpleColorPalette.js'
-);
+const { html, If } = require('../../libs/simpleHTML/SimpleHTML.js');
+const {
+  DisabledTextColor,
+  TextColor,
+} = require('../../libs/simpleColorPalette/SimpleColorPalette.js');
 
 const getCodeStyle = () => `
   border-radius: 5px;

@@ -1,15 +1,15 @@
-const { formatTraversal } = include(
-  'src/libs/gremlint/formatSyntaxTree/formatTraversal/FormatTraversal.js'
-);
-const { formatMethod } = include(
-  'src/libs/gremlint/formatSyntaxTree/formatMethod/FormatMethod.js'
-);
-const { formatString } = include(
-  'src/libs/gremlint/formatSyntaxTree/formatString/FormatString.js'
-);
-const { formatWord } = include(
-  'src/libs/gremlint/formatSyntaxTree/formatWord/FormatWord.js'
-);
+const {
+  formatTraversal,
+} = require('../../../libs/gremlint/formatSyntaxTree/formatTraversal/FormatTraversal.js');
+const {
+  formatMethod,
+} = require('../../../libs/gremlint/formatSyntaxTree/formatMethod/FormatMethod.js');
+const {
+  formatString,
+} = require('../../../libs/gremlint/formatSyntaxTree/formatString/FormatString.js');
+const {
+  formatWord,
+} = require('../../../libs/gremlint/formatSyntaxTree/formatWord/FormatWord.js');
 
 const formatSyntaxTree = (config) => (syntaxTree) => {
   switch (syntaxTree.type) {

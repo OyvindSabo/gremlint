@@ -1,5 +1,5 @@
-const { html } = include('src/libs/simpleHTML/SimpleHTML.js');
-const { getTextButtonStyle } = include('src/libs/simpleStyle/SimpleStyle.js');
+const { html } = require('../../libs/simpleHTML/SimpleHTML.js');
+const { getTextButtonStyle } = require('../../libs/simpleStyle/SimpleStyle.js');
 
 const TextButton = (getProps) => {
   const getHref = () => getProps().href;

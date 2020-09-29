@@ -13,7 +13,11 @@ const EmitModulatorIndentationAssertions = [
   path()`,
     formatQuery(
       "g.V(1).repeat(bothE('created').dedup().otherV()).emit().path()",
-      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 45,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
   assertEquals(
@@ -25,7 +29,7 @@ const EmitModulatorIndentationAssertions = [
     formatQuery('g.V().repeat(both()).times(1000000).emit().range(6,10)', {
       indentation: 0,
       maxLineLength: 35,
-      shouldPlaceDotsAfterNewlines: false,
+      shouldPlaceDotsAfterLineBreaks: false,
     })
   ),
   assertEquals(
@@ -37,7 +41,7 @@ const EmitModulatorIndentationAssertions = [
     formatQuery("g.V(1).repeat(out()).times(2).emit().path().by('name')", {
       indentation: 0,
       maxLineLength: 30,
-      shouldPlaceDotsAfterNewlines: false,
+      shouldPlaceDotsAfterLineBreaks: false,
     })
   ),
 
@@ -51,7 +55,11 @@ const EmitModulatorIndentationAssertions = [
   math('sin _')`,
     formatQuery(
       "g.withSack(1).V(1).repeat(sack(sum).by(constant(1))).times(10).emit().sack().math('sin _')",
-      { indentation: 0, maxLineLength: 40, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 40,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
 ];

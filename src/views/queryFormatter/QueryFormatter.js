@@ -3,47 +3,45 @@ const Code = require('../../components/code/Code.js');
 const TextButton = require('../../components/textButton/TextButton.js');
 const AdvancedOptions = require('../../views/queryFormatter/advancedOptions/AdvancedOptions.js');
 const { html, If } = require('../../libs/simpleHTML/SimpleHTML.js');
+const { dispatch } = require('../../libs/simpleStore/SimpleStore.js');
+const store = require('../../app/store/Store.js');
 const {
-  getQueryInput,
-  setQueryInput,
-  getQueryOutput,
-  getShowAdvancedOptions,
-  setShowAdvancedOptions,
-  getMaxLineLength,
-} = require('../../store/Store.js');
+  SET_QUERY_INPUT,
+  TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS,
+} = require('../../app/store/actions.js');
 
-const QueryFormatter = () => {
+const QueryFormatter = store.provider((getState) => () => {
   const element = html('div', {}, [
     QueryInput(() => ({
-      value: getQueryInput(),
-      oninput: ({ target }) => setQueryInput(target.value),
+      value: getState().queryInput,
+      oninput: ({ target }) => dispatch(SET_QUERY_INPUT, target.value),
     })),
     TextButton(() => ({
-      label: getShowAdvancedOptions()
+      label: getState().shouldShowAdvancedOptions
         ? 'Hide advanced options'
         : 'Show advanced options',
-      onclick: () => setShowAdvancedOptions(!getShowAdvancedOptions()),
+      onclick: () => dispatch(TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS),
     })),
     html(
       'div',
       () => ({
         style: `max-height: ${
-          getShowAdvancedOptions() ? '240px' : '0'
+          getState().shouldShowAdvancedOptions ? '240px' : '0'
         }; box-shadow: inset white 0 0 10px 0; overflow: hidden; transition: 0.5s;`,
       }),
       [AdvancedOptions()]
     ),
     If(
-      () => getQueryOutput(),
+      () => getState().queryOutput,
       () => [
         Code(() => ({
-          innerText: getQueryOutput(),
-          maxLineLength: getMaxLineLength(),
+          innerText: getState().queryOutput,
+          maxLineLength: getState().maxLineLength,
         })),
       ]
     ),
   ]);
   return element;
-};
+});
 
 module.exports = QueryFormatter;

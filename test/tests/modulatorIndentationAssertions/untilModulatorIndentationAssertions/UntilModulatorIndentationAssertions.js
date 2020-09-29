@@ -16,7 +16,11 @@ const UntilModulatorIndentationAssertions = [
   dedup()`,
     formatQuery(
       "g.V(6).repeat('a', both('created').simplePath()).emit(repeat('b', both('knows')).until(loops('b').as('b').where(loops('a').as('b'))).hasId(2)).dedup()",
-      { indentation: 0, maxLineLength: 40, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 40,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
 ];

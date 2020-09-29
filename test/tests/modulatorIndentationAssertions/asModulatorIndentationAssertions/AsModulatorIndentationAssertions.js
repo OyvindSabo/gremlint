@@ -15,7 +15,11 @@ const AsModulatorIndentationAssertions = [
   addE('uses').from('person')`,
     formatQuery(
       "g.V().has('name', within('marko', 'vadas', 'josh')).as('person').V().has('name', within('lop', 'ripple')).addE('uses').from('person')",
-      { indentation: 0, maxLineLength: 50, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 50,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
 ];

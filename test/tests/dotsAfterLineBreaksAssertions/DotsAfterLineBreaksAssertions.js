@@ -1,7 +1,7 @@
 const { assertEquals } = require('../../test.js');
 const { formatQuery } = require('../../../src/libs/gremlint/Gremlint.js');
 
-const DotsAfterNewlinesAssertions = [
+const DotsAfterLineBreaksAssertions = [
   assertEquals(
     `g.V().
   hasLabel('person').
@@ -14,7 +14,11 @@ const DotsAfterNewlinesAssertions = [
     is(gt(1)))`,
     formatQuery(
       "g.V().hasLabel('person').group().by(values('name', 'age').fold()).unfold().filter(select(values).count(local).is(gt(1)))",
-      { indentation: 0, maxLineLength: 40, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 40,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
   assertEquals(
@@ -30,9 +34,13 @@ const DotsAfterNewlinesAssertions = [
     .is(gt(1)))`,
     formatQuery(
       "g.V().hasLabel('person').group().by(values('name', 'age').fold()).unfold().filter(select(values).count(local).is(gt(1)))",
-      { indentation: 0, maxLineLength: 35, shouldPlaceDotsAfterNewlines: true }
+      {
+        indentation: 0,
+        maxLineLength: 35,
+        shouldPlaceDotsAfterLineBreaks: true,
+      }
     )
   ),
 ];
 
-module.exports = DotsAfterNewlinesAssertions;
+module.exports = DotsAfterLineBreaksAssertions;

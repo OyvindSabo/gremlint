@@ -12,7 +12,7 @@ const formatQuery = (
   config = {
     indentation: 0,
     maxLineLength: 80,
-    shouldPlaceDotsAfterNewlines: false,
+    shouldPlaceDotsAfterLineBreaks: false,
   }
 ) => {
   return pipe(
@@ -22,6 +22,4 @@ const formatQuery = (
   )(query);
 };
 
-module.exports = {
-  formatQuery,
-};
+module.exports = { formatQuery };

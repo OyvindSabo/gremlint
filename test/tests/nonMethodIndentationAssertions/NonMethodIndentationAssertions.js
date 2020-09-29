@@ -10,7 +10,7 @@ const NonMethodIndentationAssertions = [
     formatQuery('g.V().stepWhichIsNotAMethod.stepWhichIsAMethod()', {
       indentation: 0,
       maxLineLength: 45,
-      shouldPlaceDotsAfterNewlines: false,
+      shouldPlaceDotsAfterLinebreaks: false,
     })
   ),
   // Check that non-methods which are the last step in a traversal and are at
@@ -21,7 +21,7 @@ const NonMethodIndentationAssertions = [
     formatQuery('g.V().stepWhichIsNotAMethod', {
       indentation: 0,
       maxLineLength: 25,
-      shouldPlaceDotsAfterNewlines: false,
+      shouldPlaceDotsAfterLineBreaks: false,
     })
   ),
 ];

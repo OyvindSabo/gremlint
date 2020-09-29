@@ -15,7 +15,7 @@ const TimesModulatorIndentationAssertions = [
     formatQuery("g.V().repeat(both()).times(3).values('age').max()", {
       indentation: 0,
       maxLineLength: 20,
-      shouldPlaceDotsAfterNewlines: false,
+      shouldPlaceDotsAfterLineBreaks: false,
     })
   ),
 ];

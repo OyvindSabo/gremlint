@@ -251,40 +251,6 @@ module.exports = FadeIn;
   return module.exports;
 })();
 
-modules['src/libs/observable/Observable.js'] = (() => {
-  const module = { exports: {} };
-  class Observable {
-  constructor(value) {
-    // Maybe this can cause an id collision of two observables created almost at the same time
-    this._id = `${Math.random()}${+new Date()}`;
-    this._value = value;
-  }
-  emit() {
-    window.dispatchEvent(
-      new CustomEvent(this._id, {
-        detail: this._value,
-      })
-    );
-  }
-  get id() {
-    return this._id;
-  }
-  get value() {
-    return this._value;
-  }
-  set value(value) {
-    // Maybe this should do a deep compare in case value is an object?
-    if (value === this._value) return;
-    this._value = value;
-    this.emit();
-  }
-}
-
-module.exports = Observable;
-
-  return module.exports;
-})();
-
 modules['src/libs/simpleRouter/SimpleRouter.js'] = (() => {
   const module = { exports: {} };
   function SimpleRouter(routes) {
@@ -1089,269 +1055,78 @@ module.exports = Code;
   return module.exports;
 })();
 
-modules['src/libs/simpleFP/SimpleFP.js'] = (() => {
+modules['src/libs/simpleStore/SimpleStore.js'] = (() => {
   const module = { exports: {} };
-  const last = (array) => array.slice(-1)[0];
+  const createReducedState = ({ initialState, reducers, routines }) => {
+  let state = initialState;
+  let subscribedElements = [];
+  let changeListeners = [];
 
-const pipe = (...fns) => (value) => fns.reduce((value, fn) => fn(value), value);
+  Object.entries(reducers).forEach(([action, reducer]) => {
+    window.addEventListener(action, (event) => {
+      const nextState = reducer(state, event.detail);
+      state = nextState;
+      subscribedElements.forEach((subscriber) => subscriber.update());
+      changeListeners.forEach((changeListener) => changeListener(state));
+    });
+  });
 
-module.exports = { last, pipe };
+  Object.entries(routines).forEach(([action, routine]) => {
+    window.addEventListener(action, (event) => {
+      routine(state, event.detail);
+    });
+  });
+
+  const getState = () => state;
+
+  const provider = (getComponent) => {
+    const providedComponent = (...props) => {
+      const htmlElement = getComponent(getState)(...props);
+      subscribedElements = [...subscribedElements, htmlElement];
+      return htmlElement;
+    };
+    return providedComponent;
+  };
+
+  const addChangeListener = (changeListener) => {
+    changeListeners = [...changeListeners, changeListener];
+  };
+
+  return { provider, getState, addChangeListener };
+};
+
+const dispatch = (action, payload) => {
+  window.dispatchEvent(new CustomEvent(action, { detail: payload }));
+};
+
+module.exports = { createReducedState, dispatch };
 
   return module.exports;
 })();
 
-modules['src/libs/gremlint/parseToSyntaxTree/ParseToSyntaxTree.js'] = (() => {
+modules['src/app/store/actions.js'] = (() => {
   const module = { exports: {} };
-  const { last, pipe } = require('src/libs/simpleFP/SimpleFP.js');
+  const SET_QUERY_INPUT = 'SET_QUERY_INPUT';
 
-const tokenizeOnTopLevelPunctuation = (query) => {
-  word = '';
-  parenthesesCount = 0;
-  squareBracketCount = 0;
-  curlyBracketCount = 0;
-  isInsideSingleQuoteString = false;
-  query.split('').forEach((char) => {
-    if (char === '(' && !isInsideSingleQuoteString) {
-      parenthesesCount++;
-      word += '(';
-      return;
-    }
-    if (char === '[' && !isInsideSingleQuoteString) {
-      squareBracketCount++;
-      word += '[';
-      return;
-    }
-    if (char === '{' && !isInsideSingleQuoteString) {
-      curlyBracketCount++;
-      word += '{';
-      return;
-    }
-    if (char === ')' && !isInsideSingleQuoteString) {
-      parenthesesCount--;
-      word += ')';
-      return;
-    }
-    if (char === ']' && !isInsideSingleQuoteString) {
-      squareBracketCount--;
-      word += ']';
-      return;
-    }
-    if (char === '}' && !isInsideSingleQuoteString) {
-      curlyBracketCount--;
-      word += '}';
-      return;
-    }
-    if (char === "'") {
-      isInsideString = !isInsideSingleQuoteString;
-      word += "'";
-      return;
-    }
-    if (char === '.') {
-      word +=
-        isInsideSingleQuoteString ||
-        parenthesesCount ||
-        squareBracketCount ||
-        curlyBracketCount
-          ? '.'
-          : String.fromCharCode(28);
-      return;
-    }
-    word += char;
-  });
-  return word
-    .split(String.fromCharCode(28))
-    .filter((token) => token !== '')
-    .map((token) => token.trim());
-};
+const FORMAT_QUERY = 'FORMAT_QUERY';
 
-const tokenizeOnTopLevelComma = (query) => {
-  word = '';
-  parenthesesCount = 0;
-  squareBracketCount = 0;
-  curlyBracketCount = 0;
-  isInsideSingleQuoteString = false;
-  query.split('').forEach((char) => {
-    if (char === '(' && !isInsideSingleQuoteString) {
-      parenthesesCount++;
-      word += '(';
-      return;
-    }
-    if (char === '[' && !isInsideSingleQuoteString) {
-      squareBracketCount++;
-      word += '[';
-      return;
-    }
-    if (char === '{' && !isInsideSingleQuoteString) {
-      curlyBracketCount++;
-      word += '{';
-      return;
-    }
-    if (char === ')' && !isInsideSingleQuoteString) {
-      parenthesesCount--;
-      word += ')';
-      return;
-    }
-    if (char === ']' && !isInsideSingleQuoteString) {
-      squareBracketCount--;
-      word += ']';
-      return;
-    }
-    if (char === '}' && !isInsideSingleQuoteString) {
-      curlyBracketCount--;
-      word += '}';
-      return;
-    }
-    if (char === "'") {
-      isInsideString = !isInsideSingleQuoteString;
-      word += "'";
-      return;
-    }
-    if (char === ',') {
-      word +=
-        isInsideSingleQuoteString ||
-        parenthesesCount ||
-        squareBracketCount ||
-        curlyBracketCount
-          ? ','
-          : String.fromCharCode(28);
-      return;
-    }
-    word += char;
-  });
-  return word
-    .split(String.fromCharCode(28))
-    .filter((token) => token !== '')
-    .map((token) => token.trim());
-};
+const TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS =
+  'TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS';
 
-const tokenizeOnTopLevelParentheses = (query) => {
-  word = '';
-  parenthesesCount = 0;
-  squareBracketCount = 0;
-  curlyBracketCount = 0;
-  isInsideSingleQuoteString = false;
-  query.split('').forEach((char) => {
-    if (char === '(' && !isInsideSingleQuoteString) {
-      if (parenthesesCount === 0) {
-        word += String.fromCharCode(28);
-      }
-      parenthesesCount++;
-      word += '(';
-      return;
-    }
-    if (char === '[' && !isInsideSingleQuoteString) {
-      squareBracketCount++;
-      word += '[';
-      return;
-    }
-    if (char === '{' && !isInsideSingleQuoteString) {
-      curlyBracketCount++;
-      word += '{';
-      return;
-    }
-    if (char === ')' && !isInsideSingleQuoteString) {
-      parenthesesCount--;
-      word += ')';
-      return;
-    }
-    if (char === ']' && !isInsideSingleQuoteString) {
-      squareBracketCount--;
-      word += ']';
-      return;
-    }
-    if (char === '}' && !isInsideSingleQuoteString) {
-      curlyBracketCount--;
-      word += '}';
-      return;
-    }
-    if (char === "'") {
-      isInsideString = !isInsideSingleQuoteString;
-      word += "'";
-      return;
-    }
-    word += char;
-  });
-  return word
-    .split(String.fromCharCode(28))
-    .filter((token) => token !== '')
-    .map((token) => token.trim());
-};
+const SET_INDENTATION = 'SET_INDENTATION';
 
-const isWrappedInParentheses = (token) => {
-  if (token.length < 2) return false;
-  if (token.charAt(0) !== '(') return false;
-  if (token.slice(-1) !== ')') return false;
-  return true;
-};
+const SET_MAX_LINE_LENGTH = 'SET_MAX_LINE_LENGTH';
 
-const isString = (token) => {
-  if (token.length < 2) return false;
-  if (token.charAt(0) !== token.substr(-1)) return false;
-  if (['"', "'"].includes(token.charAt(0))) return true;
-  return false;
-};
-
-const isMethodInvocation = (token) => {
-  return pipe(
-    tokenizeOnTopLevelParentheses,
-    last,
-    isWrappedInParentheses
-  )(token);
-};
-
-const trimParentheses = (expression) => expression.slice(1, -1);
-
-const getMethodTokenAndArgumentTokensFromMethodInvocation = (token) => {
-  // The word before the first parenthesis is the method name
-  // The token may be a double application of a curried function, so we cannot
-  // assume that the first opening parenthesis is closed by the last closing
-  // parenthesis
-  const tokens = tokenizeOnTopLevelParentheses(token);
-  return {
-    methodToken: tokens.slice(0, -1).join(''),
-    argumentTokens: pipe(
-      trimParentheses,
-      tokenizeOnTopLevelComma
-    )(tokens.slice(-1)[0]),
-  };
-};
-
-const tokenize = pipe(tokenizeOnTopLevelPunctuation);
-
-const parseToSyntaxTree = (query) => {
-  const tokens = tokenizeOnTopLevelPunctuation(query);
-  if (tokens.length === 1) {
-    const token = tokens[0];
-    if (isMethodInvocation(token)) {
-      const {
-        methodToken,
-        argumentTokens,
-      } = getMethodTokenAndArgumentTokensFromMethodInvocation(token);
-      return {
-        type: 'method',
-        method: parseToSyntaxTree(methodToken),
-        arguments: argumentTokens.map(parseToSyntaxTree),
-      };
-    }
-    if (isString(token)) {
-      return {
-        type: 'string',
-        string: token,
-      };
-    }
-    return {
-      type: 'word',
-      word: token,
-    };
-  }
-  return {
-    type: 'traversal',
-    steps: tokens.map(parseToSyntaxTree),
-  };
-};
+const SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS =
+  'SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS';
 
 module.exports = {
-  parseToSyntaxTree,
+  SET_QUERY_INPUT,
+  FORMAT_QUERY,
+  TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS,
+  SET_INDENTATION,
+  SET_MAX_LINE_LENGTH,
+  SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS,
 };
 
   return module.exports;
@@ -1706,94 +1481,46 @@ module.exports = StyleGuide;
   return module.exports;
 })();
 
-modules['src/libs/gremlint/formatSyntaxTree/formatString/FormatString.js'] = (() => {
+modules['src/app/store/initialState.js'] = (() => {
   const module = { exports: {} };
-  const formatString = (config) => (syntaxTree) => {
-  return {
-    type: 'string',
-    string: syntaxTree.string,
-    indentation: config.indentation,
-  };
+  const initialState = {
+  queryInput: '',
+  queryOutput: '',
+  shouldShowAdvancedOptions: false,
+  indentation: 0,
+  maxLineLength: 72,
+  shouldPlaceDotsAfterLineBreaks: false,
 };
 
-module.exports = { formatString };
+module.exports = initialState;
 
   return module.exports;
 })();
 
-modules['src/libs/gremlint/formatSyntaxTree/formatWord/FormatWord.js'] = (() => {
+modules['src/app/store/routines.js'] = (() => {
   const module = { exports: {} };
-  const formatWord = (config) => (syntaxTree) => {
-  return {
-    type: 'word',
-    word: syntaxTree.word,
-    indentation: config.indentation,
-    shouldStartWithDot: config.shouldStartWithDot,
-    shouldEndWithDot: config.shouldEndWithDot,
-  };
+  const { dispatch } = require('src/libs/simpleStore/SimpleStore.js');
+const {
+  SET_QUERY_INPUT,
+  FORMAT_QUERY,
+  SET_INDENTATION,
+  SET_MAX_LINE_LENGTH,
+  SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS,
+} = require('src/app/store/actions.js');
+
+const handleSetQueryInput = () => dispatch(FORMAT_QUERY);
+const handleSetIndentation = () => dispatch(FORMAT_QUERY);
+const handleSetMaxLineLength = () => dispatch(FORMAT_QUERY);
+const handleSetShouldPlaceDotsAfterLineBreaks = () => dispatch(FORMAT_QUERY);
+
+const routines = {
+  [SET_QUERY_INPUT]: handleSetQueryInput,
+  [SET_INDENTATION]: handleSetIndentation,
+  [SET_MAX_LINE_LENGTH]: handleSetMaxLineLength,
+  [SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS]: handleSetShouldPlaceDotsAfterLineBreaks,
 };
 
-module.exports = { formatWord };
-
-  return module.exports;
-})();
-
-modules['src/libs/gremlint/utils.js'] = (() => {
-  const module = { exports: {} };
-  const spaces = (numberOfSpaces) => Array(numberOfSpaces + 1).join(' ');
-
-module.exports = {
-  spaces,
-};
-
-  return module.exports;
-})();
-
-modules['src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQueryStringFromFormattedSyntaxTree.js'] = (() => {
-  const module = { exports: {} };
-  const { spaces } = require('src/libs/gremlint/utils.js');
-
-const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
-  if (syntaxTree.type === 'traversal') {
-    return syntaxTree.stepGroups
-      .map((stepGroup) =>
-        stepGroup.steps
-          .map(recreateQueryStringFromFormattedSyntaxTree)
-          .join('.')
-      )
-      .join('\n');
-  }
-  if (syntaxTree.type === 'method') {
-    return (
-      (syntaxTree.shouldStartWithDot ? '.' : '') +
-      [
-        recreateQueryStringFromFormattedSyntaxTree(syntaxTree.method) + '(',
-        syntaxTree.argumentGroups
-          .map((arguments) =>
-            arguments.map(recreateQueryStringFromFormattedSyntaxTree).join(', ')
-          )
-          .join(',\n') +
-          ')' +
-          (syntaxTree.shouldEndWithDot ? '.' : ''),
-      ].join(syntaxTree.argumentsShouldStartOnNewLine ? '\n' : '')
-    );
-  }
-  if (syntaxTree.type === 'string') {
-    return spaces(syntaxTree.indentation) + syntaxTree.string;
-  }
-  if (syntaxTree.type === 'word') {
-    return (
-      spaces(syntaxTree.indentation) +
-      (syntaxTree.shouldStartWithDot ? '.' : '') +
-      syntaxTree.word +
-      (syntaxTree.shouldEndWithDot ? '.' : '')
-    );
-  }
-};
-
-module.exports = {
-  recreateQueryStringFromFormattedSyntaxTree,
-};
+module.exports = routines;
 
   return module.exports;
 })();
@@ -1914,6 +1641,366 @@ const Toggle = (getProps) => {
 };
 
 module.exports = Toggle;
+
+  return module.exports;
+})();
+
+modules['src/libs/simpleFP/SimpleFP.js'] = (() => {
+  const module = { exports: {} };
+  const last = (array) => array.slice(-1)[0];
+
+const pipe = (...fns) => (value) => fns.reduce((value, fn) => fn(value), value);
+
+module.exports = { last, pipe };
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/parseToSyntaxTree/ParseToSyntaxTree.js'] = (() => {
+  const module = { exports: {} };
+  const { last, pipe } = require('src/libs/simpleFP/SimpleFP.js');
+
+const tokenizeOnTopLevelPunctuation = (query) => {
+  word = '';
+  parenthesesCount = 0;
+  squareBracketCount = 0;
+  curlyBracketCount = 0;
+  isInsideSingleQuoteString = false;
+  query.split('').forEach((char) => {
+    if (char === '(' && !isInsideSingleQuoteString) {
+      parenthesesCount++;
+      word += '(';
+      return;
+    }
+    if (char === '[' && !isInsideSingleQuoteString) {
+      squareBracketCount++;
+      word += '[';
+      return;
+    }
+    if (char === '{' && !isInsideSingleQuoteString) {
+      curlyBracketCount++;
+      word += '{';
+      return;
+    }
+    if (char === ')' && !isInsideSingleQuoteString) {
+      parenthesesCount--;
+      word += ')';
+      return;
+    }
+    if (char === ']' && !isInsideSingleQuoteString) {
+      squareBracketCount--;
+      word += ']';
+      return;
+    }
+    if (char === '}' && !isInsideSingleQuoteString) {
+      curlyBracketCount--;
+      word += '}';
+      return;
+    }
+    if (char === "'") {
+      isInsideString = !isInsideSingleQuoteString;
+      word += "'";
+      return;
+    }
+    if (char === '.') {
+      word +=
+        isInsideSingleQuoteString ||
+        parenthesesCount ||
+        squareBracketCount ||
+        curlyBracketCount
+          ? '.'
+          : String.fromCharCode(28);
+      return;
+    }
+    word += char;
+  });
+  return word
+    .split(String.fromCharCode(28))
+    .filter((token) => token !== '')
+    .map((token) => token.trim());
+};
+
+const tokenizeOnTopLevelComma = (query) => {
+  word = '';
+  parenthesesCount = 0;
+  squareBracketCount = 0;
+  curlyBracketCount = 0;
+  isInsideSingleQuoteString = false;
+  query.split('').forEach((char) => {
+    if (char === '(' && !isInsideSingleQuoteString) {
+      parenthesesCount++;
+      word += '(';
+      return;
+    }
+    if (char === '[' && !isInsideSingleQuoteString) {
+      squareBracketCount++;
+      word += '[';
+      return;
+    }
+    if (char === '{' && !isInsideSingleQuoteString) {
+      curlyBracketCount++;
+      word += '{';
+      return;
+    }
+    if (char === ')' && !isInsideSingleQuoteString) {
+      parenthesesCount--;
+      word += ')';
+      return;
+    }
+    if (char === ']' && !isInsideSingleQuoteString) {
+      squareBracketCount--;
+      word += ']';
+      return;
+    }
+    if (char === '}' && !isInsideSingleQuoteString) {
+      curlyBracketCount--;
+      word += '}';
+      return;
+    }
+    if (char === "'") {
+      isInsideString = !isInsideSingleQuoteString;
+      word += "'";
+      return;
+    }
+    if (char === ',') {
+      word +=
+        isInsideSingleQuoteString ||
+        parenthesesCount ||
+        squareBracketCount ||
+        curlyBracketCount
+          ? ','
+          : String.fromCharCode(28);
+      return;
+    }
+    word += char;
+  });
+  return word
+    .split(String.fromCharCode(28))
+    .filter((token) => token !== '')
+    .map((token) => token.trim());
+};
+
+const tokenizeOnTopLevelParentheses = (query) => {
+  word = '';
+  parenthesesCount = 0;
+  squareBracketCount = 0;
+  curlyBracketCount = 0;
+  isInsideSingleQuoteString = false;
+  query.split('').forEach((char) => {
+    if (char === '(' && !isInsideSingleQuoteString) {
+      if (parenthesesCount === 0) {
+        word += String.fromCharCode(28);
+      }
+      parenthesesCount++;
+      word += '(';
+      return;
+    }
+    if (char === '[' && !isInsideSingleQuoteString) {
+      squareBracketCount++;
+      word += '[';
+      return;
+    }
+    if (char === '{' && !isInsideSingleQuoteString) {
+      curlyBracketCount++;
+      word += '{';
+      return;
+    }
+    if (char === ')' && !isInsideSingleQuoteString) {
+      parenthesesCount--;
+      word += ')';
+      return;
+    }
+    if (char === ']' && !isInsideSingleQuoteString) {
+      squareBracketCount--;
+      word += ']';
+      return;
+    }
+    if (char === '}' && !isInsideSingleQuoteString) {
+      curlyBracketCount--;
+      word += '}';
+      return;
+    }
+    if (char === "'") {
+      isInsideString = !isInsideSingleQuoteString;
+      word += "'";
+      return;
+    }
+    word += char;
+  });
+  return word
+    .split(String.fromCharCode(28))
+    .filter((token) => token !== '')
+    .map((token) => token.trim());
+};
+
+const isWrappedInParentheses = (token) => {
+  if (token.length < 2) return false;
+  if (token.charAt(0) !== '(') return false;
+  if (token.slice(-1) !== ')') return false;
+  return true;
+};
+
+const isString = (token) => {
+  if (token.length < 2) return false;
+  if (token.charAt(0) !== token.substr(-1)) return false;
+  if (['"', "'"].includes(token.charAt(0))) return true;
+  return false;
+};
+
+const isMethodInvocation = (token) => {
+  return pipe(
+    tokenizeOnTopLevelParentheses,
+    last,
+    isWrappedInParentheses
+  )(token);
+};
+
+const trimParentheses = (expression) => expression.slice(1, -1);
+
+const getMethodTokenAndArgumentTokensFromMethodInvocation = (token) => {
+  // The word before the first parenthesis is the method name
+  // The token may be a double application of a curried function, so we cannot
+  // assume that the first opening parenthesis is closed by the last closing
+  // parenthesis
+  const tokens = tokenizeOnTopLevelParentheses(token);
+  return {
+    methodToken: tokens.slice(0, -1).join(''),
+    argumentTokens: pipe(
+      trimParentheses,
+      tokenizeOnTopLevelComma
+    )(tokens.slice(-1)[0]),
+  };
+};
+
+const tokenize = pipe(tokenizeOnTopLevelPunctuation);
+
+const parseToSyntaxTree = (query) => {
+  const tokens = tokenizeOnTopLevelPunctuation(query);
+  if (tokens.length === 1) {
+    const token = tokens[0];
+    if (isMethodInvocation(token)) {
+      const {
+        methodToken,
+        argumentTokens,
+      } = getMethodTokenAndArgumentTokensFromMethodInvocation(token);
+      return {
+        type: 'method',
+        method: parseToSyntaxTree(methodToken),
+        arguments: argumentTokens.map(parseToSyntaxTree),
+      };
+    }
+    if (isString(token)) {
+      return {
+        type: 'string',
+        string: token,
+      };
+    }
+    return {
+      type: 'word',
+      word: token,
+    };
+  }
+  return {
+    type: 'traversal',
+    steps: tokens.map(parseToSyntaxTree),
+  };
+};
+
+module.exports = {
+  parseToSyntaxTree,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/formatSyntaxTree/formatString/FormatString.js'] = (() => {
+  const module = { exports: {} };
+  const formatString = (config) => (syntaxTree) => {
+  return {
+    type: 'string',
+    string: syntaxTree.string,
+    indentation: config.indentation,
+  };
+};
+
+module.exports = { formatString };
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/formatSyntaxTree/formatWord/FormatWord.js'] = (() => {
+  const module = { exports: {} };
+  const formatWord = (config) => (syntaxTree) => {
+  return {
+    type: 'word',
+    word: syntaxTree.word,
+    indentation: config.indentation,
+    shouldStartWithDot: config.shouldStartWithDot,
+    shouldEndWithDot: config.shouldEndWithDot,
+  };
+};
+
+module.exports = { formatWord };
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/utils.js'] = (() => {
+  const module = { exports: {} };
+  const spaces = (numberOfSpaces) => Array(numberOfSpaces + 1).join(' ');
+
+module.exports = {
+  spaces,
+};
+
+  return module.exports;
+})();
+
+modules['src/libs/gremlint/recreateQueryStringFromFormattedSyntaxTree/RecreateQueryStringFromFormattedSyntaxTree.js'] = (() => {
+  const module = { exports: {} };
+  const { spaces } = require('src/libs/gremlint/utils.js');
+
+const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree) => {
+  if (syntaxTree.type === 'traversal') {
+    return syntaxTree.stepGroups
+      .map((stepGroup) =>
+        stepGroup.steps
+          .map(recreateQueryStringFromFormattedSyntaxTree)
+          .join('.')
+      )
+      .join('\n');
+  }
+  if (syntaxTree.type === 'method') {
+    return (
+      (syntaxTree.shouldStartWithDot ? '.' : '') +
+      [
+        recreateQueryStringFromFormattedSyntaxTree(syntaxTree.method) + '(',
+        syntaxTree.argumentGroups
+          .map((arguments) =>
+            arguments.map(recreateQueryStringFromFormattedSyntaxTree).join(', ')
+          )
+          .join(',\n') +
+          ')' +
+          (syntaxTree.shouldEndWithDot ? '.' : ''),
+      ].join(syntaxTree.argumentsShouldStartOnNewLine ? '\n' : '')
+    );
+  }
+  if (syntaxTree.type === 'string') {
+    return spaces(syntaxTree.indentation) + syntaxTree.string;
+  }
+  if (syntaxTree.type === 'word') {
+    return (
+      spaces(syntaxTree.indentation) +
+      (syntaxTree.shouldStartWithDot ? '.' : '') +
+      syntaxTree.word +
+      (syntaxTree.shouldEndWithDot ? '.' : '')
+    );
+  }
+};
+
+module.exports = {
+  recreateQueryStringFromFormattedSyntaxTree,
+};
 
   return module.exports;
 })();
@@ -2164,15 +2251,15 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
 
           // This is the only step in the step group, so it is the first step in
           // the step group. It should only start with a dot if it is not the
-          // first stepGroup and config.shouldPlaceDotsAfterNewlines
+          // first stepGroup and config.shouldPlaceDotsAfterLineBreaks
           const shouldStartWithDot =
-            !isFirstStepGroup && config.shouldPlaceDotsAfterNewlines;
+            !isFirstStepGroup && config.shouldPlaceDotsAfterLineBreaks;
 
           // It is the last step in a group and should only end with dot if not
-          // config.shouldPlaceDotsAfterNewlines this is not the last step in
+          // config.shouldPlaceDotsAfterLineBreaks this is not the last step in
           // steps
           const shouldEndWithDot =
-            !isLastStepGroup && !config.shouldPlaceDotsAfterNewlines;
+            !isLastStepGroup && !config.shouldPlaceDotsAfterLineBreaks;
 
           return {
             stepsInStepGroup: [],
@@ -2198,10 +2285,10 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
           const shouldStartWithDot = false;
 
           // It is the last step in a group and should only end with dot if not
-          // config.shouldPlaceDotsAfterNewlines this is not the last step in
+          // config.shouldPlaceDotsAfterLineBreaks this is not the last step in
           // steps
           const shouldEndWithDot =
-            !isLastStepGroup && !config.shouldPlaceDotsAfterNewlines;
+            !isLastStepGroup && !config.shouldPlaceDotsAfterLineBreaks;
 
           return {
             stepsInStepGroup: [],
@@ -2232,9 +2319,9 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
         const isFirstStepGroup = stepGroups.length === 0;
 
         // It is the first step in a group and should start with a dot if it is
-        // not the first stepGroup and config.shouldPlaceDotsAfterNewlines
+        // not the first stepGroup and config.shouldPlaceDotsAfterLineBreaks
         const shouldStartWithDot =
-          !isFirstStepGroup && config.shouldPlaceDotsAfterNewlines;
+          !isFirstStepGroup && config.shouldPlaceDotsAfterLineBreaks;
 
         // It is the first step in a group, but not the last, so it should not
         // end with a dot.
@@ -2367,7 +2454,7 @@ const formatQuery = (
   config = {
     indentation: 0,
     maxLineLength: 80,
-    shouldPlaceDotsAfterNewlines: false,
+    shouldPlaceDotsAfterLineBreaks: false,
   }
 ) => {
   return pipe(
@@ -2377,143 +2464,90 @@ const formatQuery = (
   )(query);
 };
 
-module.exports = {
-  formatQuery,
-};
+module.exports = { formatQuery };
 
   return module.exports;
 })();
 
-modules['src/store/Store.js'] = (() => {
+modules['src/app/store/reducers.js'] = (() => {
   const module = { exports: {} };
-  const Observable = require('src/libs/observable/Observable.js');
-const { formatQuery } = require('src/libs/gremlint/Gremlint.js');
+  const { formatQuery } = require('src/libs/gremlint/Gremlint.js');
 
-const atom = (initialValue) => {
-  const observable$ = new Observable(initialValue);
-  const get = () => observable$.value;
-  const set = (value) => {
-    observable$.value = value;
-  };
-  const addChangeListener = (callback) =>
-    addEventListener(observable$.id, callback);
-  return [get, set, addChangeListener];
-};
+const {
+  SET_QUERY_INPUT,
+  FORMAT_QUERY,
+  TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS,
+  SET_INDENTATION,
+  SET_MAX_LINE_LENGTH,
+  SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS,
+} = require('src/app/store/actions.js');
 
-const [getQueryInput, setQueryInput, addQueryInputChangeListener] = atom('');
+const handleSetQueryInput = (state, queryInput) => ({ ...state, queryInput });
 
-const [getQueryOutput, setQueryOutput, addQueryOutputChangeListener] = atom('');
+const handleFormatQuery = (state) => ({
+  ...state,
+  queryOutput: formatQuery(state.queryInput, {
+    indentation: state.indentation,
+    maxLineLength: state.maxLineLength,
+    shouldPlaceDotsAfterLineBreaks: state.shouldPlaceDotsAfterLineBreaks,
+  }),
+});
 
-const [
-  getShowAdvancedOptions,
-  setShowAdvancedOptions,
-  addShowAdvancedOptionsChangeListener,
-] = atom(false);
+const handleToggleShouldShowAdvancedOptions = (state) => ({
+  ...state,
+  shouldShowAdvancedOptions: !state.shouldShowAdvancedOptions,
+});
 
-const [getIndentation, _setIndentation, addIndentationChangeListener] = atom(0);
-const setIndentation = (value) => {
-  const indentation = parseInt(value);
-  if (isNaN(indentation)) return;
-  if (indentation < 0) {
-    _setIndentation(0);
-    return;
-  }
-  const maxLineLength = getMaxLineLength();
+const handleSetIndentation = (state, unparsedIndentation) => {
+  const indentation = parseInt(unparsedIndentation);
+  if (isNaN(indentation)) return { ...state };
+  if (indentation < 0) return { ...state, indentation: 0 };
+  const { maxLineLength } = state;
   if (indentation > maxLineLength) {
-    _setIndentation(maxLineLength);
-    return;
+    return { ...state, indentation: maxLineLength };
   }
-  _setIndentation(indentation);
+  return { ...state, indentation };
 };
 
-const [
-  getMaxLineLength,
-  _setMaxLineLength,
-  addMaxLineLengthChangeListener,
-] = atom(72);
-const setMaxLineLength = (value) => {
-  const maxLineLength = parseInt(value);
-  if (isNaN(maxLineLength)) return;
-
-  const indentation = getIndentation();
+const handleSetMaxLineLength = (state, unparsedMaxLineLength) => {
+  const maxLineLength = parseInt(unparsedMaxLineLength);
+  if (isNaN(maxLineLength)) return { ...state };
+  const { indentation } = state;
   if (maxLineLength < indentation) {
-    _setMaxLineLength(indentation);
-    return;
+    return { ...state, maxLineLength: indentation };
   }
-  _setMaxLineLength(maxLineLength);
+  return { ...state, maxLineLength };
 };
 
-const [
-  getShouldPlaceDotsAfterLineBreaks,
-  setShouldPlaceDotsAfterLineBreaks,
-  addShouldPlaceDotsAfterLineBreaksChangeListener,
-] = atom(false);
+const handleSetShouldPlaceDotsAfterLineBreaks = (
+  state,
+  shouldPlaceDotsAfterLineBreaks
+) => ({ ...state, shouldPlaceDotsAfterLineBreaks });
 
-addQueryInputChangeListener(({ detail }) => {
-  setQueryOutput(
-    formatQuery(detail, {
-      indentation: getIndentation(),
-      maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
-    })
-  );
-});
-
-addIndentationChangeListener(() => {
-  setQueryOutput(
-    formatQuery(getQueryInput(), {
-      indentation: getIndentation(),
-      maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
-    })
-  );
-});
-
-addMaxLineLengthChangeListener(() => {
-  setQueryOutput(
-    formatQuery(getQueryInput(), {
-      indentation: getIndentation(),
-      maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
-    })
-  );
-});
-
-addShouldPlaceDotsAfterLineBreaksChangeListener(() => {
-  setQueryOutput(
-    formatQuery(getQueryInput(), {
-      indentation: getIndentation(),
-      maxLineLength: getMaxLineLength(),
-      shouldPlaceDotsAfterNewlines: getShouldPlaceDotsAfterLineBreaks(),
-    })
-  );
-});
-
-module.exports = {
-  getQueryInput,
-  setQueryInput,
-  addQueryInputChangeListener,
-
-  getQueryOutput,
-  setQueryOutput,
-  addQueryOutputChangeListener,
-
-  getShowAdvancedOptions,
-  setShowAdvancedOptions,
-  addShowAdvancedOptionsChangeListener,
-
-  getIndentation,
-  setIndentation,
-  addIndentationChangeListener,
-
-  getMaxLineLength,
-  setMaxLineLength,
-  addMaxLineLengthChangeListener,
-
-  getShouldPlaceDotsAfterLineBreaks,
-  setShouldPlaceDotsAfterLineBreaks,
-  addShouldPlaceDotsAfterLineBreaksChangeListener,
+const reducers = {
+  [SET_QUERY_INPUT]: handleSetQueryInput,
+  [FORMAT_QUERY]: handleFormatQuery,
+  [TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS]: handleToggleShouldShowAdvancedOptions,
+  [SET_INDENTATION]: handleSetIndentation,
+  [SET_MAX_LINE_LENGTH]: handleSetMaxLineLength,
+  [SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS]: handleSetShouldPlaceDotsAfterLineBreaks,
 };
+
+module.exports = reducers;
+
+  return module.exports;
+})();
+
+modules['src/app/store/Store.js'] = (() => {
+  const module = { exports: {} };
+  const { createReducedState } = require('src/libs/simpleStore/SimpleStore.js');
+const initialState = require('src/app/store/initialState.js');
+const reducers = require('src/app/store/reducers.js');
+const routines = require('src/app/store/routines.js');
+
+const store = createReducedState({ initialState, reducers, routines });
+
+module.exports = store;
 
   return module.exports;
 })();
@@ -2522,14 +2556,13 @@ modules['src/views/queryFormatter/advancedOptions/AdvancedOptions.js'] = (() => 
   const module = { exports: {} };
   const Toggle = require('src/components/toggle/Toggle.js');
 const { html } = require('src/libs/simpleHTML/SimpleHTML.js');
+const { dispatch } = require('src/libs/simpleStore/SimpleStore.js');
+const store = require('src/app/store/Store.js');
 const {
-  getIndentation,
-  setIndentation,
-  getMaxLineLength,
-  setMaxLineLength,
-  getShouldPlaceDotsAfterLineBreaks,
-  setShouldPlaceDotsAfterLineBreaks,
-} = require('src/store/Store.js');
+  SET_INDENTATION,
+  SET_MAX_LINE_LENGTH,
+  SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS,
+} = require('src/app/store/actions.js');
 
 const {
   getInlineContainerStyle,
@@ -2537,7 +2570,7 @@ const {
   getTextStyle,
 } = require('src/libs/simpleStyle/SimpleStyle.js');
 
-const AdvancedOptions = () => {
+const AdvancedOptions = store.provider((getState) => () => {
   const element = html('div', {}, [
     html('div', { style: 'padding: 10px' }, [
       html('div', { innerText: 'Indentation', style: getTextStyle() }, []),
@@ -2547,9 +2580,11 @@ const AdvancedOptions = () => {
           style: getInputStyle() + getInlineContainerStyle(16, 2),
           type: 'number',
           min: 0,
-          max: getMaxLineLength(),
-          value: getIndentation(),
-          oninput: ({ target }) => setIndentation(target.value),
+          max: getState().maxLineLength,
+          value: getState().indentation,
+          oninput: ({ target }) => {
+            dispatch(SET_INDENTATION, target.value);
+          },
         }),
         []
       ),
@@ -2561,9 +2596,11 @@ const AdvancedOptions = () => {
         () => ({
           style: getInputStyle() + getInlineContainerStyle(16, 2),
           type: 'number',
-          min: getIndentation(),
-          value: getMaxLineLength(),
-          oninput: ({ target }) => setMaxLineLength(target.value),
+          min: getState().indentation,
+          value: getState().maxLineLength,
+          oninput: ({ target }) => {
+            dispatch(SET_MAX_LINE_LENGTH, target.value);
+          },
         }),
         []
       ),
@@ -2573,17 +2610,22 @@ const AdvancedOptions = () => {
       Toggle(() => ({
         height: '40px',
         width: '320px',
-        checked: getShouldPlaceDotsAfterLineBreaks(),
+        checked: getState().shouldPlaceDotsAfterLineBreaks,
         labels: {
           checked: 'After line break',
           unchecked: 'Before line break',
         },
-        onchange: (checked) => setShouldPlaceDotsAfterLineBreaks(checked),
+        onchange: (shouldPlaceDotsAfterLineBreaks) => {
+          dispatch(
+            SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS,
+            shouldPlaceDotsAfterLineBreaks
+          );
+        },
       })),
     ]),
   ]);
   return element;
-};
+});
 
 module.exports = AdvancedOptions;
 
@@ -2597,48 +2639,46 @@ const Code = require('src/components/code/Code.js');
 const TextButton = require('src/components/textButton/TextButton.js');
 const AdvancedOptions = require('src/views/queryFormatter/advancedOptions/AdvancedOptions.js');
 const { html, If } = require('src/libs/simpleHTML/SimpleHTML.js');
+const { dispatch } = require('src/libs/simpleStore/SimpleStore.js');
+const store = require('src/app/store/Store.js');
 const {
-  getQueryInput,
-  setQueryInput,
-  getQueryOutput,
-  getShowAdvancedOptions,
-  setShowAdvancedOptions,
-  getMaxLineLength,
-} = require('src/store/Store.js');
+  SET_QUERY_INPUT,
+  TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS,
+} = require('src/app/store/actions.js');
 
-const QueryFormatter = () => {
+const QueryFormatter = store.provider((getState) => () => {
   const element = html('div', {}, [
     QueryInput(() => ({
-      value: getQueryInput(),
-      oninput: ({ target }) => setQueryInput(target.value),
+      value: getState().queryInput,
+      oninput: ({ target }) => dispatch(SET_QUERY_INPUT, target.value),
     })),
     TextButton(() => ({
-      label: getShowAdvancedOptions()
+      label: getState().shouldShowAdvancedOptions
         ? 'Hide advanced options'
         : 'Show advanced options',
-      onclick: () => setShowAdvancedOptions(!getShowAdvancedOptions()),
+      onclick: () => dispatch(TOGGLE_SHOULD_SHOW_ADVANCED_OPTIONS),
     })),
     html(
       'div',
       () => ({
         style: `max-height: ${
-          getShowAdvancedOptions() ? '240px' : '0'
+          getState().shouldShowAdvancedOptions ? '240px' : '0'
         }; box-shadow: inset white 0 0 10px 0; overflow: hidden; transition: 0.5s;`,
       }),
       [AdvancedOptions()]
     ),
     If(
-      () => getQueryOutput(),
+      () => getState().queryOutput,
       () => [
         Code(() => ({
-          innerText: getQueryOutput(),
-          maxLineLength: getMaxLineLength(),
+          innerText: getState().queryOutput,
+          maxLineLength: getState().maxLineLength,
         })),
       ]
     ),
   ]);
   return element;
-};
+});
 
 module.exports = QueryFormatter;
 
@@ -2702,18 +2742,11 @@ module.exports = App;
 
 window.addEventListener('load', () => {
 const App = require('src/app/App.js');
-const Store = require('src/store/Store.js');
 const Router = require('src/router/Router.js');
 
 const app = App(() => ({}));
 
 Router.addHashChangeListener(app.update);
-Store.addQueryInputChangeListener(app.update);
-Store.addQueryOutputChangeListener(app.update);
-Store.addShowAdvancedOptionsChangeListener(app.update);
-Store.addIndentationChangeListener(app.update);
-Store.addMaxLineLengthChangeListener(app.update);
-Store.addShouldPlaceDotsAfterLineBreaksChangeListener(app.update);
 
 Object.assign(document.body.style, {
   fontFamily: 'Sans-Serif',

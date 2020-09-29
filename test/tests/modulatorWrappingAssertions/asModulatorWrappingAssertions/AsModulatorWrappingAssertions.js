@@ -12,7 +12,7 @@ const ByModulatorWrappingAssertions = [
       {
         indentation: 0,
         maxLineLength: 80,
-        shouldPlaceDotsAfterNewlines: false,
+        shouldPlaceDotsAfterLineBreaks: false,
       }
     )
   ),
@@ -29,7 +29,7 @@ const ByModulatorWrappingAssertions = [
       {
         indentation: 0,
         maxLineLength: 40,
-        shouldPlaceDotsAfterNewlines: false,
+        shouldPlaceDotsAfterLineBreaks: false,
       }
     )
   ),
@@ -47,7 +47,7 @@ const ByModulatorWrappingAssertions = [
       {
         indentation: 0,
         maxLineLength: 35,
-        shouldPlaceDotsAfterNewlines: false,
+        shouldPlaceDotsAfterLineBreaks: false,
       }
     )
   ),

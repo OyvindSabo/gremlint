@@ -3,7 +3,7 @@ const { formatQuery } = require('../../src/libs/gremlint/Gremlint.js');
 const MaxLineLengthAssertions = require('./maxLineLengthAssertions/MaxLineLengthAssertions.js');
 const ModulatorIndentationAssertions = require('./modulatorIndentationAssertions/ModulatorIndentationAssertions.js');
 const ModulatorWrappingAssertions = require('./modulatorWrappingAssertions/ModulatorWrappingAssertions.js');
-const DotsAfterNewlinesAssertions = require('./dotsAfterNewlinesAssertions/DotsAfterNewlinesAssertions.js');
+const DotsAfterLineBreaksAssertions = require('./dotsAfterLineBreaksAssertions/DotsAfterLineBreaksAssertions.js');
 const NonMethodIndentationAssertions = require('./nonMethodIndentationAssertions/NonMethodIndentationAssertions.js');
 
 const doRunTests = () => {
@@ -24,8 +24,8 @@ const doRunTests = () => {
     ),
 
     test(
-      'If dots are configured to be placed after newlines, make sure they are correctly placed, and not missing, nor duplicated',
-      ...DotsAfterNewlinesAssertions
+      'If dots are configured to be placed after line breaks, make sure they are correctly placed, and not missing, nor duplicated',
+      ...DotsAfterLineBreaksAssertions
     ),
 
     test(

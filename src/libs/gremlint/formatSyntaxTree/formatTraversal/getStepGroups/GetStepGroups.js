@@ -79,15 +79,15 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
 
           // This is the only step in the step group, so it is the first step in
           // the step group. It should only start with a dot if it is not the
-          // first stepGroup and config.shouldPlaceDotsAfterNewlines
+          // first stepGroup and config.shouldPlaceDotsAfterLineBreaks
           const shouldStartWithDot =
-            !isFirstStepGroup && config.shouldPlaceDotsAfterNewlines;
+            !isFirstStepGroup && config.shouldPlaceDotsAfterLineBreaks;
 
           // It is the last step in a group and should only end with dot if not
-          // config.shouldPlaceDotsAfterNewlines this is not the last step in
+          // config.shouldPlaceDotsAfterLineBreaks this is not the last step in
           // steps
           const shouldEndWithDot =
-            !isLastStepGroup && !config.shouldPlaceDotsAfterNewlines;
+            !isLastStepGroup && !config.shouldPlaceDotsAfterLineBreaks;
 
           return {
             stepsInStepGroup: [],
@@ -113,10 +113,10 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
           const shouldStartWithDot = false;
 
           // It is the last step in a group and should only end with dot if not
-          // config.shouldPlaceDotsAfterNewlines this is not the last step in
+          // config.shouldPlaceDotsAfterLineBreaks this is not the last step in
           // steps
           const shouldEndWithDot =
-            !isLastStepGroup && !config.shouldPlaceDotsAfterNewlines;
+            !isLastStepGroup && !config.shouldPlaceDotsAfterLineBreaks;
 
           return {
             stepsInStepGroup: [],
@@ -147,9 +147,9 @@ const getStepGroups = (formatSyntaxTree, steps, config) => {
         const isFirstStepGroup = stepGroups.length === 0;
 
         // It is the first step in a group and should start with a dot if it is
-        // not the first stepGroup and config.shouldPlaceDotsAfterNewlines
+        // not the first stepGroup and config.shouldPlaceDotsAfterLineBreaks
         const shouldStartWithDot =
-          !isFirstStepGroup && config.shouldPlaceDotsAfterNewlines;
+          !isFirstStepGroup && config.shouldPlaceDotsAfterLineBreaks;
 
         // It is the first step in a group, but not the last, so it should not
         // end with a dot.

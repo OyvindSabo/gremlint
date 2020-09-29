@@ -22,7 +22,11 @@ const From_ModulatorIndentationAssertions = [
     by('name')`,
     formatQuery(
       "g.V().has('person','name','vadas').as_('e').in('knows').as_('m').out('knows').where(neq('e')).path().from_('m').by('name')",
-      { indentation: 0, maxLineLength: 20, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 20,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
 ];

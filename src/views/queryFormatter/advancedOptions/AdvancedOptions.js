@@ -1,13 +1,12 @@
 const Toggle = require('../../../components/toggle/Toggle.js');
 const { html } = require('../../../libs/simpleHTML/SimpleHTML.js');
+const { dispatch } = require('../../../libs/simpleStore/SimpleStore.js');
+const store = require('../../../app/store/Store.js');
 const {
-  getIndentation,
-  setIndentation,
-  getMaxLineLength,
-  setMaxLineLength,
-  getShouldPlaceDotsAfterLineBreaks,
-  setShouldPlaceDotsAfterLineBreaks,
-} = require('../../../store/Store.js');
+  SET_INDENTATION,
+  SET_MAX_LINE_LENGTH,
+  SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS,
+} = require('../../../app/store/actions.js');
 
 const {
   getInlineContainerStyle,
@@ -15,7 +14,7 @@ const {
   getTextStyle,
 } = require('../../../libs/simpleStyle/SimpleStyle.js');
 
-const AdvancedOptions = () => {
+const AdvancedOptions = store.provider((getState) => () => {
   const element = html('div', {}, [
     html('div', { style: 'padding: 10px' }, [
       html('div', { innerText: 'Indentation', style: getTextStyle() }, []),
@@ -25,9 +24,11 @@ const AdvancedOptions = () => {
           style: getInputStyle() + getInlineContainerStyle(16, 2),
           type: 'number',
           min: 0,
-          max: getMaxLineLength(),
-          value: getIndentation(),
-          oninput: ({ target }) => setIndentation(target.value),
+          max: getState().maxLineLength,
+          value: getState().indentation,
+          oninput: ({ target }) => {
+            dispatch(SET_INDENTATION, target.value);
+          },
         }),
         []
       ),
@@ -39,9 +40,11 @@ const AdvancedOptions = () => {
         () => ({
           style: getInputStyle() + getInlineContainerStyle(16, 2),
           type: 'number',
-          min: getIndentation(),
-          value: getMaxLineLength(),
-          oninput: ({ target }) => setMaxLineLength(target.value),
+          min: getState().indentation,
+          value: getState().maxLineLength,
+          oninput: ({ target }) => {
+            dispatch(SET_MAX_LINE_LENGTH, target.value);
+          },
         }),
         []
       ),
@@ -51,16 +54,21 @@ const AdvancedOptions = () => {
       Toggle(() => ({
         height: '40px',
         width: '320px',
-        checked: getShouldPlaceDotsAfterLineBreaks(),
+        checked: getState().shouldPlaceDotsAfterLineBreaks,
         labels: {
           checked: 'After line break',
           unchecked: 'Before line break',
         },
-        onchange: (checked) => setShouldPlaceDotsAfterLineBreaks(checked),
+        onchange: (shouldPlaceDotsAfterLineBreaks) => {
+          dispatch(
+            SET_SHOULD_PLACE_DOTS_AFTER_LINE_BREAKS,
+            shouldPlaceDotsAfterLineBreaks
+          );
+        },
       })),
     ]),
   ]);
   return element;
-};
+});
 
 module.exports = AdvancedOptions;

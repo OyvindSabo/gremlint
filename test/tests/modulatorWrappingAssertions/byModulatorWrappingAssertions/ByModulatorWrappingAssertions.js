@@ -9,7 +9,7 @@ const ByModulatorWrappingAssertions = [
     formatQuery('g.V().group().by().by(bothE().count())', {
       indentation: 0,
       maxLineLength: 40,
-      shouldPlaceDotsAfterNewlines: false,
+      shouldPlaceDotsAfterLineBreaks: false,
     })
   ),
   // Line wrapping: The modulators fit on the line of the step they are
@@ -20,7 +20,7 @@ const ByModulatorWrappingAssertions = [
     formatQuery('g.V().group().by().by(bothE().count())', {
       indentation: 0,
       maxLineLength: 35,
-      shouldPlaceDotsAfterNewlines: false,
+      shouldPlaceDotsAfterLineBreaks: false,
     })
   ),
   // Line wrapping: The modulators don't fit on the line of the step they are
@@ -34,7 +34,7 @@ const ByModulatorWrappingAssertions = [
     formatQuery('g.V().group().by().by(bothE().count())', {
       indentation: 0,
       maxLineLength: 30,
-      shouldPlaceDotsAfterNewlines: false,
+      shouldPlaceDotsAfterLineBreaks: false,
     })
   ),
 
@@ -52,7 +52,11 @@ const ByModulatorWrappingAssertions = [
     select(values).count(local).is(gt(1)))`,
     formatQuery(
       "g.V().hasLabel('person').group().by(values('name', 'age').fold()).unfold().filter(select(values).count(local).is(gt(1)))",
-      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 45,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
   // Line wrapping: The modulators don't fit on the line of the step they are
@@ -70,7 +74,11 @@ const ByModulatorWrappingAssertions = [
     is(gt(1)))`,
     formatQuery(
       "g.V().hasLabel('person').group().by(values('name', 'age').fold()).unfold().filter(select(values).count(local).is(gt(1)))",
-      { indentation: 0, maxLineLength: 40, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 40,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
 ];

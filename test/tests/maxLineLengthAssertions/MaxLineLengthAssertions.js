@@ -8,7 +8,11 @@ const MaxLineLengthAssertions = [
     "g.V().hasLabel('person').where(outE('created').count().is(P.gte(2))).count()",
     formatQuery(
       "g.V().hasLabel('person').where(outE('created').count().is(P.gte(2))).count()",
-      { indentation: 0, maxLineLength: 76, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 76,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
 
@@ -21,7 +25,11 @@ const MaxLineLengthAssertions = [
   count()`,
     formatQuery(
       "g.V().hasLabel('person').where(outE('created').count().is(P.gte(2))).count()",
-      { indentation: 0, maxLineLength: 75, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 75,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
 
@@ -36,7 +44,11 @@ const MaxLineLengthAssertions = [
   count()`,
     formatQuery(
       "g.V().hasLabel('person').where(outE('created').count().is(P.gte(2))).count()",
-      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterNewlines: false }
+      {
+        indentation: 0,
+        maxLineLength: 45,
+        shouldPlaceDotsAfterLineBreaks: false,
+      }
     )
   ),
 ];

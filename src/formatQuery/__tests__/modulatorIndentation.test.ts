@@ -806,4 +806,17 @@ test('Wrapped modulators should be indented with two spaces', () => {
       WithOptions.tokens,
       WithOptions.values)`,
   );
+
+  // Test write()-modulator indentation
+  expect(
+    formatQuery('g.io(someOutputFile).write().iterate()', {
+      indentation: 0,
+      maxLineLength: 25,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(
+    `g.io(someOutputFile).
+    write().
+  iterate()`,
+  );
 });

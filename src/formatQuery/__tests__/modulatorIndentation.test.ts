@@ -246,4 +246,26 @@ test('Wrapped modulators should be indented with two spaces', () => {
     0.75).
   iterate()`,
   );
+
+  // Test until()-modulator indentation
+  expect(
+    formatQuery(
+      "g.V(6).repeat('a', both('created').simplePath()).emit(repeat('b', both('knows')).until(loops('b').as('b').where(loops('a').as('b'))).hasId(2)).dedup()",
+      {
+        indentation: 0,
+        maxLineLength: 45,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V(6).
+  repeat('a', both('created').simplePath()).
+    emit(
+      repeat('b', both('knows')).
+        until(
+          loops('b').as('b').
+          where(loops('a').as('b'))).
+      hasId(2)).
+  dedup()`,
+  );
 });

@@ -214,4 +214,19 @@ test('Wrapped modulators should be indented with two spaces', () => {
     read().
   iterate()`,
   );
+
+  // Test times()-modulator indentation
+  expect(
+    formatQuery("g.V().repeat(both()).times(3).values('age').max()", {
+      indentation: 0,
+      maxLineLength: 20,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(
+    `g.V().
+  repeat(both()).
+    times(3).
+  values('age').
+  max()`,
+  );
 });

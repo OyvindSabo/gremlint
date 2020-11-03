@@ -56,7 +56,6 @@ test('Wrapped modulators should be indented with two spaces', () => {
     select(values).
     count(local).
     is(gt(1)))`);
-
   expect(
     formatQuery(
       "g.V().hasLabel('person').groupCount().by(values('age').choose(is(lt(28)),constant('young'),choose(is(lt(30)), constant('old'), constant('very old'))))",
@@ -89,7 +88,6 @@ test('Wrapped modulators should be indented with two spaces', () => {
     emit().
   path()`,
   );
-
   expect(
     formatQuery('g.V().repeat(both()).times(1000000).emit().range(6,10)', {
       indentation: 0,
@@ -103,7 +101,6 @@ test('Wrapped modulators should be indented with two spaces', () => {
     emit().
   range(6, 10)`,
   );
-
   expect(
     formatQuery("g.V(1).repeat(out()).times(2).emit().path().by('name')", {
       indentation: 0,
@@ -117,7 +114,6 @@ test('Wrapped modulators should be indented with two spaces', () => {
     emit().
   path().by('name')`,
   );
-
   expect(
     formatQuery("g.withSack(1).V(1).repeat(sack(sum).by(constant(1))).times(10).emit().sack().math('sin _')", {
       indentation: 0,
@@ -132,5 +128,31 @@ test('Wrapped modulators should be indented with two spaces', () => {
     emit().
   sack().
   math('sin _')`,
+  );
+
+  // Test from()-modulator indentation
+  expect(
+    formatQuery(
+      "g.V().has('person','name','vadas').as('e').in('knows').as('m').out('knows').where(neq('e')).path().from('m').by('name')",
+      {
+        indentation: 0,
+        maxLineLength: 20,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  has(
+    'person',
+    'name',
+    'vadas').
+    as('e').
+  in('knows').
+    as('m').
+  out('knows').
+  where(neq('e')).
+  path().
+    from('m').
+    by('name')`,
   );
 });

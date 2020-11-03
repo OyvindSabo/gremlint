@@ -1,0 +1,16 @@
+export const STEP_MODULATORS = [
+  'as',
+  'as_',
+  'by',
+  'emit',
+  'option',
+  'from',
+  'from_',
+  'to',
+  'read',
+  'times',
+  'until',
+  'with',
+  'with_',
+  'write',
+];

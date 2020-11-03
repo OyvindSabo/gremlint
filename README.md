@@ -10,29 +10,59 @@ Gremlint is a code formatter which parses Gremlin queries and rewrites them to a
 - To make your queries more beautiful
 - To act as a "living" style guide
 
-### How do I use it?
+### Use Gremlint as a JavaScript / TypeScript package
 
-The easiest way to use Gremlint is via the official website (https://gremlint.com). It can also be installed as a package.
+Since Gremlint is not yet "published", it has to be installed from its GitHub repo:
+
+```bash
+npm install OyvindSabo/gremlint#master
+```
+
+```typescript
+import { formatQuery } from 'gremlint';
+
+const unformattedQuery = `g.V().has('person', 'name', 'marko').shortestPath().with(ShortestPath.target, __.has('name', 'josh')).with(ShortestPath.distance, 'weight')`;
+
+formatQuery(unformattedQuery, {
+  indentation: 0,
+  maxLineLength: 80,
+  shouldPlaceDotsAfterLineBreaks: false,
+});
+
+console.log(formattedQuery);
+```
+
+```
+g.V().
+  has('person', 'name', 'marko').
+  shortestPath().
+    with(ShortestPath.target, __.has('name', 'josh')).
+    with(ShortestPath.distance, 'weight')
+```
+
+### Just looking for an online Gremlin query formatter?
+
+Gremlint.com is a website which utilizes the Gremlint library to give users an online "living" style guide for Gremlin queries. It also serves as a platform for showcasing the features of Gremlint.
 ![Gremlint V2 Screenshot](https://user-images.githubusercontent.com/25663729/88488518-f078ac00-cf8d-11ea-9e1c-01edec285751.png)
 
-## For developers
+### For contributors
 
-### Run linter
+**Lint source files**
 
 `npm run lint`
 
-### Format source files
+**Format source files**
 
 `npm run format`
 
-### Run tests
+**Run tests**
 
 `npm test`
 
-### Compile the TypeScript source code
+**Compile the TypeScript source code**
 
 `npm run build`
 
-### Bump version
+**Bump version**
 
 `npm version [major | minor | patch]`

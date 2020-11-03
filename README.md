@@ -23,7 +23,7 @@ import { formatQuery } from 'gremlint';
 
 const unformattedQuery = `g.V().has('person', 'name', 'marko').shortestPath().with(ShortestPath.target, __.has('name', 'josh')).with(ShortestPath.distance, 'weight')`;
 
-formatQuery(unformattedQuery, {
+const formattedQuery = formatQuery(unformattedQuery, {
   indentation: 0,
   maxLineLength: 80,
   shouldPlaceDotsAfterLineBreaks: false,

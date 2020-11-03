@@ -12,29 +12,27 @@ Gremlint is a code formatter which parses Gremlin queries and rewrites them to a
 
 ### How do I use it?
 
-The easiest way to use Gremlint is via the official website (https://gremlint.com). Since Gremlint is just a standalone HTML document, you can easily download it and run it locally if you wish (you can find it in `dist/index.html`).
+The easiest way to use Gremlint is via the official website (https://gremlint.com). It can also be installed as a package.
 ![Gremlint V2 Screenshot](https://user-images.githubusercontent.com/25663729/88488518-f078ac00-cf8d-11ea-9e1c-01edec285751.png)
 
 ## For developers
 
-### Compile to single HTML file
+### Run linter
 
-The compiled HTML file will end up in `dist/index.html`.
+`npm run lint`
 
-```
-$ node build
-```
+### Format source files
 
-### Continuously compile to single HTML file while editing
-
-The compiled HTML file will end up in `dist/index.html`.
-
-```
-$ node watch
-```
+`npm run format`
 
 ### Run tests
 
-```
-$ node test
-```
+`npm test`
+
+### Compile the TypeScript source code
+
+`npm run build`
+
+### Bump version
+
+`npm version [major | minor | patch]`

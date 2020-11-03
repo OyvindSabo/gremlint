@@ -19,4 +19,21 @@ test('Wrapped modulators should be indented with two spaces', () => {
   V().
   has('name', within('lop', 'ripple')).
   addE('uses').from('person')`);
+
+  // Test as_()-modulator indentation
+  expect(
+    formatQuery(
+      "g.V().has('name', within('marko', 'vadas', 'josh')).as_('person').V().has('name', within('lop', 'ripple')).addE('uses').from('person')",
+      {
+        indentation: 0,
+        maxLineLength: 50,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(`g.V().
+  has('name', within('marko', 'vadas', 'josh')).
+    as_('person').
+  V().
+  has('name', within('lop', 'ripple')).
+  addE('uses').from('person')`);
 });

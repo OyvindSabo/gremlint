@@ -268,4 +268,273 @@ test('Wrapped modulators should be indented with two spaces', () => {
       hasId(2)).
   dedup()`,
   );
+
+  // Test with()-modulator indentation
+  expect(
+    formatQuery(
+      "g.V().connectedComponent().with(ConnectedComponent.propertyName, 'component').project('name','component').by('name').by('component')",
+      {
+        indentation: 0,
+        maxLineLength: 55,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  connectedComponent().
+    with(ConnectedComponent.propertyName, 'component').
+  project('name', 'component').
+    by('name').
+    by('component')`,
+  );
+  expect(
+    formatQuery(
+      "g.V().hasLabel('person').connectedComponent().with(ConnectedComponent.propertyName, 'component').with(ConnectedComponent.edges, outE('knows')).project('name','component').by('name').by('component')",
+      {
+        indentation: 0,
+        maxLineLength: 55,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  hasLabel('person').
+  connectedComponent().
+    with(ConnectedComponent.propertyName, 'component').
+    with(ConnectedComponent.edges, outE('knows')).
+  project('name', 'component').
+    by('name').
+    by('component')`,
+  );
+  expect(
+    formatQuery(
+      "g.V().hasLabel('software').values('name').fold().order(Scope.local).index().with(WithOptions.indexer, WithOptions.list).unfold().order().by(__.tail(Scope.local, 1))",
+      {
+        indentation: 0,
+        maxLineLength: 50,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  hasLabel('software').
+  values('name').
+  fold().
+  order(Scope.local).
+  index().
+    with(WithOptions.indexer, WithOptions.list).
+  unfold().
+  order().by(__.tail(Scope.local, 1))`,
+  );
+  expect(
+    formatQuery(
+      "g.V().hasLabel('person').values('name').fold().order(Scope.local).index().with(WithOptions.indexer, WithOptions.map)",
+      {
+        indentation: 0,
+        maxLineLength: 50,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  hasLabel('person').
+  values('name').
+  fold().
+  order(Scope.local).
+  index().
+    with(WithOptions.indexer, WithOptions.map)`,
+  );
+  expect(
+    formatQuery('g.io(someInputFile).with(IO.reader, IO.graphson).read().iterate()', {
+      indentation: 0,
+      maxLineLength: 35,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(
+    `g.io(someInputFile).
+    with(IO.reader, IO.graphson).
+    read().
+  iterate()`,
+  );
+  expect(
+    formatQuery('g.io(someOutputFile).with(IO.writer,IO.graphml).write().iterate()', {
+      indentation: 0,
+      maxLineLength: 35,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(
+    `g.io(someOutputFile).
+    with(IO.writer, IO.graphml).
+    write().
+  iterate()`,
+  );
+  expect(
+    formatQuery(
+      "g.V().hasLabel('person').pageRank().with(PageRank.edges, __.outE('knows')).with(PageRank.propertyName, 'friendRank').order().by('friendRank',desc).elementMap('name','friendRank')",
+      {
+        indentation: 0,
+        maxLineLength: 50,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  hasLabel('person').
+  pageRank().
+    with(PageRank.edges, __.outE('knows')).
+    with(PageRank.propertyName, 'friendRank').
+  order().by('friendRank', desc).
+  elementMap('name', 'friendRank')`,
+  );
+  expect(
+    formatQuery(
+      "g.V().hasLabel('person').peerPressure().with(PeerPressure.propertyName, 'cluster').group().by('cluster').by('name')",
+      {
+        indentation: 0,
+        maxLineLength: 50,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  hasLabel('person').
+  peerPressure().
+    with(PeerPressure.propertyName, 'cluster').
+  group().by('cluster').by('name')`,
+  );
+  expect(
+    formatQuery("g.V().shortestPath().with(ShortestPath.target, __.has('name','peter'))", {
+      indentation: 0,
+      maxLineLength: 55,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(
+    `g.V().
+  shortestPath().
+    with(ShortestPath.target, __.has('name', 'peter'))`,
+  );
+  expect(
+    formatQuery(
+      "g.V().shortestPath().with(ShortestPath.edges, Direction.IN).with(ShortestPath.target, __.has('name','josh'))",
+      {
+        indentation: 0,
+        maxLineLength: 55,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  shortestPath().
+    with(ShortestPath.edges, Direction.IN).
+    with(ShortestPath.target, __.has('name', 'josh'))`,
+  );
+  expect(
+    formatQuery("g.V().has('person','name','marko').shortestPath().with(ShortestPath.target,__.has('name','josh'))", {
+      indentation: 0,
+      maxLineLength: 55,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(
+    `g.V().
+  has('person', 'name', 'marko').
+  shortestPath().
+    with(ShortestPath.target, __.has('name', 'josh'))`,
+  );
+  expect(
+    formatQuery(
+      "g.V().has('person','name','marko').shortestPath().with(ShortestPath.target, __.has('name','josh')).with(ShortestPath.distance, 'weight')",
+      {
+        indentation: 0,
+        maxLineLength: 55,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  has('person', 'name', 'marko').
+  shortestPath().
+    with(ShortestPath.target, __.has('name', 'josh')).
+    with(ShortestPath.distance, 'weight')`,
+  );
+  expect(
+    formatQuery(
+      "g.V().has('person','name','marko').shortestPath().with(ShortestPath.target, __.has('name','josh')).with(ShortestPath.includeEdges, true)",
+      {
+        indentation: 0,
+        maxLineLength: 55,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  has('person', 'name', 'marko').
+  shortestPath().
+    with(ShortestPath.target, __.has('name', 'josh')).
+    with(ShortestPath.includeEdges, true)`,
+  );
+  expect(
+    formatQuery(
+      "g.inject(g.withComputer().V().shortestPath().with(ShortestPath.distance, 'weight').with(ShortestPath.includeEdges, true).with(ShortestPath.maxDistance, 1).toList().toArray()).map(unfold().values('name','weight').fold())",
+      {
+        indentation: 0,
+        maxLineLength: 50,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.inject(
+  g.withComputer().
+    V().
+    shortestPath().
+      with(ShortestPath.distance, 'weight').
+      with(ShortestPath.includeEdges, true).
+      with(ShortestPath.maxDistance, 1).
+    toList().
+    toArray()).
+  map(unfold().values('name', 'weight').fold())`,
+  );
+  expect(
+    formatQuery("g.V().hasLabel('person').valueMap().with(WithOptions.tokens)", {
+      indentation: 0,
+      maxLineLength: 35,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(
+    `g.V().
+  hasLabel('person').
+  valueMap().
+    with(WithOptions.tokens)`,
+  );
+  expect(
+    formatQuery("g.V().hasLabel('person').valueMap('name').with(WithOptions.tokens,WithOptions.labels)", {
+      indentation: 0,
+      maxLineLength: 35,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(
+    `g.V().
+  hasLabel('person').
+  valueMap('name').
+    with(
+      WithOptions.tokens,
+      WithOptions.labels)`,
+  );
+  expect(
+    formatQuery(
+      "g.V().hasLabel('person').properties('location').valueMap().with(WithOptions.tokens, WithOptions.values)",
+      {
+        indentation: 0,
+        maxLineLength: 35,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(
+    `g.V().
+  hasLabel('person').
+  properties('location').
+  valueMap().
+    with(
+      WithOptions.tokens,
+      WithOptions.values)`,
+  );
 });

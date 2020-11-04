@@ -21,7 +21,9 @@ npm install OyvindSabo/gremlint#master
 ```typescript
 import { formatQuery } from 'gremlint';
 
-const unformattedQuery = `g.V().has('person', 'name', 'marko').shortestPath().with(ShortestPath.target, __.has('name', 'josh')).with(ShortestPath.distance, 'weight')`;
+const unformattedQuery = `g.V().has('person', 'name', 'marko').shortestPath().
+with(ShortestPath.target, __.has('name', 'josh')).with(ShortestPath.distance,
+'weight')`;
 
 const formattedQuery = formatQuery(unformattedQuery, {
   indentation: 0,
@@ -42,7 +44,7 @@ g.V().
 
 ### Just looking for an online Gremlin query formatter?
 
-Gremlint.com is a website which utilizes the Gremlint library to give users an online "living" style guide for Gremlin queries. It also serves as a platform for showcasing the features of Gremlint.
+https://gremlint.com is a website which utilizes the Gremlint library to give users an online "living" style guide for Gremlin queries. It also serves as a platform for showcasing the features of Gremlint. Its source code is available [here](https://github.com/OyvindSabo/gremlint.com).
 ![Gremlint V2 Screenshot](https://user-images.githubusercontent.com/25663729/88488518-f078ac00-cf8d-11ea-9e1c-01edec285751.png)
 
 ### For contributors

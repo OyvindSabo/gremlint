@@ -10,7 +10,7 @@ Gremlint is a code formatter which parses Gremlin queries and rewrites them to a
 - To make your queries more beautiful
 - To act as a "living" style guide
 
-### Use Gremlint as a JavaScript / TypeScript package
+### Install Gremlint as a JavaScript / TypeScript package
 
 Since Gremlint is not yet "published", it has to be installed from its GitHub repo:
 
@@ -18,18 +18,14 @@ Since Gremlint is not yet "published", it has to be installed from its GitHub re
 npm install OyvindSabo/gremlint#master
 ```
 
+### Basic example
+
 ```typescript
 import { formatQuery } from 'gremlint';
 
-const unformattedQuery = `g.V().has('person', 'name', 'marko').shortestPath().
-with(ShortestPath.target, __.has('name', 'josh')).with(ShortestPath.distance,
-'weight')`;
+const unformattedQuery = `g.V().has('person', 'name', 'marko').shortestPath().with(ShortestPath.target, __.has('name', 'josh')).with(ShortestPath.distance, 'weight')`;
 
-const formattedQuery = formatQuery(unformattedQuery, {
-  indentation: 0,
-  maxLineLength: 80,
-  shouldPlaceDotsAfterLineBreaks: false,
-});
+const formattedQuery = formatQuery(unformattedQuery);
 
 console.log(formattedQuery);
 ```
@@ -40,6 +36,58 @@ g.V().
   shortestPath().
     with(ShortestPath.target, __.has('name', 'josh')).
     with(ShortestPath.distance, 'weight')
+```
+
+### Override default max line length
+
+The default max line length is 80, but it can easily be overridden.
+
+```typescript
+import { formatQuery } from 'gremlint';
+
+const unformattedQuery = `g.V().has('person', 'name', 'marko').shortestPath().with(ShortestPath.target, __.has('name', 'josh')).with(ShortestPath.distance, 'weight')`;
+
+const formattedQuery = formatQuery(unformattedQuery, { maxLineLength: 50 });
+
+console.log(formattedQuery);
+```
+
+```
+g.V().
+  has('person', 'name', 'marko').
+  shortestPath().
+    with(
+      ShortestPath.target,
+      __.has('name', 'josh')).
+    with(ShortestPath.distance, 'weight')
+```
+
+### Other formatting options
+
+```typescript
+import { formatQuery } from 'gremlint';
+
+const unformattedQuery = `g.V().has('person', 'name', 'marko').shortestPath().with(ShortestPath.target, __.has('name', 'josh')).with(ShortestPath.distance, 'weight')`;
+
+const formattedQuery = formatQuery(unformattedQuery, {
+  indentation: 4, // default: 0
+  maxLineLength: 40, // default: 80
+  shouldPlaceDotsAfterLineBreaks: true, // default: false
+});
+
+console.log(formattedQuery);
+```
+
+```
+    g.V()
+      .has('person', 'name', 'marko')
+      .shortestPath()
+        .with(
+          ShortestPath.target,
+          __.has('name', 'josh'))
+        .with(
+          ShortestPath.distance,
+          'weight')
 ```
 
 ### Just looking for an online Gremlin query formatter?

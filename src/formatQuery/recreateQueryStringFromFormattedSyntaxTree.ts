@@ -1,7 +1,7 @@
 import { FormattedSyntaxTree, TokenType } from './types';
 import { spaces } from './utils';
 
-export const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: FormattedSyntaxTree): string => {
+const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: FormattedSyntaxTree): string => {
   if (syntaxTree.type === TokenType.Traversal) {
     return syntaxTree.stepGroups
       .map((stepGroup) => stepGroup.steps.map(recreateQueryStringFromFormattedSyntaxTree).join('.'))
@@ -44,4 +44,8 @@ export const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: Formatted
   // The following line is just here to convince TypeScript that the return type
   // is string and not string | undefined.
   return '';
+};
+
+export const recreateQueryStringFromFormattedSyntaxTrees = (syntaxTrees: FormattedSyntaxTree[]) => {
+  return syntaxTrees.map(recreateQueryStringFromFormattedSyntaxTree).filter(Boolean).join('\n\n');
 };

@@ -12,11 +12,11 @@ export type DotInfo = {
 export type ExtendedGremlintConfig = GremlintConfig & DotInfo;
 
 export enum TokenType {
+  Traversal = 'TRAVERSAL',
   Method = 'METHOD',
   Closure = 'CLOSURE',
   String = 'STRING',
   Word = 'WORD',
-  Traversal = 'TRAVERSAL',
 }
 
 export type UnformattedTraversalSyntaxTree = {

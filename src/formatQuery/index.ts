@@ -1,6 +1,6 @@
-import { formatSyntaxTree } from './formatSyntaxTree';
-import { parseToSyntaxTree } from './parseToSyntaxTree';
-import { recreateQueryStringFromFormattedSyntaxTree } from './recreateQueryStringFromFormattedSyntaxTree';
+import { formatSyntaxTrees } from './formatSyntaxTree';
+import { parseToSyntaxTrees } from './parseToSyntaxTree';
+import { recreateQueryStringFromFormattedSyntaxTrees } from './recreateQueryStringFromFormattedSyntaxTree';
 import { GremlintConfig } from './types';
 import { pipe } from './utils';
 
@@ -13,8 +13,8 @@ const withDefaults = (config: Partial<GremlintConfig>) => ({
 
 export const formatQuery = (query: string, config?: Partial<GremlintConfig>): string => {
   return pipe(
-    parseToSyntaxTree,
-    formatSyntaxTree(withDefaults(config ?? {})),
-    recreateQueryStringFromFormattedSyntaxTree,
+    parseToSyntaxTrees,
+    formatSyntaxTrees(withDefaults(config ?? {})),
+    recreateQueryStringFromFormattedSyntaxTrees,
   )(query);
 };

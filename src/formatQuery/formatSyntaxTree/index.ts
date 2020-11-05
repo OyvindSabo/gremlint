@@ -21,3 +21,7 @@ export const formatSyntaxTree = (config: GremlintConfig) => (
       return formatWord(config)(syntaxTree);
   }
 };
+
+export const formatSyntaxTrees = (config: GremlintConfig) => (syntaxTrees: UnformattedSyntaxTree[]) => {
+  return syntaxTrees.map(formatSyntaxTree(config));
+};

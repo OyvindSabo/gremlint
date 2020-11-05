@@ -1,6 +1,73 @@
 import { TokenType, UnformattedSyntaxTree } from './types';
 import { last, pipe } from './utils';
 
+// All top-level linebreaks where the code before the line break does not end with a dot and the code after the line
+// break does not start with a dot are considered to separate two
+const tokenizeOnTopLevelLinebreaks = (query: string): string[] => {
+  let word = '';
+  let parenthesesCount = 0;
+  let squareBracketCount = 0;
+  let curlyBracketCount = 0;
+  let isInsideSingleQuoteString = false;
+  query.split('').forEach((char, i) => {
+    if (char === '(' && !isInsideSingleQuoteString) {
+      parenthesesCount++;
+      word += '(';
+      return;
+    }
+    if (char === '[' && !isInsideSingleQuoteString) {
+      squareBracketCount++;
+      word += '[';
+      return;
+    }
+    if (char === '{' && !isInsideSingleQuoteString) {
+      curlyBracketCount++;
+      word += '{';
+      return;
+    }
+    if (char === ')' && !isInsideSingleQuoteString) {
+      parenthesesCount--;
+      word += ')';
+      return;
+    }
+    if (char === ']' && !isInsideSingleQuoteString) {
+      squareBracketCount--;
+      word += ']';
+      return;
+    }
+    if (char === '}' && !isInsideSingleQuoteString) {
+      curlyBracketCount--;
+      word += '}';
+      return;
+    }
+    if (char === "'") {
+      isInsideSingleQuoteString = !isInsideSingleQuoteString;
+      word += "'";
+      return;
+    }
+    if (char === '\n') {
+      word +=
+        isInsideSingleQuoteString ||
+        parenthesesCount ||
+        squareBracketCount ||
+        curlyBracketCount ||
+        word.trim().charAt(word.length - 1) === '.' ||
+        query
+          .substr(i + 1)
+          .trim()
+          .charAt(0) === '.'
+          ? '\n'
+          : String.fromCharCode(28);
+      return;
+    }
+    word += char;
+  });
+  return word
+    .split(String.fromCharCode(28))
+    .filter((token) => token !== '')
+    .map((token) => token.trim());
+};
+
 const tokenizeOnTopLevelPunctuation = (query: string): string[] => {
   let word = '';
   let parenthesesCount = 0;
@@ -282,23 +349,23 @@ const getMethodTokenAndClosureCodeBlockFromClosureInvocation = (
   };
 };
 
-export const parseToSyntaxTree = (query: string): UnformattedSyntaxTree => {
-  const tokens = tokenizeOnTopLevelPunctuation(query);
+const parseCodeBlockToSyntaxTree = (codeBlock: string): UnformattedSyntaxTree => {
+  const tokens = tokenizeOnTopLevelPunctuation(codeBlock);
   if (tokens.length === 1) {
     const token = tokens[0];
     if (isMethodInvocation(token)) {
       const { methodToken, argumentTokens } = getMethodTokenAndArgumentTokensFromMethodInvocation(token);
       return {
         type: TokenType.Method,
-        method: parseToSyntaxTree(methodToken),
-        arguments: argumentTokens.map(parseToSyntaxTree),
+        method: parseCodeBlockToSyntaxTree(methodToken),
+        arguments: argumentTokens.map(parseCodeBlockToSyntaxTree),
       };
     }
     if (isClosureInvocation(token)) {
       const { methodToken, closureCodeBlock } = getMethodTokenAndClosureCodeBlockFromClosureInvocation(token);
       return {
         type: TokenType.Closure,
-        method: parseToSyntaxTree(methodToken),
+        method: parseCodeBlockToSyntaxTree(methodToken),
         closureCodeBlock,
       };
     }
@@ -315,6 +382,10 @@ export const parseToSyntaxTree = (query: string): UnformattedSyntaxTree => {
   }
   return {
     type: TokenType.Traversal,
-    steps: tokens.map(parseToSyntaxTree),
+    steps: tokens.map(parseCodeBlockToSyntaxTree),
   };
+};
+
+export const parseToSyntaxTrees = (query: string): UnformattedSyntaxTree[] => {
+  return tokenizeOnTopLevelLinebreaks(query).map(parseCodeBlockToSyntaxTree);
 };

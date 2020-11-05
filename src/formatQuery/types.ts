@@ -13,6 +13,7 @@ export type ExtendedGremlintConfig = GremlintConfig & DotInfo;
 
 export enum TokenType {
   Method = 'METHOD',
+  Closure = 'CLOSURE',
   String = 'STRING',
   Word = 'WORD',
   Traversal = 'TRAVERSAL',
@@ -29,6 +30,12 @@ export type UnformattedMethodSyntaxTree = {
   arguments: UnformattedSyntaxTree[];
 };
 
+export type UnformattedClosureSyntaxTree = {
+  type: TokenType.Closure;
+  method: UnformattedSyntaxTree;
+  closureCodeBlock: string;
+};
+
 export type UnformattedStringSyntaxTree = {
   type: TokenType.String;
   string: string;
@@ -41,6 +48,7 @@ export type UnformattedWordSyntaxTree = {
 
 export type UnformattedSyntaxTree =
   | UnformattedMethodSyntaxTree
+  | UnformattedClosureSyntaxTree
   | UnformattedStringSyntaxTree
   | UnformattedWordSyntaxTree
   | UnformattedTraversalSyntaxTree;
@@ -67,6 +75,15 @@ export type FormattedMethodSyntaxTree = {
   shouldEndWithDot: boolean;
 };
 
+export type FormattedClosureSyntaxTree = {
+  type: TokenType.Closure;
+  method: FormattedSyntaxTree;
+  closureCodeBlock: string;
+  indentation: number;
+  shouldStartWithDot: boolean;
+  shouldEndWithDot: boolean;
+};
+
 export type FormattedStringSyntaxTree = {
   type: TokenType.String;
   string: string;
@@ -84,6 +101,7 @@ export type FormattedWordSyntaxTree = {
 export type FormattedSyntaxTree =
   | FormattedTraversalSyntaxTree
   | FormattedMethodSyntaxTree
+  | FormattedClosureSyntaxTree
   | FormattedStringSyntaxTree
   | FormattedWordSyntaxTree;
 

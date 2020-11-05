@@ -61,7 +61,8 @@ export const getStepGroups = (
       const shouldBeLastStepInStepGroup =
         isLastStep ||
         (isFirstStepInStepGroup && isModulator(step)) ||
-        (step.type === TokenType.Method && !(nextStepIsModulator && !lineIsTooLongWithSubsequentModulators));
+        ((step.type === TokenType.Method || step.type === TokenType.Closure) &&
+          !(nextStepIsModulator && !lineIsTooLongWithSubsequentModulators));
 
       // If it should be the last step in a line
       // We don't want to newline after words which are not methods. For

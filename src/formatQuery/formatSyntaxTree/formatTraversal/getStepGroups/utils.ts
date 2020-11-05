@@ -6,7 +6,7 @@ export const isTraversalSource = (step: FormattedSyntaxTree): boolean => {
 };
 
 export const isModulator = (step: UnformattedSyntaxTree | FormattedSyntaxTree): boolean => {
-  if (step.type !== TokenType.Method) return false;
+  if (step.type !== TokenType.Method && step.type !== TokenType.Closure) return false;
   if (step.method.type !== TokenType.Word) return false;
   return STEP_MODULATORS.includes(step.method.word);
 };

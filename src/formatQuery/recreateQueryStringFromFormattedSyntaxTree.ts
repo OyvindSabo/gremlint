@@ -20,6 +20,16 @@ export const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: Formatted
       ].join(syntaxTree.argumentsShouldStartOnNewLine ? '\n' : '')
     );
   }
+  if (syntaxTree.type === TokenType.Closure) {
+    return (
+      (syntaxTree.shouldStartWithDot ? '.' : '') +
+      recreateQueryStringFromFormattedSyntaxTree(syntaxTree.method) +
+      '{' +
+      syntaxTree.closureCodeBlock +
+      '}' +
+      (syntaxTree.shouldEndWithDot ? '.' : '')
+    );
+  }
   if (syntaxTree.type === TokenType.String) {
     return spaces(syntaxTree.indentation) + syntaxTree.string;
   }

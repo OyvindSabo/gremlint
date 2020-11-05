@@ -1,6 +1,6 @@
-import { formatSyntaxTrees } from './formatSyntaxTree';
-import { parseToSyntaxTrees } from './parseToSyntaxTree';
-import { recreateQueryStringFromFormattedSyntaxTrees } from './recreateQueryStringFromFormattedSyntaxTree';
+import { formatSyntaxTrees } from './formatSyntaxTrees';
+import { parseToSyntaxTrees } from './parseToSyntaxTrees';
+import { recreateQueryStringFromFormattedSyntaxTrees } from './recreateQueryStringFromFormattedSyntaxTrees';
 import { GremlintConfig } from './types';
 import { pipe } from './utils';
 

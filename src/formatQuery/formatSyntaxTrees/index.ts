@@ -5,9 +5,7 @@ import { formatString } from './formatString';
 import { formatTraversal } from './formatTraversal';
 import { formatWord } from './formatWord';
 
-export const formatSyntaxTree = (config: GremlintConfig) => (
-  syntaxTree: UnformattedSyntaxTree,
-): FormattedSyntaxTree => {
+const formatSyntaxTree = (config: GremlintConfig) => (syntaxTree: UnformattedSyntaxTree): FormattedSyntaxTree => {
   switch (syntaxTree.type) {
     case TokenType.Traversal:
       return formatTraversal(formatSyntaxTree)(config)(syntaxTree);

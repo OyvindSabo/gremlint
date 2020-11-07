@@ -25,7 +25,9 @@ const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: FormattedSyntaxT
       (syntaxTree.shouldStartWithDot ? '.' : '') +
       recreateQueryStringFromFormattedSyntaxTree(syntaxTree.method) +
       '{' +
-      syntaxTree.closureCodeBlock +
+      syntaxTree.closureCodeBlock
+        .map(({ lineOfCode, indentation }, i) => `${spaces(indentation)}${lineOfCode}`)
+        .join('\n') +
       '}' +
       (syntaxTree.shouldEndWithDot ? '.' : '')
     );

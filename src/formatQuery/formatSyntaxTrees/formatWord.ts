@@ -1,6 +1,6 @@
-import { ExtendedGremlintConfig, FormattedWordSyntaxTree, TokenType, UnformattedWordSyntaxTree } from '../types';
+import { FormattedWordSyntaxTree, GremlintConfig, TokenType, UnformattedWordSyntaxTree } from '../types';
 
-export const formatWord = (config: ExtendedGremlintConfig) => (
+export const formatWord = (config: GremlintConfig) => (
   syntaxTree: UnformattedWordSyntaxTree,
 ): FormattedWordSyntaxTree => {
   return {
@@ -9,5 +9,6 @@ export const formatWord = (config: ExtendedGremlintConfig) => (
     indentation: config.indentation,
     shouldStartWithDot: Boolean(config.shouldStartWithDot),
     shouldEndWithDot: Boolean(config.shouldEndWithDot),
+    width: syntaxTree.word.length,
   };
 };

@@ -1,6 +1,6 @@
-import { DotInfo, ExtendedGremlintConfig, GremlintConfig } from '../types';
+import { GremlintConfig } from '../types';
 
-export const withIndentation = (indentation: number) => (config: GremlintConfig): GremlintConfig => ({
+const withIndentation = (indentation: number) => (config: GremlintConfig): GremlintConfig => ({
   ...config,
   indentation,
 });
@@ -12,21 +12,37 @@ export const withIncreasedIndentation = (indentationIncrease: number) => (config
   indentation: config.indentation + indentationIncrease,
 });
 
-export const withDotInfo = ({ shouldStartWithDot, shouldEndWithDot }: DotInfo) => (
-  config: GremlintConfig,
-): ExtendedGremlintConfig => ({
+export const withDotInfo = ({
+  shouldStartWithDot,
+  shouldEndWithDot,
+}: {
+  shouldStartWithDot: boolean;
+  shouldEndWithDot: boolean;
+}) => (config: GremlintConfig): GremlintConfig => ({
   ...config,
   shouldStartWithDot,
   shouldEndWithDot,
 });
 
-export const withZeroDotInfo = (config: GremlintConfig): ExtendedGremlintConfig => ({
+export const withZeroDotInfo = (config: GremlintConfig): GremlintConfig => ({
   ...config,
   shouldStartWithDot: false,
   shouldEndWithDot: false,
 });
 
-export const withNoEndDotInfo = (config: GremlintConfig): ExtendedGremlintConfig => ({
+export const withNoEndDotInfo = (config: GremlintConfig): GremlintConfig => ({
   ...config,
   shouldEndWithDot: false,
+});
+
+export const withHorizontalPosition = (horizontalPosition: number) => (config: GremlintConfig): GremlintConfig => ({
+  ...config,
+  horizontalPosition,
+});
+
+export const withIncreasedHorizontalPosition = (horizontalPositionIncrease: number) => (
+  config: GremlintConfig,
+): GremlintConfig => ({
+  ...config,
+  horizontalPosition: config.horizontalPosition + horizontalPositionIncrease,
 });

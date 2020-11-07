@@ -2,14 +2,10 @@ export type GremlintConfig = {
   indentation: number;
   maxLineLength: number;
   shouldPlaceDotsAfterLineBreaks: boolean;
+  shouldEndWithDot: boolean;
+  shouldStartWithDot: boolean;
+  horizontalPosition: number; // Will be used by child syntax trees and is the width before its child content starts, so hasLabel(...) has a width of 9
 };
-
-export type DotInfo = {
-  shouldEndWithDot?: boolean;
-  shouldStartWithDot?: boolean;
-};
-
-export type ExtendedGremlintConfig = GremlintConfig & DotInfo;
 
 export enum TokenType {
   Traversal = 'TRAVERSAL',
@@ -30,10 +26,18 @@ export type UnformattedMethodSyntaxTree = {
   arguments: UnformattedSyntaxTree[];
 };
 
+export type UnformattedClosureLineOfCode = {
+  lineOfCode: string;
+  // Relative indentation compared to the opening curly bracket, so relativeIndentation of In {it.get} is 0.
+  relativeIndentation: number;
+};
+
+export type UnformattedClosureCodeBlock = UnformattedClosureLineOfCode[];
+
 export type UnformattedClosureSyntaxTree = {
   type: TokenType.Closure;
   method: UnformattedSyntaxTree;
-  closureCodeBlock: string;
+  closureCodeBlock: UnformattedClosureCodeBlock;
 };
 
 export type UnformattedStringSyntaxTree = {
@@ -62,6 +66,7 @@ export type FormattedTraversalSyntaxTree = {
   steps: UnformattedSyntaxTree[];
   stepGroups: GremlinStepGroup[];
   indentation: number;
+  width: number;
 };
 
 export type FormattedMethodSyntaxTree = {
@@ -71,15 +76,25 @@ export type FormattedMethodSyntaxTree = {
   argumentGroups: FormattedSyntaxTree[][];
   argumentsShouldStartOnNewLine: boolean;
   indentation: number;
+  width: number;
   shouldStartWithDot: boolean;
   shouldEndWithDot: boolean;
 };
 
+type FormattedClosureLineOfCode = {
+  lineOfCode: string;
+  relativeIndentation: number;
+  indentation: number;
+};
+
+type FormattedClosureCodeBlock = FormattedClosureLineOfCode[];
+
 export type FormattedClosureSyntaxTree = {
   type: TokenType.Closure;
   method: FormattedSyntaxTree;
-  closureCodeBlock: string;
+  closureCodeBlock: FormattedClosureCodeBlock;
   indentation: number;
+  width: number;
   shouldStartWithDot: boolean;
   shouldEndWithDot: boolean;
 };
@@ -87,6 +102,7 @@ export type FormattedClosureSyntaxTree = {
 export type FormattedStringSyntaxTree = {
   type: TokenType.String;
   string: string;
+  width: number;
   indentation: number;
 };
 
@@ -94,6 +110,7 @@ export type FormattedWordSyntaxTree = {
   type: TokenType.Word;
   word: string;
   indentation: number;
+  width: number;
   shouldStartWithDot: boolean;
   shouldEndWithDot: boolean;
 };

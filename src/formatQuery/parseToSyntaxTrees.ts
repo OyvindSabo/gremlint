@@ -1,5 +1,5 @@
-import { TokenType, UnformattedSyntaxTree } from './types';
-import { last, pipe } from './utils';
+import { UnformattedClosureCodeBlock, TokenType, UnformattedSyntaxTree } from './types';
+import { last, neq, pipe } from './utils';
 
 // All top-level linebreaks where the code before the line break does not end with a dot and the code after the line
 // break does not start with a dot are considered to separate two
@@ -335,21 +335,36 @@ const getMethodTokenAndArgumentTokensFromMethodInvocation = (
   };
 };
 
+const getIndentation = (lineOfCode: string): number => lineOfCode.split('').findIndex(neq(' '));
+
 const getMethodTokenAndClosureCodeBlockFromClosureInvocation = (
   token: string,
-): { methodToken: string; closureCodeBlock: string } => {
+  fullQuery: string,
+): { methodToken: string; closureCodeBlock: UnformattedClosureCodeBlock } => {
   // The word before the first curly bracket is the method name
   // The token may be a double application of a curried function, so we cannot
   // assume that the first opening curly bracket is closed by the last closing
   // curly bracket
   const tokens = tokenizeOnTopLevelCurlyBrackets(token);
+  const methodToken = tokens.slice(0, -1).join('');
+  const closureCodeBlockToken = trimCurlyBrackets(tokens.slice(-1)[0]);
+  const initialClosureCodeBlockIndentation = fullQuery
+    .substr(0, fullQuery.indexOf(closureCodeBlockToken))
+    .split('\n')
+    .slice(-1)[0].length;
   return {
-    methodToken: tokens.slice(0, -1).join(''),
-    closureCodeBlock: trimCurlyBrackets(tokens.slice(-1)[0]),
+    methodToken,
+    closureCodeBlock: trimCurlyBrackets(tokens.slice(-1)[0])
+      .split('\n')
+      .map((lineOfCode, i) => ({
+        lineOfCode: lineOfCode.trimStart(),
+        relativeIndentation:
+          i === 0 ? getIndentation(lineOfCode) : getIndentation(lineOfCode) - initialClosureCodeBlockIndentation,
+      })),
   };
 };
 
-const parseCodeBlockToSyntaxTree = (codeBlock: string): UnformattedSyntaxTree => {
+const parseCodeBlockToSyntaxTree = (fullQuery: string) => (codeBlock: string): UnformattedSyntaxTree => {
   const tokens = tokenizeOnTopLevelPunctuation(codeBlock);
   if (tokens.length === 1) {
     const token = tokens[0];
@@ -357,15 +372,18 @@ const parseCodeBlockToSyntaxTree = (codeBlock: string): UnformattedSyntaxTree =>
       const { methodToken, argumentTokens } = getMethodTokenAndArgumentTokensFromMethodInvocation(token);
       return {
         type: TokenType.Method,
-        method: parseCodeBlockToSyntaxTree(methodToken),
-        arguments: argumentTokens.map(parseCodeBlockToSyntaxTree),
+        method: parseCodeBlockToSyntaxTree(fullQuery)(methodToken),
+        arguments: argumentTokens.map(parseCodeBlockToSyntaxTree(fullQuery)),
       };
     }
     if (isClosureInvocation(token)) {
-      const { methodToken, closureCodeBlock } = getMethodTokenAndClosureCodeBlockFromClosureInvocation(token);
+      const { methodToken, closureCodeBlock } = getMethodTokenAndClosureCodeBlockFromClosureInvocation(
+        token,
+        fullQuery,
+      );
       return {
         type: TokenType.Closure,
-        method: parseCodeBlockToSyntaxTree(methodToken),
+        method: parseCodeBlockToSyntaxTree(fullQuery)(methodToken),
         closureCodeBlock,
       };
     }
@@ -382,10 +400,10 @@ const parseCodeBlockToSyntaxTree = (codeBlock: string): UnformattedSyntaxTree =>
   }
   return {
     type: TokenType.Traversal,
-    steps: tokens.map(parseCodeBlockToSyntaxTree),
+    steps: tokens.map(parseCodeBlockToSyntaxTree(fullQuery)),
   };
 };
 
 export const parseToSyntaxTrees = (query: string): UnformattedSyntaxTree[] => {
-  return tokenizeOnTopLevelLinebreaks(query).map(parseCodeBlockToSyntaxTree);
+  return tokenizeOnTopLevelLinebreaks(query).map(parseCodeBlockToSyntaxTree(query));
 };

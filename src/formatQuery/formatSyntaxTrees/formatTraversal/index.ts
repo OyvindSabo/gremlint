@@ -6,6 +6,7 @@ import {
   TokenType,
   UnformattedTraversalSyntaxTree,
 } from '../../types';
+import { last, sum } from '../../utils';
 import { withZeroIndentation } from '../utils';
 import { getStepGroups } from './getStepGroups';
 
@@ -13,8 +14,8 @@ import { getStepGroups } from './getStepGroups';
 export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (config: GremlintConfig) => (
   syntaxTree: UnformattedTraversalSyntaxTree,
 ): FormattedTraversalSyntaxTree => {
-  const recreatedQuery = recreateQueryOnelinerFromSyntaxTree(config.indentation)(syntaxTree);
-  if (recreatedQuery.length <= config.maxLineLength) {
+  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(config.indentation)(syntaxTree).length;
+  if (recreatedQueryLength <= config.maxLineLength) {
     return {
       type: TokenType.Traversal,
       steps: syntaxTree.steps,
@@ -26,12 +27,21 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
         },
       ],
       indentation: 0,
+      width: recreatedQueryLength,
     };
   }
+  const stepGroups = getStepGroups(formatSyntaxTree, syntaxTree.steps, config);
+  const width =
+    last(stepGroups)
+      .steps.map(({ width }) => width)
+      .reduce(sum, 0) +
+    stepGroups.length -
+    1;
   return {
     type: TokenType.Traversal,
     steps: syntaxTree.steps,
-    stepGroups: getStepGroups(formatSyntaxTree, syntaxTree.steps, config),
+    stepGroups,
     indentation: 0,
+    width,
   };
 };

@@ -1,4 +1,5 @@
 import {
+  FormattedMethodSyntaxTree,
   TokenType,
   UnformattedClosureSyntaxTree,
   UnformattedMethodSyntaxTree,
@@ -6,7 +7,7 @@ import {
   UnformattedTraversalSyntaxTree,
   UnformattedWordSyntaxTree,
 } from './types';
-import { spaces } from './utils';
+import { last, spaces } from './utils';
 
 type GremlinOnelinerSyntaxTree =
   | Pick<UnformattedTraversalSyntaxTree, 'type' | 'steps'>
@@ -34,8 +35,12 @@ const recreateQueryOnelinerFromSyntaxTree = (indentation: number = 0) => (
         spaces(indentation) +
         recreateQueryOnelinerFromSyntaxTree()(syntaxTree.method) +
         '{' +
-        syntaxTree.closureCodeBlock +
-        ')'
+        last(
+          syntaxTree.closureCodeBlock.map(
+            ({ lineOfCode, relativeIndentation }) => `${spaces(Math.max(relativeIndentation, 0))}${lineOfCode}`,
+          ),
+        ) +
+        '}'
       );
     case TokenType.String:
       return spaces(indentation) + syntaxTree.string;

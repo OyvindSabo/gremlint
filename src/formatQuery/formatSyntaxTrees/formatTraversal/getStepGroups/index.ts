@@ -7,8 +7,13 @@ import {
   TokenType,
   UnformattedSyntaxTree,
 } from '../../../types';
-import { pipe } from '../../../utils';
-import { withDotInfo, withIncreasedIndentation, withZeroIndentation } from '../../utils';
+import { pipe, sum } from '../../../utils';
+import {
+  withDotInfo,
+  withIncreasedHorizontalPosition,
+  withIncreasedIndentation,
+  withZeroIndentation,
+} from '../../utils';
 import { isModulator, isTraversalSource } from './utils';
 
 export const getStepGroups = (
@@ -98,6 +103,7 @@ export const getStepGroups = (
                     pipe(
                       withIncreasedIndentation(indentationIncrease),
                       withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
+                      withIncreasedHorizontalPosition(indentationIncrease),
                     )(config),
                   )(step),
                 ],
@@ -124,7 +130,13 @@ export const getStepGroups = (
                 steps: [
                   ...stepsInStepGroup,
                   formatSyntaxTree(
-                    pipe(withZeroIndentation, withDotInfo({ shouldStartWithDot, shouldEndWithDot }))(config),
+                    pipe(
+                      withZeroIndentation,
+                      withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
+                      withIncreasedHorizontalPosition(
+                        stepsInStepGroup.map(({ width }) => width).reduce(sum, 0) + stepsInStepGroup.length,
+                      ),
+                    )(config),
                   )(step),
                 ],
               },
@@ -154,6 +166,7 @@ export const getStepGroups = (
               pipe(
                 withIncreasedIndentation(indentationIncrease),
                 withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
+                withIncreasedHorizontalPosition(indentationIncrease),
               )(config),
             )(step),
           ],
@@ -167,9 +180,15 @@ export const getStepGroups = (
         return {
           stepsInStepGroup: [
             ...stepsInStepGroup,
-            formatSyntaxTree(pipe(withZeroIndentation, withDotInfo({ shouldStartWithDot, shouldEndWithDot }))(config))(
-              step,
-            ),
+            formatSyntaxTree(
+              pipe(
+                withZeroIndentation,
+                withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
+                withIncreasedHorizontalPosition(
+                  stepsInStepGroup.map(({ width }) => width).reduce(sum, 0) + stepsInStepGroup.length,
+                ),
+              )(config),
+            )(step),
           ],
           stepGroups,
         };

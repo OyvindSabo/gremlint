@@ -7,5 +7,6 @@ export const formatString = (config: GremlintConfig) => (
     type: TokenType.String,
     string: syntaxTree.string,
     indentation: config.indentation,
+    width: syntaxTree.string.length + 2,
   };
 };

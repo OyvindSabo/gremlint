@@ -27,7 +27,7 @@ g.V(1).out().map(values('name'))`);
       `g.V().branch{ it.get().value('name') }.option('marko', values('age')).option(none, values('name'))
 
 g.V().branch(values('name')).option('marko', values('age')).option(none, values('name'))
-    
+
 g.V().choose(has('name','marko'),values('age'), values('name'))`,
       {
         indentation: 0,

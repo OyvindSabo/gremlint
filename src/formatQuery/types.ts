@@ -8,12 +8,18 @@ export type GremlintConfig = {
 };
 
 export enum TokenType {
+  NonGremlinCode = 'NON_GREMLIN_CODE',
   Traversal = 'TRAVERSAL',
   Method = 'METHOD',
   Closure = 'CLOSURE',
   String = 'STRING',
   Word = 'WORD',
 }
+
+export type UnformattedNonGremlinSyntaxTree = {
+  type: TokenType.NonGremlinCode;
+  code: string;
+};
 
 export type UnformattedTraversalSyntaxTree = {
   type: TokenType.Traversal;
@@ -55,7 +61,12 @@ export type UnformattedSyntaxTree =
   | UnformattedClosureSyntaxTree
   | UnformattedStringSyntaxTree
   | UnformattedWordSyntaxTree
-  | UnformattedTraversalSyntaxTree;
+  | UnformattedTraversalSyntaxTree
+  | UnformattedNonGremlinSyntaxTree;
+
+export type FormattedNonGremlinSyntaxTree = UnformattedNonGremlinSyntaxTree & {
+  width: number;
+};
 
 export type GremlinStepGroup = {
   steps: FormattedSyntaxTree[];
@@ -120,7 +131,8 @@ export type FormattedSyntaxTree =
   | FormattedMethodSyntaxTree
   | FormattedClosureSyntaxTree
   | FormattedStringSyntaxTree
-  | FormattedWordSyntaxTree;
+  | FormattedWordSyntaxTree
+  | FormattedNonGremlinSyntaxTree;
 
 export type GremlinSyntaxTreeFormatter = (
   config: GremlintConfig,

@@ -2,6 +2,9 @@ import { FormattedSyntaxTree, TokenType } from './types';
 import { spaces } from './utils';
 
 const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: FormattedSyntaxTree): string => {
+  if (syntaxTree.type === TokenType.NonGremlinCode) {
+    return syntaxTree.code;
+  }
   if (syntaxTree.type === TokenType.Traversal) {
     return syntaxTree.stepGroups
       .map((stepGroup) => stepGroup.steps.map(recreateQueryStringFromFormattedSyntaxTree).join('.'))
@@ -49,5 +52,5 @@ const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: FormattedSyntaxT
 };
 
 export const recreateQueryStringFromFormattedSyntaxTrees = (syntaxTrees: FormattedSyntaxTree[]) => {
-  return syntaxTrees.map(recreateQueryStringFromFormattedSyntaxTree).filter(Boolean).join('\n\n');
+  return syntaxTrees.map(recreateQueryStringFromFormattedSyntaxTree).join('');
 };

@@ -3,6 +3,7 @@ import {
   TokenType,
   UnformattedClosureSyntaxTree,
   UnformattedMethodSyntaxTree,
+  UnformattedNonGremlinSyntaxTree,
   UnformattedStringSyntaxTree,
   UnformattedTraversalSyntaxTree,
   UnformattedWordSyntaxTree,
@@ -10,6 +11,7 @@ import {
 import { last, spaces } from './utils';
 
 type GremlinOnelinerSyntaxTree =
+  | UnformattedNonGremlinSyntaxTree
   | Pick<UnformattedTraversalSyntaxTree, 'type' | 'steps'>
   | Pick<UnformattedMethodSyntaxTree, 'type' | 'method' | 'arguments'>
   | Pick<UnformattedClosureSyntaxTree, 'type' | 'method' | 'closureCodeBlock'>
@@ -20,6 +22,9 @@ const recreateQueryOnelinerFromSyntaxTree = (indentation: number = 0) => (
   syntaxTree: GremlinOnelinerSyntaxTree,
 ): string => {
   switch (syntaxTree.type) {
+    // This case will never occur
+    case TokenType.NonGremlinCode:
+      return syntaxTree.code;
     case TokenType.Traversal:
       return spaces(indentation) + syntaxTree.steps.map(recreateQueryOnelinerFromSyntaxTree()).join('.');
     case TokenType.Method:

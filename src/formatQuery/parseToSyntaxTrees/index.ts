@@ -1,72 +1,11 @@
-import { UnformattedClosureCodeBlock, TokenType, UnformattedSyntaxTree } from './types';
-import { last, neq, pipe } from './utils';
-
-// All top-level linebreaks where the code before the line break does not end with a dot and the code after the line
-// break does not start with a dot are considered to separate two
-const tokenizeOnTopLevelLinebreaks = (query: string): string[] => {
-  let word = '';
-  let parenthesesCount = 0;
-  let squareBracketCount = 0;
-  let curlyBracketCount = 0;
-  let isInsideSingleQuoteString = false;
-  query.split('').forEach((char, i) => {
-    if (char === '(' && !isInsideSingleQuoteString) {
-      parenthesesCount++;
-      word += '(';
-      return;
-    }
-    if (char === '[' && !isInsideSingleQuoteString) {
-      squareBracketCount++;
-      word += '[';
-      return;
-    }
-    if (char === '{' && !isInsideSingleQuoteString) {
-      curlyBracketCount++;
-      word += '{';
-      return;
-    }
-    if (char === ')' && !isInsideSingleQuoteString) {
-      parenthesesCount--;
-      word += ')';
-      return;
-    }
-    if (char === ']' && !isInsideSingleQuoteString) {
-      squareBracketCount--;
-      word += ']';
-      return;
-    }
-    if (char === '}' && !isInsideSingleQuoteString) {
-      curlyBracketCount--;
-      word += '}';
-      return;
-    }
-    if (char === "'") {
-      isInsideSingleQuoteString = !isInsideSingleQuoteString;
-      word += "'";
-      return;
-    }
-    if (char === '\n') {
-      word +=
-        isInsideSingleQuoteString ||
-        parenthesesCount ||
-        squareBracketCount ||
-        curlyBracketCount ||
-        word.trim().charAt(word.length - 1) === '.' ||
-        query
-          .substr(i + 1)
-          .trim()
-          .charAt(0) === '.'
-          ? '\n'
-          : String.fromCharCode(28);
-      return;
-    }
-    word += char;
-  });
-  return word
-    .split(String.fromCharCode(28))
-    .filter((token) => token !== '')
-    .map((token) => token.trim());
-};
+import {
+  UnformattedClosureCodeBlock,
+  TokenType,
+  UnformattedSyntaxTree,
+  UnformattedNonGremlinSyntaxTree,
+} from '../types';
+import { last, neq, pipe } from '../utils';
+import { extractGremlinQueries } from './extractGremlinQueries';
 
 const tokenizeOnTopLevelPunctuation = (query: string): string[] => {
   let word = '';
@@ -364,7 +303,7 @@ const getMethodTokenAndClosureCodeBlockFromClosureInvocation = (
   };
 };
 
-const parseCodeBlockToSyntaxTree = (fullQuery: string) => (codeBlock: string): UnformattedSyntaxTree => {
+const parseCodeBlockToSyntaxTree = (fullCode: string) => (codeBlock: string): UnformattedSyntaxTree => {
   const tokens = tokenizeOnTopLevelPunctuation(codeBlock);
   if (tokens.length === 1) {
     const token = tokens[0];
@@ -372,18 +311,15 @@ const parseCodeBlockToSyntaxTree = (fullQuery: string) => (codeBlock: string): U
       const { methodToken, argumentTokens } = getMethodTokenAndArgumentTokensFromMethodInvocation(token);
       return {
         type: TokenType.Method,
-        method: parseCodeBlockToSyntaxTree(fullQuery)(methodToken),
-        arguments: argumentTokens.map(parseCodeBlockToSyntaxTree(fullQuery)),
+        method: parseCodeBlockToSyntaxTree(fullCode)(methodToken),
+        arguments: argumentTokens.map(parseCodeBlockToSyntaxTree(fullCode)),
       };
     }
     if (isClosureInvocation(token)) {
-      const { methodToken, closureCodeBlock } = getMethodTokenAndClosureCodeBlockFromClosureInvocation(
-        token,
-        fullQuery,
-      );
+      const { methodToken, closureCodeBlock } = getMethodTokenAndClosureCodeBlockFromClosureInvocation(token, fullCode);
       return {
         type: TokenType.Closure,
-        method: parseCodeBlockToSyntaxTree(fullQuery)(methodToken),
+        method: parseCodeBlockToSyntaxTree(fullCode)(methodToken),
         closureCodeBlock,
       };
     }
@@ -400,10 +336,32 @@ const parseCodeBlockToSyntaxTree = (fullQuery: string) => (codeBlock: string): U
   }
   return {
     type: TokenType.Traversal,
-    steps: tokens.map(parseCodeBlockToSyntaxTree(fullQuery)),
+    steps: tokens.map(parseCodeBlockToSyntaxTree(fullCode)),
   };
 };
 
-export const parseToSyntaxTrees = (query: string): UnformattedSyntaxTree[] => {
-  return tokenizeOnTopLevelLinebreaks(query).map(parseCodeBlockToSyntaxTree(query));
+export const parseNonGremlinCodeToSyntaxTree = (code: string): UnformattedNonGremlinSyntaxTree => ({
+  type: TokenType.NonGremlinCode,
+  code,
+});
+
+export const parseToSyntaxTrees = (code: string): UnformattedSyntaxTree[] => {
+  const queries = extractGremlinQueries(code);
+  const { syntaxTrees, remainingCode } = queries.reduce(
+    (state, query: string): { syntaxTrees: UnformattedSyntaxTree[]; remainingCode: string } => {
+      const indexOfQuery = state.remainingCode.indexOf(query);
+      const nonGremlinCode = state.remainingCode.substr(0, indexOfQuery);
+      return {
+        syntaxTrees: [
+          ...state.syntaxTrees,
+          parseNonGremlinCodeToSyntaxTree(nonGremlinCode),
+          parseCodeBlockToSyntaxTree(code)(query),
+        ],
+        remainingCode: state.remainingCode.substr(indexOfQuery + query.length),
+      };
+    },
+    { syntaxTrees: [] as UnformattedSyntaxTree[], remainingCode: code },
+  );
+  if (!remainingCode) return syntaxTrees;
+  return [...syntaxTrees, parseNonGremlinCodeToSyntaxTree(remainingCode)];
 };

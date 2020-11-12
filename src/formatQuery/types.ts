@@ -4,7 +4,7 @@ export type GremlintConfig = {
   shouldPlaceDotsAfterLineBreaks: boolean;
   shouldEndWithDot: boolean;
   shouldStartWithDot: boolean;
-  horizontalPosition: number; // Will be used by child syntax trees and is the width before its child content starts, so hasLabel(...) has a width of 9
+  horizontalPosition: number; // Will be used by child syntax trees and is the horizontal position its child content starts, so a non-indented hasLabel(...) has a horizontal position of 9
 };
 
 export enum TokenType {

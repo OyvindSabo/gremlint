@@ -11,7 +11,7 @@ const withDefaults = (config: Partial<GremlintConfig>): GremlintConfig => ({
   ...config,
   shouldStartWithDot: false,
   shouldEndWithDot: false,
-  horizontalPosition: 0,
+  horizontalPosition: config.indentation ?? 0,
 });
 
 export const formatQuery = (query: string, config?: Partial<GremlintConfig>): string => {

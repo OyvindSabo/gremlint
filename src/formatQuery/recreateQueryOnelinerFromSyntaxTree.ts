@@ -18,7 +18,7 @@ type GremlinOnelinerSyntaxTree =
   | Pick<UnformattedStringSyntaxTree, 'type' | 'string'>
   | Pick<UnformattedWordSyntaxTree, 'type' | 'word'>;
 
-const recreateQueryOnelinerFromSyntaxTree = (indentation: number = 0) => (
+const recreateQueryOnelinerFromSyntaxTree = (localIndentation: number = 0) => (
   syntaxTree: GremlinOnelinerSyntaxTree,
 ): string => {
   switch (syntaxTree.type) {
@@ -26,10 +26,10 @@ const recreateQueryOnelinerFromSyntaxTree = (indentation: number = 0) => (
     case TokenType.NonGremlinCode:
       return syntaxTree.code;
     case TokenType.Traversal:
-      return spaces(indentation) + syntaxTree.steps.map(recreateQueryOnelinerFromSyntaxTree()).join('.');
+      return spaces(localIndentation) + syntaxTree.steps.map(recreateQueryOnelinerFromSyntaxTree()).join('.');
     case TokenType.Method:
       return (
-        spaces(indentation) +
+        spaces(localIndentation) +
         recreateQueryOnelinerFromSyntaxTree()(syntaxTree.method) +
         '(' +
         syntaxTree.arguments.map(recreateQueryOnelinerFromSyntaxTree()).join(', ') +
@@ -37,7 +37,7 @@ const recreateQueryOnelinerFromSyntaxTree = (indentation: number = 0) => (
       );
     case TokenType.Closure:
       return (
-        spaces(indentation) +
+        spaces(localIndentation) +
         recreateQueryOnelinerFromSyntaxTree()(syntaxTree.method) +
         '{' +
         last(
@@ -48,9 +48,9 @@ const recreateQueryOnelinerFromSyntaxTree = (indentation: number = 0) => (
         '}'
       );
     case TokenType.String:
-      return spaces(indentation) + syntaxTree.string;
+      return spaces(localIndentation) + syntaxTree.string;
     case TokenType.Word:
-      return spaces(indentation) + syntaxTree.word;
+      return spaces(localIndentation) + syntaxTree.word;
   }
 };
 

@@ -2,7 +2,7 @@ import recreateQueryOnelinerFromSyntaxTree from '../recreateQueryOnelinerFromSyn
 import {
   FormattedMethodSyntaxTree,
   GremlinSyntaxTreeFormatter,
-  GremlintConfig,
+  GremlintInternalConfig,
   TokenType,
   UnformattedMethodSyntaxTree,
 } from '../types';
@@ -15,11 +15,11 @@ import {
   withZeroIndentation,
 } from './utils';
 
-// Groups arguments into argument groups an adds an indentation property
-export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (config: GremlintConfig) => (
+// Groups arguments into argument groups an adds a localIndentation property
+export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (config: GremlintInternalConfig) => (
   syntaxTree: UnformattedMethodSyntaxTree,
 ): FormattedMethodSyntaxTree => {
-  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(config.indentation)(syntaxTree).length;
+  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(config.localIndentation)(syntaxTree).length;
   const method = formatSyntaxTree(withNoEndDotInfo(config))(syntaxTree.method);
   if (recreatedQueryLength <= config.maxLineLength) {
     return {
@@ -38,7 +38,7 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
         ),
       ],
       argumentsShouldStartOnNewLine: false,
-      indentation: config.indentation,
+      localIndentation: config.localIndentation,
       shouldStartWithDot: false,
       shouldEndWithDot: Boolean(config.shouldEndWithDot),
       width: recreatedQueryLength,
@@ -63,7 +63,7 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
     argumentsShouldStartOnNewLine: true,
     shouldStartWithDot: false,
     shouldEndWithDot: Boolean(config.shouldEndWithDot),
-    indentation: 0,
+    localIndentation: 0,
     width,
   };
 };

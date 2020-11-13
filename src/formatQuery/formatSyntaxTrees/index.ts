@@ -1,4 +1,4 @@
-import { FormattedSyntaxTree, GremlintConfig, TokenType, UnformattedSyntaxTree } from '../types';
+import { FormattedSyntaxTree, GremlintInternalConfig, TokenType, UnformattedSyntaxTree } from '../types';
 import { formatClosure } from './formatClosure';
 import { formatMethod } from './formatMethod';
 import { formatNonGremlin } from './formatNonGremlin';
@@ -6,7 +6,9 @@ import { formatString } from './formatString';
 import { formatTraversal } from './formatTraversal';
 import { formatWord } from './formatWord';
 
-const formatSyntaxTree = (config: GremlintConfig) => (syntaxTree: UnformattedSyntaxTree): FormattedSyntaxTree => {
+const formatSyntaxTree = (config: GremlintInternalConfig) => (
+  syntaxTree: UnformattedSyntaxTree,
+): FormattedSyntaxTree => {
   switch (syntaxTree.type) {
     case TokenType.NonGremlinCode:
       return formatNonGremlin(config)(syntaxTree);
@@ -23,6 +25,6 @@ const formatSyntaxTree = (config: GremlintConfig) => (syntaxTree: UnformattedSyn
   }
 };
 
-export const formatSyntaxTrees = (config: GremlintConfig) => (syntaxTrees: UnformattedSyntaxTree[]) => {
+export const formatSyntaxTrees = (config: GremlintInternalConfig) => (syntaxTrees: UnformattedSyntaxTree[]) => {
   return syntaxTrees.map(formatSyntaxTree(config));
 };

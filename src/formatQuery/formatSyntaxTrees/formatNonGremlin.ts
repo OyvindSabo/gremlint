@@ -1,14 +1,14 @@
 import {
   FormattedNonGremlinSyntaxTree,
   FormattedWordSyntaxTree,
-  GremlintConfig,
+  GremlintInternalConfig,
   TokenType,
   UnformattedNonGremlinSyntaxTree,
   UnformattedWordSyntaxTree,
 } from '../types';
 import { last } from '../utils';
 
-export const formatNonGremlin = (config: GremlintConfig) => (
+export const formatNonGremlin = (config: GremlintInternalConfig) => (
   syntaxTree: UnformattedNonGremlinSyntaxTree,
 ): FormattedNonGremlinSyntaxTree => {
   return {

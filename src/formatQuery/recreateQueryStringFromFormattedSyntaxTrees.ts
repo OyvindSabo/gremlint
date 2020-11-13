@@ -1,5 +1,5 @@
-import { FormattedSyntaxTree, TokenType } from './types';
-import { spaces } from './utils';
+import { FormattedSyntaxTree, GremlintInternalConfig, TokenType } from './types';
+import { eq, spaces } from './utils';
 
 const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: FormattedSyntaxTree): string => {
   if (syntaxTree.type === TokenType.NonGremlinCode) {
@@ -29,18 +29,18 @@ const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: FormattedSyntaxT
       recreateQueryStringFromFormattedSyntaxTree(syntaxTree.method) +
       '{' +
       syntaxTree.closureCodeBlock
-        .map(({ lineOfCode, indentation }, i) => `${spaces(indentation)}${lineOfCode}`)
+        .map(({ lineOfCode, localIndentation }, i) => `${spaces(localIndentation)}${lineOfCode}`)
         .join('\n') +
       '}' +
       (syntaxTree.shouldEndWithDot ? '.' : '')
     );
   }
   if (syntaxTree.type === TokenType.String) {
-    return spaces(syntaxTree.indentation) + syntaxTree.string;
+    return spaces(syntaxTree.localIndentation) + syntaxTree.string;
   }
   if (syntaxTree.type === TokenType.Word) {
     return (
-      spaces(syntaxTree.indentation) +
+      spaces(syntaxTree.localIndentation) +
       (syntaxTree.shouldStartWithDot ? '.' : '') +
       syntaxTree.word +
       (syntaxTree.shouldEndWithDot ? '.' : '')
@@ -51,6 +51,28 @@ const recreateQueryStringFromFormattedSyntaxTree = (syntaxTree: FormattedSyntaxT
   return '';
 };
 
-export const recreateQueryStringFromFormattedSyntaxTrees = (syntaxTrees: FormattedSyntaxTree[]) => {
-  return syntaxTrees.map(recreateQueryStringFromFormattedSyntaxTree).join('');
+const withIndentationIfNotEmpty = (indentation: number) => (lineOfCode: string): string => {
+  if (!lineOfCode) return lineOfCode;
+  return spaces(indentation) + lineOfCode;
+};
+
+const lineIsEmpty = (lineOfCode: string): boolean => {
+  return lineOfCode.split('').every(eq(' '));
+};
+
+const removeIndentationFromEmptyLines = (lineOfCode: string): string => {
+  if (lineIsEmpty(lineOfCode)) return '';
+  return lineOfCode;
+};
+
+export const recreateQueryStringFromFormattedSyntaxTrees = ({ globalIndentation }: GremlintInternalConfig) => (
+  syntaxTrees: FormattedSyntaxTree[],
+): string => {
+  return syntaxTrees
+    .map(recreateQueryStringFromFormattedSyntaxTree)
+    .join('')
+    .split('\n')
+    .map(withIndentationIfNotEmpty(globalIndentation))
+    .map(removeIndentationFromEmptyLines)
+    .join('\n');
 };

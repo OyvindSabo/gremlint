@@ -3,7 +3,7 @@ import {
   GremlinStepGroup,
   FormattedSyntaxTree,
   GremlinSyntaxTreeFormatter,
-  GremlintConfig,
+  GremlintInternalConfig,
   TokenType,
   UnformattedSyntaxTree,
 } from '../../../types';
@@ -19,7 +19,7 @@ import { isModulator, isTraversalSource } from './utils';
 export const getStepGroups = (
   formatSyntaxTree: GremlinSyntaxTreeFormatter,
   steps: UnformattedSyntaxTree[],
-  config: GremlintConfig,
+  config: GremlintInternalConfig,
 ): GremlinStepGroup[] => {
   const { stepGroups } = steps.reduce(
     ({ stepsInStepGroup, stepGroups }, step, index, steps) => {
@@ -53,7 +53,7 @@ export const getStepGroups = (
       })();
 
       const recreatedQueryWithSubsequentModulators = recreateQueryOnelinerFromSyntaxTree(
-        config.indentation + stepGroupIndentationIncrease,
+        config.localIndentation + stepGroupIndentationIncrease,
       )({
         type: TokenType.Traversal,
         steps: stepsWithSubsequentModulators,

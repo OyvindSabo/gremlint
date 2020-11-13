@@ -1,9 +1,16 @@
-export type GremlintConfig = {
+export type GremlintUserConfig = {
   indentation: number;
   maxLineLength: number;
   shouldPlaceDotsAfterLineBreaks: boolean;
-  shouldEndWithDot: boolean;
+};
+
+export type GremlintInternalConfig = {
+  globalIndentation: number;
+  localIndentation: number;
+  maxLineLength: number;
+  shouldPlaceDotsAfterLineBreaks: boolean;
   shouldStartWithDot: boolean;
+  shouldEndWithDot: boolean;
   horizontalPosition: number; // Will be used by child syntax trees and is the horizontal position its child content starts, so a non-indented hasLabel(...) has a horizontal position of 9
 };
 
@@ -76,7 +83,7 @@ export type FormattedTraversalSyntaxTree = {
   type: TokenType.Traversal;
   steps: UnformattedSyntaxTree[];
   stepGroups: GremlinStepGroup[];
-  indentation: number;
+  localIndentation: number;
   width: number;
 };
 
@@ -86,7 +93,7 @@ export type FormattedMethodSyntaxTree = {
   arguments: UnformattedSyntaxTree[];
   argumentGroups: FormattedSyntaxTree[][];
   argumentsShouldStartOnNewLine: boolean;
-  indentation: number;
+  localIndentation: number;
   width: number;
   shouldStartWithDot: boolean;
   shouldEndWithDot: boolean;
@@ -95,7 +102,7 @@ export type FormattedMethodSyntaxTree = {
 type FormattedClosureLineOfCode = {
   lineOfCode: string;
   relativeIndentation: number;
-  indentation: number;
+  localIndentation: number;
 };
 
 type FormattedClosureCodeBlock = FormattedClosureLineOfCode[];
@@ -104,7 +111,7 @@ export type FormattedClosureSyntaxTree = {
   type: TokenType.Closure;
   method: FormattedSyntaxTree;
   closureCodeBlock: FormattedClosureCodeBlock;
-  indentation: number;
+  localIndentation: number;
   width: number;
   shouldStartWithDot: boolean;
   shouldEndWithDot: boolean;
@@ -114,13 +121,13 @@ export type FormattedStringSyntaxTree = {
   type: TokenType.String;
   string: string;
   width: number;
-  indentation: number;
+  localIndentation: number;
 };
 
 export type FormattedWordSyntaxTree = {
   type: TokenType.Word;
   word: string;
-  indentation: number;
+  localIndentation: number;
   width: number;
   shouldStartWithDot: boolean;
   shouldEndWithDot: boolean;
@@ -135,5 +142,5 @@ export type FormattedSyntaxTree =
   | FormattedNonGremlinSyntaxTree;
 
 export type GremlinSyntaxTreeFormatter = (
-  config: GremlintConfig,
+  config: GremlintInternalConfig,
 ) => (syntaxTree: UnformattedSyntaxTree) => FormattedSyntaxTree;

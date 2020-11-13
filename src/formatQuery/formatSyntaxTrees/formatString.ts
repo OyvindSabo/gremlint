@@ -1,12 +1,12 @@
-import { FormattedStringSyntaxTree, GremlintConfig, TokenType, UnformattedStringSyntaxTree } from '../types';
+import { FormattedStringSyntaxTree, GremlintInternalConfig, TokenType, UnformattedStringSyntaxTree } from '../types';
 
-export const formatString = (config: GremlintConfig) => (
+export const formatString = (config: GremlintInternalConfig) => (
   syntaxTree: UnformattedStringSyntaxTree,
 ): FormattedStringSyntaxTree => {
   return {
     type: TokenType.String,
     string: syntaxTree.string,
-    indentation: config.indentation,
+    localIndentation: config.localIndentation,
     width: syntaxTree.string.length + 2,
   };
 };

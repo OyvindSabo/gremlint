@@ -2,7 +2,7 @@ import recreateQueryOnelinerFromSyntaxTree from '../../recreateQueryOnelinerFrom
 import {
   FormattedTraversalSyntaxTree,
   GremlinSyntaxTreeFormatter,
-  GremlintConfig,
+  GremlintInternalConfig,
   TokenType,
   UnformattedTraversalSyntaxTree,
 } from '../../types';
@@ -10,11 +10,11 @@ import { last, sum } from '../../utils';
 import { withZeroIndentation } from '../utils';
 import { getStepGroups } from './getStepGroups';
 
-// Groups steps into step groups and adds an indentation property
-export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (config: GremlintConfig) => (
+// Groups steps into step groups and adds a localIndentation property
+export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (config: GremlintInternalConfig) => (
   syntaxTree: UnformattedTraversalSyntaxTree,
 ): FormattedTraversalSyntaxTree => {
-  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(config.indentation)(syntaxTree).length;
+  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(config.localIndentation)(syntaxTree).length;
   if (recreatedQueryLength <= config.maxLineLength) {
     return {
       type: TokenType.Traversal,
@@ -26,7 +26,7 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
           ),
         },
       ],
-      indentation: 0,
+      localIndentation: 0,
       width: recreatedQueryLength,
     };
   }
@@ -41,7 +41,7 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
     type: TokenType.Traversal,
     steps: syntaxTree.steps,
     stepGroups,
-    indentation: 0,
+    localIndentation: 0,
     width,
   };
 };

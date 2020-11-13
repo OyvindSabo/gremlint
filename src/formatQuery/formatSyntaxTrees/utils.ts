@@ -1,15 +1,17 @@
-import { GremlintConfig } from '../types';
+import { GremlintInternalConfig } from '../types';
 
-const withIndentation = (indentation: number) => (config: GremlintConfig): GremlintConfig => ({
+const withIndentation = (localIndentation: number) => (config: GremlintInternalConfig): GremlintInternalConfig => ({
   ...config,
-  indentation,
+  localIndentation,
 });
 
 export const withZeroIndentation = withIndentation(0);
 
-export const withIncreasedIndentation = (indentationIncrease: number) => (config: GremlintConfig): GremlintConfig => ({
+export const withIncreasedIndentation = (indentationIncrease: number) => (
+  config: GremlintInternalConfig,
+): GremlintInternalConfig => ({
   ...config,
-  indentation: config.indentation + indentationIncrease,
+  localIndentation: config.localIndentation + indentationIncrease,
 });
 
 export const withDotInfo = ({
@@ -18,31 +20,33 @@ export const withDotInfo = ({
 }: {
   shouldStartWithDot: boolean;
   shouldEndWithDot: boolean;
-}) => (config: GremlintConfig): GremlintConfig => ({
+}) => (config: GremlintInternalConfig): GremlintInternalConfig => ({
   ...config,
   shouldStartWithDot,
   shouldEndWithDot,
 });
 
-export const withZeroDotInfo = (config: GremlintConfig): GremlintConfig => ({
+export const withZeroDotInfo = (config: GremlintInternalConfig): GremlintInternalConfig => ({
   ...config,
   shouldStartWithDot: false,
   shouldEndWithDot: false,
 });
 
-export const withNoEndDotInfo = (config: GremlintConfig): GremlintConfig => ({
+export const withNoEndDotInfo = (config: GremlintInternalConfig): GremlintInternalConfig => ({
   ...config,
   shouldEndWithDot: false,
 });
 
-export const withHorizontalPosition = (horizontalPosition: number) => (config: GremlintConfig): GremlintConfig => ({
+export const withHorizontalPosition = (horizontalPosition: number) => (
+  config: GremlintInternalConfig,
+): GremlintInternalConfig => ({
   ...config,
   horizontalPosition,
 });
 
 export const withIncreasedHorizontalPosition = (horizontalPositionIncrease: number) => (
-  config: GremlintConfig,
-): GremlintConfig => ({
+  config: GremlintInternalConfig,
+): GremlintInternalConfig => ({
   ...config,
   horizontalPosition: config.horizontalPosition + horizontalPositionIncrease,
 });

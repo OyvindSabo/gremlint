@@ -54,7 +54,9 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
   ]);
   const lastArgumentGroup = last(argumentGroups);
   // Add the width of the last line of parameters, the dots between them and the indentation of the parameters
-  const width = lastArgumentGroup.map(({ width }) => width).reduce(sum, 0) + lastArgumentGroup.length - 1;
+  const width = lastArgumentGroup
+    ? lastArgumentGroup.map(({ width }) => width).reduce(sum, 0) + lastArgumentGroup.length - 1
+    : 0;
   return {
     type: TokenType.Method,
     method,

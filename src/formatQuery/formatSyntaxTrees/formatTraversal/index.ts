@@ -31,12 +31,10 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
     };
   }
   const stepGroups = getStepGroups(formatSyntaxTree, syntaxTree.steps, config);
-  const width =
-    last(stepGroups)
-      .steps.map(({ width }) => width)
-      .reduce(sum, 0) +
-    stepGroups.length -
-    1;
+  const lastStepGroup = last(stepGroups);
+  const width = lastStepGroup
+    ? lastStepGroup.steps.map(({ width }) => width).reduce(sum, 0) + stepGroups.length - 1
+    : 0;
   return {
     type: TokenType.Traversal,
     steps: syntaxTree.steps,

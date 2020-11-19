@@ -1,6 +1,7 @@
 import recreateQueryOnelinerFromSyntaxTree from '../recreateQueryOnelinerFromSyntaxTree';
 import {
   FormattedMethodSyntaxTree,
+  FormattedSyntaxTree,
   GremlinSyntaxTreeFormatter,
   GremlintInternalConfig,
   TokenType,
@@ -21,7 +22,8 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
 ): FormattedMethodSyntaxTree => {
   const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(config.localIndentation)(syntaxTree).length;
   const method = formatSyntaxTree(withNoEndDotInfo(config))(syntaxTree.method);
-  if (recreatedQueryLength <= config.maxLineLength) {
+  const argumentsWillNotBeWrapped = recreatedQueryLength <= config.maxLineLength;
+  if (argumentsWillNotBeWrapped) {
     return {
       type: TokenType.Method,
       method,
@@ -29,13 +31,22 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
       // still be understood by recreateQueryOnelinerFromSyntaxTree
       arguments: syntaxTree.arguments,
       argumentGroups: [
-        syntaxTree.arguments.map(
-          formatSyntaxTree(
-            // Since the method's arguments will be on the same line, their horizontal position is increased by the
-            // method's width plus the width of the opening parenthesis
-            pipe(withZeroIndentation, withZeroDotInfo, withIncreasedHorizontalPosition(method.width + 1))(config),
-          ),
-        ),
+        syntaxTree.arguments.reduce((argumentGroup: FormattedSyntaxTree[], syntaxTree) => {
+          return [
+            ...argumentGroup,
+            formatSyntaxTree(
+              // Since the method's arguments will be on the same line, their horizontal position is increased by the
+              // method's width plus the width of the opening parenthesis
+              pipe(
+                withZeroIndentation,
+                withZeroDotInfo,
+                withIncreasedHorizontalPosition(
+                  method.width + 1 + argumentGroup.map(({ width }) => width).reduce(sum, 0) + argumentGroup.length,
+                ),
+              )(config),
+            )(syntaxTree),
+          ];
+        }, []),
       ],
       argumentsShouldStartOnNewLine: false,
       localIndentation: config.localIndentation,
@@ -49,7 +60,7 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
   // further down so the start dot can be placed after the indentation.
   const argumentGroups = syntaxTree.arguments.map((step) => [
     formatSyntaxTree(
-      pipe(withIncreasedIndentation(2), withZeroDotInfo, withIncreasedHorizontalPosition(method.width + 2))(config),
+      pipe(withIncreasedIndentation(2), withZeroDotInfo, withIncreasedHorizontalPosition(method.width + 3))(config),
     )(step),
   ]);
   const lastArgumentGroup = last(argumentGroups);

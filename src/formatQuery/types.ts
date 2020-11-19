@@ -31,6 +31,9 @@ export type UnformattedNonGremlinSyntaxTree = {
 export type UnformattedTraversalSyntaxTree = {
   type: TokenType.Traversal;
   steps: UnformattedSyntaxTree[];
+  // Initial horizontal position of the first line of the query. This is needed in order to be able to preserve relative
+  // indentation between lines inside a non-Gremlin code block that starts on the first line of the query.
+  initialHorizontalPosition: number;
 };
 
 export type UnformattedMethodSyntaxTree = {
@@ -83,6 +86,7 @@ export type FormattedTraversalSyntaxTree = {
   type: TokenType.Traversal;
   steps: UnformattedSyntaxTree[];
   stepGroups: GremlinStepGroup[];
+  initialHorizontalPosition: number;
   localIndentation: number;
   width: number;
 };

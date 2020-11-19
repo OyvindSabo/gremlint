@@ -1,13 +1,14 @@
 import recreateQueryOnelinerFromSyntaxTree from '../../recreateQueryOnelinerFromSyntaxTree';
 import {
+  FormattedSyntaxTree,
   FormattedTraversalSyntaxTree,
   GremlinSyntaxTreeFormatter,
   GremlintInternalConfig,
   TokenType,
   UnformattedTraversalSyntaxTree,
 } from '../../types';
-import { last, sum } from '../../utils';
-import { withZeroIndentation } from '../utils';
+import { last, pipe, sum } from '../../utils';
+import { withHorizontalPosition, withIncreasedHorizontalPosition, withZeroIndentation } from '../utils';
 import { getStepGroups } from './getStepGroups';
 
 // Groups steps into step groups and adds a localIndentation property
@@ -21,11 +22,27 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
       steps: syntaxTree.steps,
       stepGroups: [
         {
-          steps: syntaxTree.steps.map((step, stepIndex) =>
-            formatSyntaxTree(stepIndex === 0 ? config : withZeroIndentation(config))(step),
-          ),
+          steps: syntaxTree.steps.reduce((steps, step, stepIndex) => {
+            const formattedStep =
+              stepIndex === 0
+                ? formatSyntaxTree(withIncreasedHorizontalPosition(syntaxTree.initialHorizontalPosition)(config))(step)
+                : // Since the traversal's steps will be on the same line, their horizontal position is increased by the
+                  // steps's width plus the width of the dots between them
+                  formatSyntaxTree(
+                    pipe(
+                      withZeroIndentation,
+                      withIncreasedHorizontalPosition(
+                        syntaxTree.initialHorizontalPosition +
+                          steps.map(({ width }) => width).reduce(sum, 0) +
+                          steps.length,
+                      ),
+                    )(config),
+                  )(step);
+            return [...steps, formattedStep];
+          }, [] as FormattedSyntaxTree[]),
         },
       ],
+      initialHorizontalPosition: syntaxTree.initialHorizontalPosition,
       localIndentation: 0,
       width: recreatedQueryLength,
     };
@@ -39,6 +56,7 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
     type: TokenType.Traversal,
     steps: syntaxTree.steps,
     stepGroups,
+    initialHorizontalPosition: syntaxTree.initialHorizontalPosition,
     localIndentation: 0,
     width,
   };

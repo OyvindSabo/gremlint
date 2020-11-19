@@ -10,12 +10,15 @@ import {
 import { pipe, sum } from '../../../utils';
 import {
   withDotInfo,
+  withHorizontalPosition,
   withIncreasedHorizontalPosition,
   withIncreasedIndentation,
+  withIndentation,
   withZeroIndentation,
 } from '../../utils';
 import { isModulator, isTraversalSource } from './utils';
 
+// TODO: Split this into smaller functions
 export const getStepGroups = (
   formatSyntaxTree: GremlinSyntaxTreeFormatter,
   steps: UnformattedSyntaxTree[],
@@ -81,7 +84,8 @@ export const getStepGroups = (
         if (isFirstStepInStepGroup) {
           const traversalSourceIndentationIncrease = stepGroups[0] && isTraversalSource(stepGroups[0].steps[0]) ? 2 : 0;
           const modulatorIndentationIncrease = isModulator(step) ? 2 : 0;
-          const indentationIncrease = traversalSourceIndentationIncrease + modulatorIndentationIncrease;
+          const localIndentation =
+            config.localIndentation + traversalSourceIndentationIncrease + modulatorIndentationIncrease;
 
           // This is the only step in the step group, so it is the first step in
           // the step group. It should only start with a dot if it is not the
@@ -101,9 +105,9 @@ export const getStepGroups = (
                 steps: [
                   formatSyntaxTree(
                     pipe(
-                      withIncreasedIndentation(indentationIncrease),
+                      withIndentation(localIndentation),
                       withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
-                      withIncreasedHorizontalPosition(indentationIncrease),
+                      withHorizontalPosition(localIndentation),
                     )(config),
                   )(step),
                 ],
@@ -117,9 +121,6 @@ export const getStepGroups = (
           // start with a dot
           const shouldStartWithDot = false;
 
-          // It is the last step in a group and should only end with dot if not
-          // config.shouldPlaceDotsAfterLineBreaks this is not the last step in
-          // steps
           const shouldEndWithDot = !isLastStepGroup && !config.shouldPlaceDotsAfterLineBreaks;
 
           return {
@@ -134,6 +135,7 @@ export const getStepGroups = (
                       withZeroIndentation,
                       withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
                       withIncreasedHorizontalPosition(
+                        // If I recall correctly, the + stepsInStepGroup.length handles the horizontal increase caused by the dots joining the steps
                         stepsInStepGroup.map(({ width }) => width).reduce(sum, 0) + stepsInStepGroup.length,
                       ),
                     )(config),
@@ -148,7 +150,8 @@ export const getStepGroups = (
       // If it is the first step in a group and also not the last one, format it
       // with indentation, otherwise, remove the indentation
       if (isFirstStepInStepGroup) {
-        const indentationIncrease = stepGroups[0] && isTraversalSource(stepGroups[0].steps[0]) ? 2 : 0;
+        const localIndentation =
+          config.localIndentation + (stepGroups[0] && isTraversalSource(stepGroups[0].steps[0]) ? 2 : 0);
 
         const isFirstStepGroup = stepGroups.length === 0;
 
@@ -164,9 +167,9 @@ export const getStepGroups = (
           stepsInStepGroup: [
             formatSyntaxTree(
               pipe(
-                withIncreasedIndentation(indentationIncrease),
+                withIndentation(localIndentation),
                 withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
-                withIncreasedHorizontalPosition(indentationIncrease),
+                withHorizontalPosition(localIndentation),
               )(config),
             )(step),
           ],
@@ -175,6 +178,8 @@ export const getStepGroups = (
       }
       return (() => {
         // If it is not the first step in a group and not the last one either
+        const horizontalPosition =
+          config.localIndentation + stepsInStepGroup.map(({ width }) => width).reduce(sum, 0) + stepsInStepGroup.length;
         const shouldStartWithDot = false;
         const shouldEndWithDot = false;
         return {
@@ -184,9 +189,7 @@ export const getStepGroups = (
               pipe(
                 withZeroIndentation,
                 withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
-                withIncreasedHorizontalPosition(
-                  stepsInStepGroup.map(({ width }) => width).reduce(sum, 0) + stepsInStepGroup.length,
-                ),
+                withHorizontalPosition(horizontalPosition),
               )(config),
             )(step),
           ],

@@ -48,4 +48,50 @@ by{ it.get().value('sell_price') -
                         by('name').
                         by{ it.get().value('sell_price') -
                             it.get().value('buy_price') };`);
+
+  // Test that relative indentation is preserved in closures which are nested
+  expect(
+    formatQuery(
+      `g.V().filter(out('Sells').
+             map{ it.get('sell_price') -
+                  it.get('buy_price') }.
+             where(gt(50)))`,
+      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(
+    `g.V().
+  filter(
+    out('Sells').
+    map{ it.get('sell_price') -
+         it.get('buy_price') }.
+    where(gt(50)))`,
+  );
+
+  // Test that relative indentation is preserved between all the lines within a closure when not all tokens in a stepGroup are methods (for instance, g in g.V() adds to the width of the stepGroup even if it is not a method)
+  expect(
+    formatQuery(
+      `g.V().map({ it.get('sell_price') -
+            it.get('buy_price') }))`,
+      {
+        indentation: 0,
+        maxLineLength: 35,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(`g.V().map({ it.get('sell_price') -
+            it.get('buy_price') }))`);
+
+  // Test that relative indentation is preserved between all the lines within a closure when the first line is indented because the query doesn't start at the beginning of the line
+  expect(
+    formatQuery(
+      `profit = g.V().map({ it.get('sell_price') -
+                     it.get('buy_price') }))`,
+      {
+        indentation: 0,
+        maxLineLength: 35,
+        shouldPlaceDotsAfterLineBreaks: false,
+      },
+    ),
+  ).toBe(`profit = g.V().map({ it.get('sell_price') -
+                     it.get('buy_price') }))`);
 });

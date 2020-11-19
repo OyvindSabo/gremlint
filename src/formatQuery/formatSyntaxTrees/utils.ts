@@ -1,6 +1,8 @@
 import { GremlintInternalConfig } from '../types';
 
-const withIndentation = (localIndentation: number) => (config: GremlintInternalConfig): GremlintInternalConfig => ({
+export const withIndentation = (localIndentation: number) => (
+  config: GremlintInternalConfig,
+): GremlintInternalConfig => ({
   ...config,
   localIndentation,
 });

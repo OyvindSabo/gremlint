@@ -337,6 +337,7 @@ const parseCodeBlockToSyntaxTree = (fullCode: string) => (codeBlock: string): Un
   return {
     type: TokenType.Traversal,
     steps: tokens.map(parseCodeBlockToSyntaxTree(fullCode)),
+    initialHorizontalPosition: fullCode.substr(0, fullCode.indexOf(codeBlock)).split('\n').slice(-1)[0].length,
   };
 };
 

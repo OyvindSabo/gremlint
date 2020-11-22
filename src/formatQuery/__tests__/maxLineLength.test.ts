@@ -36,4 +36,16 @@ test('No line in the query should exceed the maximum line length', () => {
   where(
     outE('created').count().is(P.gte(2))).
   count()`);*/
+
+  // Test that if the query is wrapped before exceeding the max line length, even if it does not start at the beginning
+  // of the line
+  expect(
+    formatQuery("List<Vertex> people = g.V().hasLabel('person').toList();", {
+      indentation: 0,
+      maxLineLength: 40,
+      shouldPlaceDotsAfterLineBreaks: false,
+    }),
+  ).toBe(`List<Vertex> people = g.V().
+  hasLabel('person').
+  toList();`);
 });

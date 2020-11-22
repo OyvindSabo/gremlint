@@ -88,7 +88,7 @@ by{ it.get().value('sell_price') -
                      it.get('buy_price') }))`,
       {
         indentation: 0,
-        maxLineLength: 35,
+        maxLineLength: 45,
         shouldPlaceDotsAfterLineBreaks: false,
       },
     ),

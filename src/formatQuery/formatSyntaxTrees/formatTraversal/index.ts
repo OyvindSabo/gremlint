@@ -8,14 +8,19 @@ import {
   UnformattedTraversalSyntaxTree,
 } from '../../types';
 import { last, pipe, sum } from '../../utils';
-import { withHorizontalPosition, withIncreasedHorizontalPosition, withZeroIndentation } from '../utils';
+import { withIncreasedHorizontalPosition, withZeroIndentation } from '../utils';
 import { getStepGroups } from './getStepGroups';
+import { isTraversalSource } from './getStepGroups/utils';
 
 // Groups steps into step groups and adds a localIndentation property
 export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (config: GremlintInternalConfig) => (
   syntaxTree: UnformattedTraversalSyntaxTree,
 ): FormattedTraversalSyntaxTree => {
-  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(config.localIndentation)(syntaxTree).length;
+  const initialHorizontalPositionIndentationIncrease =
+    syntaxTree.steps[0] && isTraversalSource(syntaxTree.steps[0]) ? syntaxTree.initialHorizontalPosition : 0;
+  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(
+    config.localIndentation + initialHorizontalPositionIndentationIncrease,
+  )(syntaxTree).length;
   if (recreatedQueryLength <= config.maxLineLength) {
     return {
       type: TokenType.Traversal,

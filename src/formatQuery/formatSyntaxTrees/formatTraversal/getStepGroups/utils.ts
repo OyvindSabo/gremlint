@@ -1,7 +1,7 @@
 import { FormattedSyntaxTree, TokenType, UnformattedSyntaxTree } from '../../../types';
 import { STEP_MODULATORS } from '../../../consts';
 
-export const isTraversalSource = (step: FormattedSyntaxTree): boolean => {
+export const isTraversalSource = (step: UnformattedSyntaxTree | FormattedSyntaxTree): boolean => {
   return step.type === TokenType.Word && step.word === 'g';
 };
 

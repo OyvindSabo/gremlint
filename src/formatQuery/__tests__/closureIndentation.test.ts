@@ -94,4 +94,30 @@ by{ it.get().value('sell_price') -
     ),
   ).toBe(`profit = g.V().map({ it.get('sell_price') -
                      it.get('buy_price') }))`);
+
+  // Test that relative indentation is preserved between all lines within a closure when the method to which the closure is an argument is wrapped
+  expect(
+    formatQuery(
+      `g.V(ids).
+  has('factor_a').
+  has('factor_b').
+  project('Factor A', 'Factor B', 'Product').
+    by(values('factor_a')).
+    by(values('factor_b')).
+    by(map{ it.get().value('factor_a') *
+            it.get().value('factor_b') })`,
+      { indentation: 0, maxLineLength: 40, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V(ids).
+  has('factor_a').
+  has('factor_b').
+  project(
+    'Factor A',
+    'Factor B',
+    'Product').
+    by(values('factor_a')).
+    by(values('factor_b')).
+    by(
+      map{ it.get().value('factor_a') *
+           it.get().value('factor_b') })`);
 });

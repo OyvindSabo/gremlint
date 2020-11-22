@@ -9,6 +9,7 @@ import {
 } from '../types';
 import { last, pipe, sum } from '../utils';
 import {
+  withHorizontalPosition,
   withIncreasedHorizontalPosition,
   withIncreasedIndentation,
   withNoEndDotInfo,
@@ -60,7 +61,11 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
   // further down so the start dot can be placed after the indentation.
   const argumentGroups = syntaxTree.arguments.map((step) => [
     formatSyntaxTree(
-      pipe(withIncreasedIndentation(2), withZeroDotInfo, withIncreasedHorizontalPosition(method.width + 3))(config),
+      pipe(
+        withIncreasedIndentation(2),
+        withZeroDotInfo,
+        withHorizontalPosition(config.localIndentation + method.width),
+      )(config),
     )(step),
   ]);
   const lastArgumentGroup = last(argumentGroups);

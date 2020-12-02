@@ -27,7 +27,7 @@
     "query"
   ],
   "author": "Øyvind Sæbø",
-  "license": "SEE LICENCE IN LICENCE",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/OyvindSabo/gremlint/issues"
   },

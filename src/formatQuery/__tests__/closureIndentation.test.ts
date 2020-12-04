@@ -86,6 +86,40 @@ by{ it.get().value('sell_price') -
     where(gt(50)))`,
   );
 
+  expect(
+    formatQuery(
+      `g.V().filter(map{ one   = 1
+                  two   = 2
+                  three = 3 }))`,
+      { indentation: 0, maxLineLength: 35, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V().filter(map{ one   = 1
+                  two   = 2
+                  three = 3 }))`);
+  expect(
+    formatQuery(
+      `g.V().filter(map{ one   = 1
+                  two   = 2
+                  three = 3 }))`,
+      { indentation: 0, maxLineLength: 28, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V().
+  filter(map{ one   = 1
+              two   = 2
+              three = 3 }))`);
+  expect(
+    formatQuery(
+      `g.V().filter(map{ one   = 1
+              two   = 2
+              three = 3 }))`,
+      { indentation: 0, maxLineLength: 22, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V().
+  filter(
+    map{ one   = 1
+         two   = 2
+         three = 3 }))`);
+
   // Test that relative indentation is preserved between all the lines within a closure when not all tokens in a stepGroup are methods (for instance, g in g.V() adds to the width of the stepGroup even if it is not a method)
   expect(
     formatQuery(

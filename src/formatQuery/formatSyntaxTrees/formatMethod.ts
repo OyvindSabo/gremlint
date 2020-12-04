@@ -80,11 +80,7 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
   // further down so the start dot can be placed after the indentation.
   const argumentGroups = syntaxTree.arguments.map((step) => [
     formatSyntaxTree(
-      pipe(
-        withIncreasedIndentation(2),
-        withZeroDotInfo,
-        withHorizontalPosition(config.localIndentation + method.width),
-      )(config),
+      pipe(withIncreasedIndentation(2), withZeroDotInfo, withHorizontalPosition(config.localIndentation + 2))(config),
     )(step),
   ]);
   const lastArgumentGroup = last(argumentGroups);

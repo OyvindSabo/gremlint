@@ -110,8 +110,8 @@ by{ it.get().value('sell_price') -
   expect(
     formatQuery(
       `g.V().filter(map{ one   = 1
-              two   = 2
-              three = 3 }))`,
+                  two   = 2
+                  three = 3 }))`,
       { indentation: 0, maxLineLength: 22, shouldPlaceDotsAfterLineBreaks: false },
     ),
   ).toBe(`g.V().

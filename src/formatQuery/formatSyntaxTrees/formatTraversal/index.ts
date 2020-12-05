@@ -49,7 +49,7 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
           steps: syntaxTree.steps.reduce((steps, step, stepIndex) => {
             const formattedStep =
               stepIndex === 0
-                ? formatSyntaxTree(withIncreasedHorizontalPosition(syntaxTree.initialHorizontalPosition)(config))(step)
+                ? formatSyntaxTree(withIncreasedHorizontalPosition(0)(config))(step)
                 : // Since the traversal's steps will be on the same line, their horizontal position is increased by the
                   // steps's width plus the width of the dots between them
                   formatSyntaxTree(

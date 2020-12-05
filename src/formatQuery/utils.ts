@@ -30,3 +30,11 @@ export const neq = (a: unknown) => (b: unknown): boolean => a !== b;
 export const sum = (a: number, b: number): number => a + b;
 
 export const count = (array: any): number => array?.length ?? 0;
+
+export const choose = (
+  getCondition: (...params: any[]) => any,
+  getThen: (...params: any[]) => any,
+  getElse: (...params: any[]) => any,
+) => (...params: any[]) => {
+  return getCondition(...params) ? getThen(...params) : getElse(...params);
+};

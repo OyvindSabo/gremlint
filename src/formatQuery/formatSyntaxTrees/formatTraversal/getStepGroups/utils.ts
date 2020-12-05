@@ -17,8 +17,15 @@
  * under the License.
  */
 
-import { FormattedSyntaxTree, TokenType, UnformattedSyntaxTree } from '../../../types';
+import {
+  FormattedSyntaxTree,
+  GremlinStepGroup,
+  GremlintInternalConfig,
+  TokenType,
+  UnformattedSyntaxTree,
+} from '../../../types';
 import { STEP_MODULATORS } from '../../../consts';
+import recreateQueryOnelinerFromSyntaxTree from '../../../recreateQueryOnelinerFromSyntaxTree';
 
 export const isTraversalSource = (step: UnformattedSyntaxTree | FormattedSyntaxTree): boolean => {
   return step.type === TokenType.Word && step.word === 'g';
@@ -28,4 +35,90 @@ export const isModulator = (step: UnformattedSyntaxTree | FormattedSyntaxTree): 
   if (step.type !== TokenType.Method && step.type !== TokenType.Closure) return false;
   if (step.method.type !== TokenType.Word) return false;
   return STEP_MODULATORS.includes(step.method.word);
+};
+
+export const isStepFirstStepInStepGroup = ({ stepsInStepGroup }: { stepsInStepGroup: FormattedSyntaxTree[] }) => {
+  return !stepsInStepGroup.length;
+};
+
+const isLineTooLongWithSubsequentModulators = (config: GremlintInternalConfig) => (
+  {
+    stepsInStepGroup,
+    stepGroups,
+  }: {
+    stepsInStepGroup: FormattedSyntaxTree[];
+    stepGroups: GremlinStepGroup[];
+  },
+  step: UnformattedSyntaxTree,
+  index: number,
+  steps: UnformattedSyntaxTree[],
+) => {
+  const stepsWithSubsequentModulators = steps.slice(index + 1).reduce(
+    (aggregator, step) => {
+      const { stepsInStepGroup, hasReachedFinalModulator } = aggregator;
+      if (hasReachedFinalModulator) return aggregator;
+      if (isModulator(step)) {
+        return {
+          ...aggregator,
+          stepsInStepGroup: [...stepsInStepGroup, step],
+        };
+      }
+      return { ...aggregator, hasReachedFinalModulator: true };
+    },
+    {
+      stepsInStepGroup: [...stepsInStepGroup, step],
+      hasReachedFinalModulator: false,
+    },
+  ).stepsInStepGroup;
+
+  const stepGroupIndentationIncrease = (() => {
+    const traversalSourceIndentationIncrease = stepGroups[0] && isTraversalSource(stepGroups[0].steps[0]) ? 2 : 0;
+    const modulatorIndentationIncrease = isModulator([...stepsInStepGroup, step][0]) ? 2 : 0;
+    const indentationIncrease = traversalSourceIndentationIncrease + modulatorIndentationIncrease;
+    return indentationIncrease;
+  })();
+
+  const recreatedQueryWithSubsequentModulators = recreateQueryOnelinerFromSyntaxTree(
+    config.localIndentation + stepGroupIndentationIncrease,
+  )({
+    type: TokenType.Traversal,
+    steps: stepsWithSubsequentModulators,
+  });
+
+  const lineIsTooLongWithSubsequentModulators = recreatedQueryWithSubsequentModulators.length > config.maxLineLength;
+  return lineIsTooLongWithSubsequentModulators;
+};
+
+// If the first step in a group is a modulator, then it must also be the last step in the group
+export const shouldStepBeLastStepInStepGroup = (config: GremlintInternalConfig) => (
+  {
+    stepsInStepGroup,
+    stepGroups,
+  }: {
+    stepsInStepGroup: FormattedSyntaxTree[];
+    stepGroups: GremlinStepGroup[];
+  },
+  step: UnformattedSyntaxTree,
+  index: number,
+  steps: UnformattedSyntaxTree[],
+) => {
+  const isFirstStepInStepGroup = !stepsInStepGroup.length;
+
+  const isLastStep = index === steps.length - 1;
+  const nextStepIsModulator = !isLastStep && isModulator(steps[index + 1]);
+
+  const lineIsTooLongWithSubsequentModulators = isLineTooLongWithSubsequentModulators(config)(
+    { stepsInStepGroup, stepGroups },
+    step,
+    index,
+    steps,
+  );
+
+  // If the first step in a group is a modulator, then it must also be the last step in the group
+  const stepShouldBeLastStepInStepGroup =
+    isLastStep ||
+    (isFirstStepInStepGroup && isModulator(step)) ||
+    ((step.type === TokenType.Method || step.type === TokenType.Closure) &&
+      !(nextStepIsModulator && !lineIsTooLongWithSubsequentModulators));
+  return stepShouldBeLastStepInStepGroup;
 };

@@ -61,17 +61,17 @@ export const formatClosure = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (
 ): FormattedClosureSyntaxTree => {
   const { closureCodeBlock: unformattedClosureCodeBlock, method: unformattedMethod } = syntaxTree;
   const { localIndentation, horizontalPosition, maxLineLength, shouldEndWithDot } = config;
-  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(localIndentation)(syntaxTree).length;
+  const recreatedQuery = recreateQueryOnelinerFromSyntaxTree(localIndentation)(syntaxTree);
   const formattedMethod = formatSyntaxTree(withNoEndDotInfo(config))(unformattedMethod);
   const methodWidth = formattedMethod.width;
 
-  if (recreatedQueryLength <= maxLineLength) {
+  if (recreatedQuery.length <= maxLineLength) {
     return {
       type: TokenType.Closure,
       method: formattedMethod,
       closureCodeBlock: getFormattedClosureCodeBlock(unformattedClosureCodeBlock, horizontalPosition, methodWidth),
       localIndentation,
-      width: recreatedQueryLength,
+      width: recreatedQuery.trim().length,
       shouldStartWithDot: false,
       shouldEndWithDot: Boolean(shouldEndWithDot),
     };

@@ -130,7 +130,6 @@ by{ it.get().value('sell_price') -
   ).toBe(`g.V().where(map{ buyPrice  = it.get().value('buy_price');
                  sellPrice = it.get().value('sell_price');
                  sellPrice - buyPrice; }.is(gt(50)))`);
-
   expect(
     formatQuery(
       `g.V().where(map{ buyPrice  = it.get().value('buy_price');
@@ -142,7 +141,6 @@ by{ it.get().value('sell_price') -
   where(map{ buyPrice  = it.get().value('buy_price');
              sellPrice = it.get().value('sell_price');
              sellPrice - buyPrice; }.is(gt(50)))`);
-
   expect(
     formatQuery(
       `g.V().where(map{ buyPrice  = it.get().value('buy_price');
@@ -155,6 +153,54 @@ by{ it.get().value('sell_price') -
     map{ buyPrice  = it.get().value('buy_price');
          sellPrice = it.get().value('sell_price');
          sellPrice - buyPrice; }.is(gt(50)))`);
+
+  expect(
+    formatQuery(
+      `g.V().where(out().map{ buyPrice  = it.get().value('buy_price');
+                       sellPrice = it.get().value('sell_price');
+                       sellPrice - buyPrice; }.is(gt(50)))`,
+      { indentation: 0, maxLineLength: 60, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V().where(out().map{ buyPrice  = it.get().value('buy_price');
+                       sellPrice = it.get().value('sell_price');
+                       sellPrice - buyPrice; }.is(gt(50)))`);
+  expect(
+    formatQuery(
+      `g.V().where(out().map{ buyPrice  = it.get().value('buy_price');
+                       sellPrice = it.get().value('sell_price');
+                       sellPrice - buyPrice; }.is(gt(50)))`,
+      { indentation: 0, maxLineLength: 55, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V().
+  where(out().map{ buyPrice  = it.get().value('buy_price');
+                   sellPrice = it.get().value('sell_price');
+                   sellPrice - buyPrice; }.is(gt(50)))`);
+  expect(
+    formatQuery(
+      `g.V().where(out().map{ buyPrice  = it.get().value('buy_price');
+                       sellPrice = it.get().value('sell_price');
+                       sellPrice - buyPrice; }.is(gt(50)))`,
+      { indentation: 0, maxLineLength: 50, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V().
+  where(
+    out().map{ buyPrice  = it.get().value('buy_price');
+               sellPrice = it.get().value('sell_price');
+               sellPrice - buyPrice; }.is(gt(50)))`);
+  expect(
+    formatQuery(
+      `g.V().where(out().map{ buyPrice  = it.get().value('buy_price');
+                       sellPrice = it.get().value('sell_price');
+                       sellPrice - buyPrice; }.is(gt(50)))`,
+      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V().
+  where(
+    out().
+    map{ buyPrice  = it.get().value('buy_price');
+         sellPrice = it.get().value('sell_price');
+         sellPrice - buyPrice; }.
+    is(gt(50)))`);
 
   // Test that relative indentation is preserved between all the lines within a closure when not all tokens in a stepGroup are methods (for instance, g in g.V() adds to the width of the stepGroup even if it is not a method)
   expect(

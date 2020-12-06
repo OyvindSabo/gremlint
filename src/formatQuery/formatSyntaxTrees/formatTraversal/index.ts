@@ -37,10 +37,10 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
 ): FormattedTraversalSyntaxTree => {
   const initialHorizontalPositionIndentationIncrease =
     syntaxTree.steps[0] && isTraversalSource(syntaxTree.steps[0]) ? syntaxTree.initialHorizontalPosition : 0;
-  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(
+  const recreatedQuery = recreateQueryOnelinerFromSyntaxTree(
     config.localIndentation + initialHorizontalPositionIndentationIncrease,
-  )(syntaxTree).length;
-  if (recreatedQueryLength <= config.maxLineLength) {
+  )(syntaxTree);
+  if (recreatedQuery.length <= config.maxLineLength) {
     return {
       type: TokenType.Traversal,
       steps: syntaxTree.steps,
@@ -49,7 +49,7 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
           steps: syntaxTree.steps.reduce((steps, step, stepIndex) => {
             const formattedStep =
               stepIndex === 0
-                ? formatSyntaxTree(withIncreasedHorizontalPosition(0)(config))(step)
+                ? formatSyntaxTree(config)(step)
                 : // Since the traversal's steps will be on the same line, their horizontal position is increased by the
                   // steps's width plus the width of the dots between them
                   formatSyntaxTree(
@@ -68,7 +68,7 @@ export const formatTraversal = (formatSyntaxTree: GremlinSyntaxTreeFormatter) =>
       ],
       initialHorizontalPosition: syntaxTree.initialHorizontalPosition,
       localIndentation: 0,
-      width: recreatedQueryLength,
+      width: recreatedQuery.trim().length,
     };
   }
   const stepGroups = getStepGroups(formatSyntaxTree, syntaxTree.steps, config);

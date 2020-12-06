@@ -40,9 +40,9 @@ import {
 export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (config: GremlintInternalConfig) => (
   syntaxTree: UnformattedMethodSyntaxTree,
 ): FormattedMethodSyntaxTree => {
-  const recreatedQueryLength = recreateQueryOnelinerFromSyntaxTree(config.localIndentation)(syntaxTree).length;
+  const recreatedQuery = recreateQueryOnelinerFromSyntaxTree(config.localIndentation)(syntaxTree);
   const method = formatSyntaxTree(withNoEndDotInfo(config))(syntaxTree.method);
-  const argumentsWillNotBeWrapped = recreatedQueryLength <= config.maxLineLength;
+  const argumentsWillNotBeWrapped = recreatedQuery.length <= config.maxLineLength;
   if (argumentsWillNotBeWrapped) {
     return {
       type: TokenType.Method,
@@ -72,7 +72,7 @@ export const formatMethod = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (c
       localIndentation: config.localIndentation,
       shouldStartWithDot: false,
       shouldEndWithDot: Boolean(config.shouldEndWithDot),
-      width: recreatedQueryLength,
+      width: recreatedQuery.trim().length,
     };
   }
   // shouldEndWithDot has to reside on the method object, so the end dot can be

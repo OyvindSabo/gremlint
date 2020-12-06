@@ -31,7 +31,6 @@ import {
   UnformattedSyntaxTree,
 } from '../../../types';
 
-// TODO: Split this into smaller functions
 export const getStepGroups = (
   formatSyntaxTree: GremlinSyntaxTreeFormatter,
   steps: UnformattedSyntaxTree[],

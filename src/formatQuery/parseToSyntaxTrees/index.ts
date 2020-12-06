@@ -322,7 +322,9 @@ const getMethodTokenAndClosureCodeBlockFromClosureInvocation = (
   };
 };
 
-const parseCodeBlockToSyntaxTree = (fullCode: string) => (codeBlock: string): UnformattedSyntaxTree => {
+const parseCodeBlockToSyntaxTree = (fullCode: string, shouldCalculateInitialHorizontalPosition?: boolean) => (
+  codeBlock: string,
+): UnformattedSyntaxTree => {
   const tokens = tokenizeOnTopLevelPunctuation(codeBlock);
   if (tokens.length === 1) {
     const token = tokens[0];
@@ -356,7 +358,9 @@ const parseCodeBlockToSyntaxTree = (fullCode: string) => (codeBlock: string): Un
   return {
     type: TokenType.Traversal,
     steps: tokens.map(parseCodeBlockToSyntaxTree(fullCode)),
-    initialHorizontalPosition: fullCode.substr(0, fullCode.indexOf(codeBlock)).split('\n').slice(-1)[0].length,
+    initialHorizontalPosition: shouldCalculateInitialHorizontalPosition
+      ? fullCode.substr(0, fullCode.indexOf(codeBlock)).split('\n').slice(-1)[0].length
+      : 0,
   };
 };
 
@@ -375,7 +379,7 @@ export const parseToSyntaxTrees = (code: string): UnformattedSyntaxTree[] => {
         syntaxTrees: [
           ...state.syntaxTrees,
           parseNonGremlinCodeToSyntaxTree(nonGremlinCode),
-          parseCodeBlockToSyntaxTree(code)(query),
+          parseCodeBlockToSyntaxTree(code, true)(query),
         ],
         remainingCode: state.remainingCode.substr(indexOfQuery + query.length),
       };

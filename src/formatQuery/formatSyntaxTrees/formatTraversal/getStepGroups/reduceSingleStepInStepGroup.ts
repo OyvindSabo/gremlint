@@ -69,7 +69,7 @@ const reduceSingleStepInStepGroup = (formatSyntaxTree: GremlinSyntaxTreeFormatte
             pipe(
               withIndentation(localIndentation),
               withDotInfo({ shouldStartWithDot, shouldEndWithDot }),
-              withHorizontalPosition(localIndentation),
+              withHorizontalPosition(localIndentation + +config.shouldPlaceDotsAfterLineBreaks),
             )(config),
           )(step),
         ],

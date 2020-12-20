@@ -33,66 +33,43 @@ const getClosureLineOfCodeIndentation = (
   relativeIndentation: number,
   horizontalPosition: number,
   methodWidth: number,
-  dotsAfterLineBreaksIndentation: number,
   lineNumber: number,
 ) => {
   if (lineNumber === 0) return Math.max(relativeIndentation, 0);
-  return Math.max(relativeIndentation + horizontalPosition + methodWidth + dotsAfterLineBreaksIndentation + 1, 0);
+  return Math.max(relativeIndentation + horizontalPosition + methodWidth + 1, 0);
 };
 
-const getFormattedClosureLineOfCode = (
-  horizontalPosition: number,
-  methodWidth: number,
-  dotsAfterLineBreaksIndentation: number,
-) => ({ lineOfCode, relativeIndentation }: UnformattedClosureLineOfCode, lineNumber: number) => ({
+const getFormattedClosureLineOfCode = (horizontalPosition: number, methodWidth: number) => (
+  { lineOfCode, relativeIndentation }: UnformattedClosureLineOfCode,
+  lineNumber: number,
+) => ({
   lineOfCode,
   relativeIndentation,
-  localIndentation: getClosureLineOfCodeIndentation(
-    relativeIndentation,
-    horizontalPosition,
-    methodWidth,
-    dotsAfterLineBreaksIndentation,
-    lineNumber,
-  ),
+  localIndentation: getClosureLineOfCodeIndentation(relativeIndentation, horizontalPosition, methodWidth, lineNumber),
 });
 
 const getFormattedClosureCodeBlock = (
   unformattedClosureCodeBlock: UnformattedClosureCodeBlock,
   horizontalPosition: number,
   methodWidth: number,
-  dotsAfterLineBreaksIndentation: number,
 ) => {
-  return unformattedClosureCodeBlock.map(
-    getFormattedClosureLineOfCode(horizontalPosition, methodWidth, dotsAfterLineBreaksIndentation),
-  );
+  return unformattedClosureCodeBlock.map(getFormattedClosureLineOfCode(horizontalPosition, methodWidth));
 };
 
 export const formatClosure = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (config: GremlintInternalConfig) => (
   syntaxTree: UnformattedClosureSyntaxTree,
 ): FormattedClosureSyntaxTree => {
   const { closureCodeBlock: unformattedClosureCodeBlock, method: unformattedMethod } = syntaxTree;
-  const {
-    localIndentation,
-    horizontalPosition,
-    maxLineLength,
-    shouldEndWithDot,
-    shouldPlaceDotsAfterLineBreaks,
-  } = config;
+  const { localIndentation, horizontalPosition, maxLineLength, shouldEndWithDot } = config;
   const recreatedQuery = recreateQueryOnelinerFromSyntaxTree(localIndentation)(syntaxTree);
   const formattedMethod = formatSyntaxTree(withNoEndDotInfo(config))(unformattedMethod);
   const methodWidth = formattedMethod.width;
-  const dotsAfterLineBreaksIndentation = +shouldPlaceDotsAfterLineBreaks;
 
   if (recreatedQuery.length <= maxLineLength) {
     return {
       type: TokenType.Closure,
       method: formattedMethod,
-      closureCodeBlock: getFormattedClosureCodeBlock(
-        unformattedClosureCodeBlock,
-        horizontalPosition,
-        methodWidth,
-        dotsAfterLineBreaksIndentation,
-      ),
+      closureCodeBlock: getFormattedClosureCodeBlock(unformattedClosureCodeBlock, horizontalPosition, methodWidth),
       localIndentation,
       width: recreatedQuery.trim().length,
       shouldStartWithDot: false,
@@ -103,12 +80,7 @@ export const formatClosure = (formatSyntaxTree: GremlinSyntaxTreeFormatter) => (
   return {
     type: TokenType.Closure,
     method: formattedMethod,
-    closureCodeBlock: getFormattedClosureCodeBlock(
-      unformattedClosureCodeBlock,
-      horizontalPosition,
-      methodWidth,
-      dotsAfterLineBreaksIndentation,
-    ),
+    closureCodeBlock: getFormattedClosureCodeBlock(unformattedClosureCodeBlock, horizontalPosition, methodWidth),
     localIndentation: 0,
     width: 0,
     shouldStartWithDot: false,

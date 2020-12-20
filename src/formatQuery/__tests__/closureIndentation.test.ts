@@ -257,26 +257,7 @@ by{ it.get().value('sell_price') -
            it.get().value('factor_b') })`);
 
   // Test that relative indentation is preserved between all lines within a closure when dots are placed after line breaks
-  expect(
-    formatQuery(
-      `g.V(ids).
-  has('factor_a').
-  has('factor_b').
-  project('Factor A', 'Factor B', 'Product').
-    by(values('factor_a')).
-    by(values('factor_b')).
-    by(map{ it.get().value('factor_a') *
-            it.get().value('factor_b') })`,
-      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterLineBreaks: false },
-    ),
-  ).toBe(`g.V(ids).
-  has('factor_a').
-  has('factor_b').
-  project('Factor A', 'Factor B', 'Product').
-    by(values('factor_a')).
-    by(values('factor_b')).
-    by(map{ it.get().value('factor_a') *
-            it.get().value('factor_b') })`);
+  // When the whole query is long enough to wrap
   expect(
     formatQuery(
       `g.V(ids).
@@ -297,4 +278,72 @@ by{ it.get().value('sell_price') -
     .by(values('factor_b'))
     .by(map{ it.get().value('factor_a') *
              it.get().value('factor_b') })`);
+
+  // When the query is long enough to wrap, but the traversal containing the closure is not the first step in its step group and not long enough to wrap
+  expect(
+    formatQuery(
+      `g.V().where(out().map{ buyPrice  = it.get().value('buy_price');
+                       sellPrice = it.get().value('sell_price');
+                       sellPrice - buyPrice; })`,
+      { indentation: 0, maxLineLength: 50, shouldPlaceDotsAfterLineBreaks: true },
+    ),
+  ).toBe(`g.V().where(out().map{ buyPrice  = it.get().value('buy_price');
+                       sellPrice = it.get().value('sell_price');
+                       sellPrice - buyPrice; })`);
+
+  // When the query is long enough to wrap, but the traversal containing the closure is the first step in its step group and not long enough to wrap
+  expect(
+    formatQuery(
+      `g.V().where(out().map{ buyPrice  = it.get().value('buy_price');
+                       sellPrice = it.get().value('sell_price');
+                       sellPrice - buyPrice; }.is(gt(50)))`,
+      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterLineBreaks: true },
+    ),
+  ).toBe(`g.V()
+  .where(
+    out()
+    .map{ buyPrice  = it.get().value('buy_price');
+          sellPrice = it.get().value('sell_price');
+          sellPrice - buyPrice; }
+    .is(gt(50)))`);
+
+  // When the query is long enough to wrap, but the traversal containing the closure is the first step in its traversal and not long enough to wrap
+  expect(
+    formatQuery(
+      `g.V(ids).
+  has('factor_a').
+  has('factor_b').
+  project('Factor A', 'Factor B', 'Product').
+    by(values('factor_a')).
+    by(values('factor_b')).
+    by(map{ it.get().value('factor_a') *
+            it.get().value('factor_b') })`,
+      { indentation: 0, maxLineLength: 40, shouldPlaceDotsAfterLineBreaks: true },
+    ),
+  ).toBe(`g.V(ids)
+  .has('factor_a')
+  .has('factor_b')
+  .project(
+    'Factor A',
+    'Factor B',
+    'Product')
+    .by(values('factor_a'))
+    .by(values('factor_b'))
+    .by(
+      map{ it.get().value('factor_a') *
+           it.get().value('factor_b') })`);
+
+  // When the whole query is short enough to not wrap
+  expect(
+    formatQuery(
+      `g.V().map({ it.get('sell_price') -
+            it.get('buy_price') }))`,
+      {
+        indentation: 0,
+        maxLineLength: 35,
+        shouldPlaceDotsAfterLineBreaks: true,
+      },
+    ),
+  ).toBe(`g.V().map({ it.get('sell_price') -
+            it.get('buy_price') }))`);
 });

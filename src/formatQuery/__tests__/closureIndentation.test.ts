@@ -255,4 +255,46 @@ by{ it.get().value('sell_price') -
     by(
       map{ it.get().value('factor_a') *
            it.get().value('factor_b') })`);
+
+  // Test that relative indentation is preserved between all lines within a closure when dots are placed after line breaks
+  expect(
+    formatQuery(
+      `g.V(ids).
+  has('factor_a').
+  has('factor_b').
+  project('Factor A', 'Factor B', 'Product').
+    by(values('factor_a')).
+    by(values('factor_b')).
+    by(map{ it.get().value('factor_a') *
+            it.get().value('factor_b') })`,
+      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterLineBreaks: false },
+    ),
+  ).toBe(`g.V(ids).
+  has('factor_a').
+  has('factor_b').
+  project('Factor A', 'Factor B', 'Product').
+    by(values('factor_a')).
+    by(values('factor_b')).
+    by(map{ it.get().value('factor_a') *
+            it.get().value('factor_b') })`);
+  expect(
+    formatQuery(
+      `g.V(ids).
+  has('factor_a').
+  has('factor_b').
+  project('Factor A', 'Factor B', 'Product').
+    by(values('factor_a')).
+    by(values('factor_b')).
+    by(map{ it.get().value('factor_a') *
+            it.get().value('factor_b') })`,
+      { indentation: 0, maxLineLength: 45, shouldPlaceDotsAfterLineBreaks: true },
+    ),
+  ).toBe(`g.V(ids)
+  .has('factor_a')
+  .has('factor_b')
+  .project('Factor A', 'Factor B', 'Product')
+    .by(values('factor_a'))
+    .by(values('factor_b'))
+    .by(map{ it.get().value('factor_a') *
+             it.get().value('factor_b') })`);
 });

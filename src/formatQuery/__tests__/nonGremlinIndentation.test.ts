@@ -19,6 +19,7 @@
 
 import { formatQuery } from '..';
 
+// TODO: These tests seem related to those in closureIndentation.test.ts, so it might be worth checking if they can be merged.
 test('Both top-level and inlined non-Gremlin code should be indented together with the Gremlin query', () => {
   // Test that top-level and inlined non-Gremlin code are not indented when indentation is 0
   expect(
